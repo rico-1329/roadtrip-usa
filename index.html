@@ -3143,10 +3143,7 @@ function highlightTripItem(itemId) {
 }
 
 function openTrip() {
-  // Masquer TOUTES les vues
-  ['timeline-view','compte-amis-view','checklist-view','mappro-view','chat-view','logs-view'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.style.display = 'none';
-  });
+  _hideAllViews();
   // Fermer Map Pro proprement
   if (_mapProInstance) { _mapProInstance.remove(); _mapProInstance = null; }
   document.removeEventListener('keydown', _mapProKeyHandler);
