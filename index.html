@@ -2209,6 +2209,9 @@ function closeModal() {
   _leavePresence(); // Quitter le canal de présence
   if (driveMapInstance) { driveMapInstance.remove(); driveMapInstance = null; }
 
+  // Retour à la vue précédente
+  if (!_openedFromMap) { _showTimeline(); }
+
   if (_openedFromMap) {
     _openedFromMap = false;
     const idxToFocus = _lastModalIdx;
