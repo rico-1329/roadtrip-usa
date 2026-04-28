@@ -1493,6 +1493,10 @@ async function openModal(idx) {
   // Annoncer la présence sur cette fiche
   _announcePresence(storageKey(idx));
 
+  // Afficher la vue modale
+  const _moEl = document.getElementById('modal-overlay');
+  _moEl.style.cssText = 'display:block;position:fixed;inset:0;top:44px;background:var(--sand);z-index:600;overflow-y:auto;opacity:1;pointer-events:all;';
+
   // Maintenant construire le contenu avec les données fraîches
   _renderModalContent(idx);
 }
