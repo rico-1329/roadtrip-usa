@@ -546,7 +546,7 @@
   #app>header{display:none;}
 
   /* ADMIN PANEL */
-  #admin-overlay{position:fixed;inset:0;background:rgba(26,22,16,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .2s;opacity:1;pointer-events:all;}
+  #admin-overlay{position:fixed;inset:0;background:rgba(26,22,16,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .2s;}
   #admin-overlay.open{opacity:1;pointer-events:all;}
   #admin-panel{background:var(--sand);border-radius:16px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(12px);transition:transform .2s;}
   #admin-overlay.open #admin-panel{transform:translateY(0);}
@@ -9145,7 +9145,7 @@ function openAdmin() {
   if (_tripMap) { _tripMap.remove(); _tripMap = null; }
   document.getElementById('fab-btn').style.display = 'none';
   const fw = document.querySelector('.filters-wrap'); if (fw) fw.style.display = 'none';
-  const _ao = document.getElementById('admin-overlay'); _ao.style.display = 'block'; _ao.style.opacity = '1'; _ao.style.pointerEvents = 'all';
+  document.getElementById('admin-overlay').style.cssText = 'display:block;position:fixed;inset:0;top:44px;background:var(--sand);z-index:600;overflow-y:auto;opacity:1;pointer-events:all;';
   ['nav-timeline-btn','nav-trip-btn','nav-ca-btn','nav-checklist-btn','nav-mappro-btn','nav-chat-btn','nav-logs-btn','nav-resa-btn'].forEach(id => {
     document.getElementById(id)?.classList.remove('active');
   });
