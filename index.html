@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
+<html lang="fr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Road Trip USA — Été 2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
   :root {
     --sand:#F5F0E8; --sand-dark:#EAE3D2;
@@ -67,6 +67,17 @@
   .fbadge.info{background:var(--teal-pale);color:var(--teal);}
   .search-box{margin-left:auto;font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 12px;border:1px solid var(--sand-dark);border-radius:20px;background:white;color:var(--ink);outline:none;width:180px;transition:border-color .15s;}
   .search-box:focus{border-color:var(--amber);}
+
+  /* DÉPÔT DE GARANTIE */
+  .garantie-bloc{background:white;border:.5px solid var(--sand-dark);border-left:3px solid var(--slate);border-radius:10px;padding:.85rem 1rem;}
+  .garantie-bloc.verse{border-left-color:var(--amber);}
+  .garantie-bloc.restitue{border-left-color:var(--green);}
+  .garantie-status-row{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;flex-wrap:wrap;}
+  .garantie-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;}
+  .garantie-badge.attente{background:var(--slate-pale);color:var(--slate);}
+  .garantie-badge.verse{background:var(--amber-pale);color:var(--amber);}
+  .garantie-badge.restitue{background:var(--green-pale);color:var(--green);}
+  .garantie-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 
   /* FULLSCREEN MODE */
   body.fullscreen .filters-wrap{top:44px;}
@@ -683,13 +694,13 @@
     <div class="auth-countdown">
       <span class="auth-countdown-label">✈️ Départ Marseille dans</span>
       <div class="auth-countdown-units" id="auth-cd-units">
-        <div class="auth-countdown-unit"><span class="auth-countdown-val" id="acd-days">–</span><span class="auth-countdown-lbl">jours</span></div>
+        <div class="auth-countdown-unit"><span class="auth-countdown-val" id="acd-days">72</span><span class="auth-countdown-lbl">jours</span></div>
         <span class="auth-countdown-sep">:</span>
-        <div class="auth-countdown-unit"><span class="auth-countdown-val" id="acd-hours">–</span><span class="auth-countdown-lbl">h</span></div>
+        <div class="auth-countdown-unit"><span class="auth-countdown-val" id="acd-hours">08</span><span class="auth-countdown-lbl">h</span></div>
         <span class="auth-countdown-sep">:</span>
-        <div class="auth-countdown-unit"><span class="auth-countdown-val" id="acd-mins">–</span><span class="auth-countdown-lbl">min</span></div>
+        <div class="auth-countdown-unit"><span class="auth-countdown-val" id="acd-mins">42</span><span class="auth-countdown-lbl">min</span></div>
         <span class="auth-countdown-sep">:</span>
-        <div class="auth-countdown-unit"><span class="auth-countdown-val" id="acd-secs">–</span><span class="auth-countdown-lbl">sec</span></div>
+        <div class="auth-countdown-unit"><span class="auth-countdown-val" id="acd-secs">38</span><span class="auth-countdown-lbl">sec</span></div>
       </div>
       <span class="auth-countdown-sub">LH2267 · 28 juil. 03h35</span>
     </div>
@@ -719,7 +730,7 @@
     </script>
     <div class="auth-field">
       <label>Email</label>
-      <input type="email" id="auth-email" placeholder="votre@email.com" autocomplete="email">
+      <input type="email" id="auth-email" placeholder="votre@email.com" autocomplete="email" value="bernarderic29@gmail.com">
     </div>
     <div class="auth-field">
       <label>Mot de passe</label>
@@ -732,15 +743,12 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.2 · 27/04/26</span>
-      <button onclick="openAboutModal()" title="À propos de Roadtrip USA"
-        style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;"
-        onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'"
-        onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.3 · 16/05/26</span>
+      <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
   </div>
-</div>
+
 
 <!-- APP (masqué jusqu'à connexion) -->
 <div id="app" style="display:none">
@@ -783,9 +791,7 @@
     <button class="nav-item" id="nav-chat-btn" onclick="openChat();closeMenu()">
       <span class="nav-item-icon">💬</span> Chat
     </button>
-    <button class="nav-item" id="nav-logs-btn" onclick="openLogs();closeMenu()">
-      <span class="nav-item-icon">📋</span> Logs
-    </button>
+    <button class="nav-item" id="nav-logs-btn" onclick="openLogs();closeMenu()"><span class="nav-item-icon">⚠️</span> Logs <span style="font-size:9px;background:var(--amber);color:white;padding:1px 6px;border-radius:8px;margin-left:4px;">1</span></button>
     <button class="nav-item" id="nav-admin-btn" onclick="openAdmin();closeMenu()" style="display:none;">
       <span class="nav-item-icon">⚙️</span> Administration
     </button>
@@ -902,9 +908,9 @@
         <span style="font-size:9px;opacity:.5;margin-left:4px;">▼</span>
       </button>
       <div class="multi-select-dropdown" id="alert-filter-dropdown">
-        <label class="msd-option"><input type="checkbox" value="urgent" onchange="applyAlertFilter()"> 🔴 Annulations <span class="fbadge urgent" id="badge-urgent" style="margin-left:auto;">…</span></label>
-        <label class="msd-option"><input type="checkbox" value="missing" onchange="applyAlertFilter()"> 🟡 Non confirmés <span class="fbadge missing" id="badge-missing" style="margin-left:auto;">…</span></label>
-        <label class="msd-option"><input type="checkbox" value="info" onchange="applyAlertFilter()"> 🔵 Remarques <span class="fbadge info" id="badge-info" style="margin-left:auto;">…</span></label>
+        <label class="msd-option"><input type="checkbox" value="urgent" onchange="applyAlertFilter()"> 🔴 Annulations <span class="fbadge urgent" id="badge-urgent" style="margin-left:auto;">18</span></label>
+        <label class="msd-option"><input type="checkbox" value="missing" onchange="applyAlertFilter()"> 🟡 Non confirmés <span class="fbadge missing" id="badge-missing" style="margin-left:auto;">3</span></label>
+        <label class="msd-option"><input type="checkbox" value="info" onchange="applyAlertFilter()"> 🔵 Remarques <span class="fbadge info" id="badge-info" style="margin-left:auto;">7</span></label>
         <div class="msd-sep"></div>
         <button class="msd-reset" onclick="resetAlertFilter()">Toutes les alertes</button>
       </div>
@@ -919,19 +925,793 @@
 <main>
   <aside style="display:none;">
     <div style="display:none" id="sidebar-alerts"></div>
-    <div style="display:none" id="budget-list"></div>
-    <div style="display:none" id="budget-totals"></div>
+    <div style="display:none" id="budget-list"><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Jackson</span>
+        <span class="budget-price" style="font-size:11px;">375 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Yellowstone / Grand Teton</span>
+        <span class="budget-price" style="font-size:11px;">723 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Montpelier OU Rock Springs</span>
+        <span class="budget-price" style="font-size:11px;">164 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Randonnée ?</span>
+        <span class="budget-price" style="font-size:11px;">0 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Moab / Arches</span>
+        <span class="budget-price" style="font-size:11px;">377 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Monument Valley</span>
+        <span class="budget-price" style="font-size:11px;">390 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Page / Lac Powell</span>
+        <span class="budget-price" style="font-size:11px;">251 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Bryce Canyon / Zion</span>
+        <span class="budget-price" style="font-size:11px;">149 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Kanab</span>
+        <span class="budget-price" style="font-size:11px;">100 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Grand Canyon</span>
+        <span class="budget-price" style="font-size:11px;">147 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Williams / Seligman OU Kingman</span>
+        <span class="budget-price" style="font-size:11px;">104 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Las Vegas</span>
+        <span class="budget-price" style="font-size:11px;">317 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Death Valley</span>
+        <span class="budget-price" style="font-size:11px;">189 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Los Angeles</span>
+        <span class="budget-price" style="font-size:11px;">387 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Solvang</span>
+        <span class="budget-price" style="font-size:11px;">148 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">Monterey</span>
+        <span class="budget-price" style="font-size:11px;">192 €</span>
+      </div>
+      
+    </div><div class="budget-item" style="flex-direction:column;gap:3px;padding:6px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="budget-city">San Francisco</span>
+        <span class="budget-price" style="font-size:11px;">302 €</span>
+      </div>
+      
+    </div></div>
+    <div style="display:none" id="budget-totals">
+    <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--ink);">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:4px;">
+        <span>Budget total</span><span>4 315 €</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--green);margin-bottom:3px;">
+        <span>Réglé</span><span>0 €</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--red);">
+        <span>Reste à payer</span><span>4 315 €</span>
+      </div>
+      <div style="height:4px;background:var(--sand-dark);border-radius:2px;overflow:hidden;margin-top:8px;">
+        <div style="height:100%;width:0%;background:var(--amber);border-radius:2px;transition:width .3s;"></div>
+      </div>
+    </div></div>
   </aside>
   <div>
-    <div class="result-count" id="result-count"></div>
-    <div class="timeline" id="timeline"></div>
+    <div class="result-count" id="result-count">17 hébergements · 20 trajets &amp; transports</div>
+    <div class="timeline" id="timeline"><div class="day-separator"><div class="day-separator-node">J+0</div><span class="day-separator-label">mar. 28 juil.</span><div class="day-separator-line"></div></div><div class="entry" id="step-0"><div class="marker flight"></div>
+        <div class="flight-step-card">
+          <div class="flight-step-header">
+            <div class="flight-step-title">✈️ Vol aller</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div class="flight-step-date">28 juil.</div>
+              <button class="btn-fiche" data-fiche-idx="0" onclick="openModal(0)">
+    📋 Fiche
+  </button>
+            </div>
+          </div>
+          <div class="flight-step-summary">
+            <span class="flight-step-sumroute">MRS → MUC → DEN → JAC</span>
+            <span class="flight-step-sumstops">3 vols</span>
+          </div>
+          <div class="flight-step-tags">
+            <span class="flight-step-tag ref">ZKUZPE</span>
+            <span class="flight-step-tag">ETKT 220 6059505613-14</span>
+            <span class="flight-step-tag">1 bagage 23 kg</span>
+          </div>
+          <button class="flight-toggle" onclick="toggleFlightChildren('flight-children-0','flight-toggle-icon-0','flight-toggle-lbl-0')">
+            <span class="flight-toggle-icon" id="flight-toggle-icon-0">▶</span>
+            <span id="flight-toggle-lbl-0">Voir le détail des vols (3 segments)</span>
+          </button>
+          <div class="flight-children" id="flight-children-0">
+            
+        <div class="flight-child-wrap">
+          <div class="flight-child-connector">
+            <div class="flight-child-connector-dot"></div>
+            <div class="flight-child-connector-line"></div>
+          </div>
+          <div class="flight-child-card" id="seg-card-seg_0_0">
+            <div class="flight-child-head">
+              <span class="flight-child-num">LH 2267</span>
+              <span class="flight-child-route">MRS → MUC</span>
+              <button class="flight-child-btn" id="seg-btn-seg_0_0" onclick="openSegModal(0,0)" title="Fiche de ce vol">📋 Fiche</button>
+            </div>
+            <div class="flight-child-times">
+              <span class="flight-child-dep">06:05</span>
+              <span style="opacity:.3">→</span>
+              <span class="flight-child-arr">07:40</span>
+              <span style="margin-left:auto;opacity:.4">⏱ 1h35</span>
+            </div>
+            <div class="flight-child-tags">
+              <span class="flight-child-tag">A319</span>
+              <span class="flight-child-tag">Boissons à la vente</span>
+            </div>
+            <div class="flight-child-qr" onclick="openSegModal(0,0)" id="qr-seg_0_0">
+              <div class="flight-child-qr-icon">▣</div>
+              <div class="flight-child-qr-text">Carte d'embarquement / QR code<br><span style="font-size:10px;opacity:.6">Cliquer pour ajouter</span></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flight-layover-chip" style="margin-left:20px;">
+          <span>⏳</span><span>Escale MUC · Escale 3h25</span>
+        </div>
+        <div class="flight-child-wrap">
+          <div class="flight-child-connector">
+            <div class="flight-child-connector-dot"></div>
+            <div class="flight-child-connector-line"></div>
+          </div>
+          <div class="flight-child-card" id="seg-card-seg_0_1">
+            <div class="flight-child-head">
+              <span class="flight-child-num">LH 480</span>
+              <span class="flight-child-route">MUC → DEN</span>
+              <button class="flight-child-btn" id="seg-btn-seg_0_1" onclick="openSegModal(0,1)" title="Fiche de ce vol">📋 Fiche</button>
+            </div>
+            <div class="flight-child-times">
+              <span class="flight-child-dep">11:05</span>
+              <span style="opacity:.3">→</span>
+              <span class="flight-child-arr">13:45</span>
+              <span style="margin-left:auto;opacity:.4">⏱ 10h40</span>
+            </div>
+            <div class="flight-child-tags">
+              <span class="flight-child-tag">A380-800</span>
+              <span class="flight-child-tag">Repas inclus</span>
+            </div>
+            <div class="flight-child-qr" onclick="openSegModal(0,1)" id="qr-seg_0_1">
+              <div class="flight-child-qr-icon">▣</div>
+              <div class="flight-child-qr-text">Carte d'embarquement / QR code<br><span style="font-size:10px;opacity:.6">Cliquer pour ajouter</span></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flight-layover-chip" style="margin-left:20px;">
+          <span>⏳</span><span>Escale DEN · Escale 2h35</span>
+        </div>
+        <div class="flight-child-wrap">
+          <div class="flight-child-connector">
+            <div class="flight-child-connector-dot"></div>
+            
+          </div>
+          <div class="flight-child-card" id="seg-card-seg_0_2">
+            <div class="flight-child-head">
+              <span class="flight-child-num">LH 8734 (UA 2200)</span>
+              <span class="flight-child-route">DEN → JAC</span>
+              <button class="flight-child-btn" id="seg-btn-seg_0_2" onclick="openSegModal(0,2)" title="Fiche de ce vol">📋 Fiche</button>
+            </div>
+            <div class="flight-child-times">
+              <span class="flight-child-dep">16:20</span>
+              <span style="opacity:.3">→</span>
+              <span class="flight-child-arr">17:53</span>
+              <span style="margin-left:auto;opacity:.4">⏱ 1h33</span>
+            </div>
+            <div class="flight-child-tags">
+              <span class="flight-child-tag">A320</span>
+              <span class="flight-child-tag">Pas de repas</span>
+            </div>
+            <div class="flight-child-qr" onclick="openSegModal(0,2)" id="qr-seg_0_2">
+              <div class="flight-child-qr-icon">▣</div>
+              <div class="flight-child-qr-text">Carte d'embarquement / QR code<br><span style="font-size:10px;opacity:.6">Cliquer pour ajouter</span></div>
+            </div>
+          </div>
+        </div>
+        
+          </div>
+          <div class="card-alerts"><div class="alert-pill info">
+      <span class="pill-icon">🔵</span>
+      <div><span class="pill-label">Récupération du véhicule à l'arrivée</span><span class="pill-detail">Budget JAC · 18h00 · 1250 E Airport Road</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-1"><div class="marker carpick"></div>
+        <div class="car-pickup-card">
+          <div class="car-pickup-header">
+            <div class="car-pickup-city">🚗 Prise en charge du véhicule</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+              <div class="car-pickup-date">28 juil. · 18h00</div>
+              <button class="btn-fiche has-data" data-fiche-idx="1" onclick="openModal(1)">
+    📋 Fiche
+  </button>
+            </div>
+          </div>
+          <div class="car-pickup-sub">Budget · Volkswagen Passat ou similaire</div>
+          <div class="car-pickup-addr">📍 1250 E Airport Road, Jackson, WY 83001</div>
+          <div class="car-pickup-tags">
+            <span class="car-pickup-tag ref">Réf. 35554355FR4</span>
+            <span class="car-pickup-tag">BSP 8878530806</span>
+            <span class="car-pickup-tag">Allianz 950476</span>
+            <span class="car-pickup-tag">Dépôt 200 €</span>
+          </div>
+          <div class="card-alerts"><div class="alert-pill info">
+      <span class="pill-icon">🔵</span>
+      <div><span class="pill-label">Premier plein inclus</span><span class="pill-detail">Restituer le véhicule réservoir vide à San Francisco (SFO)</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-2"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(2)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Budget JAC · Airport Road <span style="opacity:.4;margin:0 2px">→</span> Elk Country Inn Jackson</span>
+            <span class="drive-pill-meta">⏱ 0h20 · 13 km</span>
+            
+          </div>
+          
+        </div></div><div class="entry" id="step-3"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Jackson, Wyoming</div>
+            </div>
+            <div class="card-date">28 juil.</div>
+            <button class="btn-fiche has-data" data-fiche-idx="3" onclick="openModal(3)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">Elk Country Inn Jackson ★</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">375 €</span><span class="tag tag-ptdej">🍳 Petit-déj</span><span class="tag tag-annul">Annulation avant le 25 juillet</span><span class="tag tag-visit">🗺 Centre-ville (arcs en bois de cerf, boutiques western),…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"><span class="tag" style="background:var(--slate-pale);color:var(--slate)">Carte bancaire</span><span class="tag" style="background:var(--amber-pale);color:var(--amber)">👤 Éric</span><span class="tag" style="background:var(--amber-pale);color:var(--amber)">📝 Note</span></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation imminente</span><span class="pill-detail">Date limite : 25 juillet</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-4"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(4)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Jackson <span style="opacity:.4;margin:0 2px">→</span> Yellowstone / Grand Teton</span>
+            <span class="drive-pill-meta">⏱ 1h30 · 100 km</span>
+            <span style="font-size:10px;opacity:.5;margin-left:4px;">📋</span>
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+1</div><span class="day-separator-label">mer. 29 juil.</span><div class="day-separator-line"></div></div><div class="entry" id="step-5"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Yellowstone / Grand Teton, Wyoming</div>
+            </div>
+            <div class="card-date">29 juil. – 1er août</div>
+            <button class="btn-fiche" data-fiche-idx="5" onclick="openModal(5)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">Best Western Weston Inn ★</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">723 €</span><span class="tag tag-nights">3 nuits</span><span class="tag tag-ptdej">🍳 Petit-déj</span><span class="tag tag-annul">Annulation avant le 20 juillet</span><span class="tag tag-visit">🗺 Old Faithful, Grand Prismatic Spring, Grand Canyon de Y…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Date limite possiblement dépassée</span><span class="pill-detail">Annulation avant le 20 juillet — à vérifier d'urgence</span></div>
+    </div></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+4</div><span class="day-separator-label">sam. 1 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-6"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Montpelier OU Rock Springs, Wyoming</div>
+            </div>
+            <div class="card-date">1er août</div>
+            <button class="btn-fiche" data-fiche-idx="6" onclick="openModal(6)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">⚠️ CHOIX À FAIRE : Montpelier (opt. 1) / Four Points by Sheraton Rock Springs (opt. 2)</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">164 €</span><span class="tag tag-ptdej">🍳 Petit-déj</span><span class="tag tag-annul">Annulation avant le 29 juillet</span><span class="tag tag-visit">🗺 Oxbow Bend, Jenny Lake, Schwabacher Landing, Snake Rive…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">⚠️ Choix à réaliser</span><span class="pill-detail">Option 1 : Montpelier (pas d'hôtel défini) — Option 2 : Four Points Sheraton Rock Springs (102€) — décider et réserver</span></div>
+    </div><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation proche</span><span class="pill-detail">Date limite : 29 juillet</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-7"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(7)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Étape nuit <span style="opacity:.4;margin:0 2px">→</span> Moab / Arches</span>
+            <span class="drive-pill-meta">⏱ 4h30 · 238 km</span>
+            
+          </div>
+          
+        </div></div><div class="entry" id="step-8"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Randonnée ?</div>
+            </div>
+            <div class="card-date">1 août</div>
+            <button class="btn-fiche has-data" data-fiche-idx="8" onclick="openModal(8)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">🗺 Visite</div>
+          <div class="card-tags"><span class="tag tag-visit">🗺 Randonnée</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"><span class="tag" style="background:var(--amber-pale);color:var(--amber)">📝 Note</span></div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+5</div><span class="day-separator-label">dim. 2 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-9"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Moab / Arches, Utah</div>
+            </div>
+            <div class="card-date">2 – 3 août</div>
+            <button class="btn-fiche" data-fiche-idx="9" onclick="openModal(9)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">Hyatt Place (4 places)</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">377 €</span><span class="tag tag-nights">2 nuits</span><span class="tag tag-ptdej">🍳 Petit-déj</span><span class="tag tag-annul">Annulation avant le 29 juillet</span><span class="tag tag-visit">🗺 Delicate Arch, Landscape Arch &amp; Devils Garden, Canyonla…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation imminente</span><span class="pill-detail">Date limite : 29 juillet</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-10"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(10)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Moab <span style="opacity:.4;margin:0 2px">→</span> Monument Valley</span>
+            <span class="drive-pill-meta">⏱ 2h29 · 204 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+7</div><span class="day-separator-label">mar. 4 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-11"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Monument Valley, Arizona</div>
+            </div>
+            <div class="card-date">4 août</div>
+            <button class="btn-fiche" data-fiche-idx="11" onclick="openModal(11)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">The View Hotel</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">390 €</span><span class="tag tag-visit">🗺 Tour 4x4 Navajo, Mittens &amp; Merrick Butte, Forrest Gump …</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill missing">
+      <span class="pill-icon">🟡</span>
+      <div><span class="pill-label">Politique d'annulation manquante</span><span class="pill-detail">Aucune date limite renseignée — contacter l'hôtel</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-12"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(12)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Monument Valley <span style="opacity:.4;margin:0 2px">→</span> Page / Antelope Canyon</span>
+            <span class="drive-pill-meta">⏱ 3h16 · 145 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+8</div><span class="day-separator-label">mer. 5 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-13"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Page / Lac Powell, Arizona</div>
+            </div>
+            <div class="card-date">5 – 6 août</div>
+            <button class="btn-fiche" data-fiche-idx="13" onclick="openModal(13)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">Days Inn &amp; Suites by Wyndham</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">251 €</span><span class="tag tag-nights">2 nuits</span><span class="tag tag-ptdej">🍳 Petit-déj</span><span class="tag tag-annul">Annulation avant le 4 août</span><span class="tag tag-visit">🗺 Lower Antelope Canyon (déjà réservé), Upper Antelope Ca…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation proche</span><span class="pill-detail">Date limite : 4 août</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-14"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(14)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Page <span style="opacity:.4;margin:0 2px">→</span> Bryce Canyon / Zion</span>
+            <span class="drive-pill-meta">⏱ 2h55 · 251 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+10</div><span class="day-separator-label">ven. 7 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-15"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Bryce Canyon / Zion, Utah</div>
+            </div>
+            <div class="card-date">7 août</div>
+            <button class="btn-fiche" data-fiche-idx="15" onclick="openModal(15)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">Bryce Pioneer Village ★</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">149 €</span><span class="tag tag-annul">Annulation avant le 6 août</span><span class="tag tag-visit">🗺 Navajo Loop + Queen's Garden, lever de soleil Sunrise P…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation proche</span><span class="pill-detail">Date limite : 6 août</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-16"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(16)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Bryce Canyon <span style="opacity:.4;margin:0 2px">→</span> Kanab</span>
+            <span class="drive-pill-meta">⏱ 1h00 · 80 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+11</div><span class="day-separator-label">sam. 8 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-17"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Kanab, Utah</div>
+            </div>
+            <div class="card-date">8 août</div>
+            <button class="btn-fiche" data-fiche-idx="17" onclick="openModal(17)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">La Quinta by Wyndham Kanab</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">100 €</span><span class="tag tag-visit">🗺 Best Friends Animal Sanctuary, The Wave (permis requis)…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill missing">
+      <span class="pill-icon">🟡</span>
+      <div><span class="pill-label">Politique d'annulation manquante</span><span class="pill-detail">À confirmer · Passage possible à Zion (50 km)</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-18"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(18)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Kanab <span style="opacity:.4;margin:0 2px">→</span> Grand Canyon / Seligman</span>
+            <span class="drive-pill-meta">⏱ 4h30 · 210 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+12</div><span class="day-separator-label">dim. 9 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-19"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Grand Canyon, Arizona</div>
+            </div>
+            <div class="card-date">9 août</div>
+            <button class="btn-fiche" data-fiche-idx="19" onclick="openModal(19)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">Grand Canyon Hotel &amp; Suites ★</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">147 €</span><span class="tag tag-ptdej">🍳 Petit-déj</span><span class="tag tag-annul">Annulation avant le 3 août</span><span class="tag tag-visit">🗺 Grand Canyon South Rim, Bright Angel Trail, Seligman (R…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation imminente</span><span class="pill-detail">Date limite : 3 août</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-20"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(20)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Grand Canyon <span style="opacity:.4;margin:0 2px">→</span> Williams / Kingman</span>
+            <span class="drive-pill-meta">⏱ 1h00 · 100 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+13</div><span class="day-separator-label">lun. 10 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-21"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Williams / Seligman OU Kingman, Arizona</div>
+            </div>
+            <div class="card-date">10 août</div>
+            <button class="btn-fiche" data-fiche-idx="21" onclick="openModal(21)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">⚠️ CHOIX À FAIRE : Howard Johnson Williams (opt. 1) / Ramada Wyndham Kingman (opt. 2)</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">104 €</span><span class="tag tag-ptdej">🍳 Petit-déj</span><span class="tag tag-annul">Annulation avant le 7 août</span><span class="tag tag-visit">🗺 Williams : Main Street, Bearizona Wildlife Park, Grand …</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">⚠️ Choix à réaliser</span><span class="pill-detail">Option 1 : Howard Johnson Williams (Route 66) — Option 2 : Ramada Kingman (104€) — décider et réserver</span></div>
+    </div><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation proche</span><span class="pill-detail">Date limite : 7 août</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-22"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(22)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Williams / Kingman <span style="opacity:.4;margin:0 2px">→</span> Las Vegas</span>
+            <span class="drive-pill-meta">⏱ 3h15 · 320 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+14</div><span class="day-separator-label">mar. 11 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-23"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Las Vegas, Nevada</div>
+            </div>
+            <div class="card-date">11 – 12 août</div>
+            <button class="btn-fiche" data-fiche-idx="23" onclick="openModal(23)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">⚠️ CHOIX À FAIRE : New York New York (opt. 1) / Paris Las Vegas (opt. 2)</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">317 €</span><span class="tag tag-nights">2 nuits</span><span class="tag tag-annul">Annulation avant le 8 août</span><span class="tag tag-visit">🗺 Old Vegas, street art, quartier Fremont, The Strip</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">⚠️ Choix à réaliser</span><span class="pill-detail">Option 1 : New York New York (317€) — Option 2 : Paris Las Vegas — décider et réserver</span></div>
+    </div><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation proche</span><span class="pill-detail">Date limite : 8 août</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-24"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(24)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Las Vegas <span style="opacity:.4;margin:0 2px">→</span> Death Valley</span>
+            <span class="drive-pill-meta">⏱ 4h37 · 416 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+16</div><span class="day-separator-label">jeu. 13 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-25"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Death Valley, Californie</div>
+            </div>
+            <div class="card-date">13 août</div>
+            <button class="btn-fiche" data-fiche-idx="25" onclick="openModal(25)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">Furnace Creek Ranch</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">189 €</span><span class="tag tag-annul">Annulation avant le 8 août</span><span class="tag tag-visit">🗺 Badwater Basin, Zabriskie Point, visite Bagdad Café en …</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation proche</span><span class="pill-detail">Date limite : 8 août</span></div>
+    </div><div class="alert-pill info">
+      <span class="pill-icon">🔵</span>
+      <div><span class="pill-label">Départ très tôt obligatoire</span><span class="pill-detail">Chaleur extrême en journée — prévoir départ à l'aube</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-26"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(26)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Death Valley <span style="opacity:.4;margin:0 2px">→</span> Los Angeles</span>
+            <span class="drive-pill-meta">⏱ 4h00 · 400 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+17</div><span class="day-separator-label">ven. 14 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-27"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Los Angeles, Californie</div>
+            </div>
+            <div class="card-date">14 – 15 août</div>
+            <button class="btn-fiche" data-fiche-idx="27" onclick="openModal(27)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">⚠️ CHOIX À FAIRE : Hollywood Celebrity Hotel (opt. 1) / Sure Stay Santa Monica (opt. 2)</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">387 €</span><span class="tag tag-nights">2 nuits</span><span class="tag tag-ptdej">🍳 Petit-déj</span><span class="tag tag-annul">Annulation avant le 11 août</span><span class="tag tag-visit">🗺 Hollywood Walk of Fame, Dolby Theatre, TCL Chinese Thea…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">⚠️ Choix à réaliser</span><span class="pill-detail">Option 1 : Hollywood Celebrity Hotel ★ (300€ env.) — Option 2 : Sure Stay Santa Monica (273€ · annul. 8 août) — décider</span></div>
+    </div><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation proche</span><span class="pill-detail">Date limite : 11 août</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-28"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(28)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Los Angeles <span style="opacity:.4;margin:0 2px">→</span> Solvang</span>
+            <span class="drive-pill-meta">⏱ 2h00 · 200 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+19</div><span class="day-separator-label">dim. 16 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-29"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Solvang, Californie</div>
+            </div>
+            <div class="card-date">16 août</div>
+            <button class="btn-fiche has-data" data-fiche-idx="29" onclick="openModal(29)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">Solvang Inn &amp; Cottages ★</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">148 €</span><span class="tag tag-ptdej">🍳 Petit-déj</span><span class="tag tag-annul">Annulation avant le 12 août</span><span class="tag tag-visit">🗺 Village danois, dégustation de vins, balade à vélo dans…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation proche</span><span class="pill-detail">Date limite : 12 août</span></div>
+    </div><div class="alert-pill info">
+      <span class="pill-icon">🔵</span>
+      <div><span class="pill-label">4 personnes</span><span class="pill-detail">3 adultes + 1 enfant — confirmer configuration chambre</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-30"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(30)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Solvang <span style="opacity:.4;margin:0 2px">→</span> Monterey</span>
+            <span class="drive-pill-meta">⏱ 2h00 · 190 km</span>
+            <span style="font-size:10px;opacity:.5;margin-left:4px;">📋</span>
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+20</div><span class="day-separator-label">lun. 17 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-31"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">Monterey, Californie</div>
+            </div>
+            <div class="card-date">17 août</div>
+            <button class="btn-fiche" data-fiche-idx="31" onclick="openModal(31)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">Colton Inn</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">192 €</span><span class="tag tag-ptdej">🍳 Petit-déj</span><span class="tag tag-annul">Annulation avant le 13 août</span><span class="tag tag-visit">🗺 Aquarium de Monterey (réserver à l'avance), 17-Mile Dri…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">Annulation proche</span><span class="pill-detail">Date limite : 13 août</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-32"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(32)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Monterey <span style="opacity:.4;margin:0 2px">→</span> San Francisco</span>
+            <span class="drive-pill-meta">⏱ 2h00 · 190 km</span>
+            
+          </div>
+          
+        </div></div><div class="day-separator"><div class="day-separator-node">J+21</div><span class="day-separator-label">mar. 18 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-33"><div class="marker visit"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">San Francisco, Californie</div>
+            </div>
+            <div class="card-date">18 – 19 août</div>
+            <button class="btn-fiche" data-fiche-idx="33" onclick="openModal(33)">📋 Fiche</button>
+          </div>
+          <div class="card-hotel">⚠️ CHOIX À FAIRE : Hotel Caza Fisherman's Wharf (opt. 1) / Hotel Zetta San Francisco (opt. 2)</div>
+          <div class="card-tags"><span class="tag tag-price" title="Montant budgété">302 €</span><span class="tag tag-nights">2 nuits</span><span class="tag tag-visit">🗺 Cable car Powell Street, Union Square, Alcatraz (réserv…</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"></div>
+          <div class="card-alerts"><div class="alert-pill urgent">
+      <span class="pill-icon">🔴</span>
+      <div><span class="pill-label">⚠️ Choix à réaliser</span><span class="pill-detail">Option 1 : Hotel Caza Fisherman's Wharf — Option 2 : Hotel Zetta SF — décider et réserver</span></div>
+    </div><div class="alert-pill missing">
+      <span class="pill-icon">🟡</span>
+      <div><span class="pill-label">Hôtel non réservé</span><span class="pill-detail">302 € budgétés — aucune réservation effectuée</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-34"><div class="marker drive" style="top:5px;width:18px;height:18px;font-size:10px;">🚗</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="drive-pill" onclick="openModal(34)" style="cursor:pointer;" title="Voir la fiche trajet">
+            <span class="drive-pill-route">Hôtel San Francisco <span style="opacity:.4;margin:0 2px">→</span> San Francisco Airport SFO</span>
+            <span class="drive-pill-meta">⏱ 0h30 · 22 km</span>
+            
+          </div>
+          <div class="card-alerts"><div class="alert-pill info">
+      <span class="pill-icon">🔵</span>
+      <div><span class="pill-label">Restitution du véhicule</span><span class="pill-detail">Budget SFO · 780 McDonnell Road · Réservoir vide</span></div>
+    </div></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+23</div><span class="day-separator-label">jeu. 20 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-35"><div class="marker carreturn"></div>
+        <div class="car-return-card">
+          <div class="car-pickup-header">
+            <div class="car-pickup-city" style="color:var(--teal-pale)">🔑 Restitution du véhicule</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+              <div class="car-pickup-date">20 août · matin</div>
+              <button class="btn-fiche" data-fiche-idx="35" onclick="openModal(35)">
+    📋 Fiche
+  </button>
+            </div>
+          </div>
+          <div class="car-pickup-sub">Budget · 780 McDonnell Road, San Francisco</div>
+          <div class="car-pickup-addr">📍 780 McDonnell Road, San Francisco, CA</div>
+          <div class="car-pickup-tags">
+            <span class="car-pickup-tag ref">Réf. 35554355FR4</span>
+            <span class="car-pickup-tag">BSP 8878530806</span>
+            <span class="car-pickup-tag" style="background:rgba(42,107,107,.25);color:var(--teal-pale);">Réservoir vide ✓</span>
+          </div>
+          <div class="card-alerts"><div class="alert-pill info">
+      <span class="pill-icon">🔵</span>
+      <div><span class="pill-label">Restituer réservoir vide</span><span class="pill-detail">Premier plein inclus à la prise en charge — restitution à vide autorisée</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-36"><div class="marker flight"></div>
+        <div class="flight-step-card">
+          <div class="flight-step-header">
+            <div class="flight-step-title">✈️ Vol retour</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div class="flight-step-date">20 – 21 août</div>
+              <button class="btn-fiche" data-fiche-idx="36" onclick="openModal(36)">
+    📋 Fiche
+  </button>
+            </div>
+          </div>
+          <div class="flight-step-summary">
+            <span class="flight-step-sumroute">SFO → MUC → MRS</span>
+            <span class="flight-step-sumstops">2 vols</span>
+          </div>
+          <div class="flight-step-tags">
+            <span class="flight-step-tag ref">ZKUZPE</span>
+            <span class="flight-step-tag">ETKT 220 6059505613-14</span>
+            <span class="flight-step-tag">1 bagage 23 kg</span>
+          </div>
+          <button class="flight-toggle" onclick="toggleFlightChildren('flight-children-36','flight-toggle-icon-36','flight-toggle-lbl-36')">
+            <span class="flight-toggle-icon" id="flight-toggle-icon-36">▶</span>
+            <span id="flight-toggle-lbl-36">Voir le détail des vols (2 segments)</span>
+          </button>
+          <div class="flight-children" id="flight-children-36">
+            
+        <div class="flight-child-wrap">
+          <div class="flight-child-connector">
+            <div class="flight-child-connector-dot"></div>
+            <div class="flight-child-connector-line"></div>
+          </div>
+          <div class="flight-child-card" id="seg-card-seg_36_0">
+            <div class="flight-child-head">
+              <span class="flight-child-num">LH 459</span>
+              <span class="flight-child-route">SFO → MUC</span>
+              <button class="flight-child-btn" id="seg-btn-seg_36_0" onclick="openSegModal(36,0)" title="Fiche de ce vol">📋 Fiche</button>
+            </div>
+            <div class="flight-child-times">
+              <span class="flight-child-dep">20 août 21:05</span>
+              <span style="opacity:.3">→</span>
+              <span class="flight-child-arr">21 août 17:10</span>
+              <span style="margin-left:auto;opacity:.4">⏱ 11h05</span>
+            </div>
+            <div class="flight-child-tags">
+              <span class="flight-child-tag">A350-900</span>
+              <span class="flight-child-tag">Repas inclus</span>
+            </div>
+            <div class="flight-child-qr" onclick="openSegModal(36,0)" id="qr-seg_36_0">
+              <div class="flight-child-qr-icon">▣</div>
+              <div class="flight-child-qr-text">Carte d'embarquement / QR code<br><span style="font-size:10px;opacity:.6">Cliquer pour ajouter</span></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flight-layover-chip" style="margin-left:20px;">
+          <span>⏳</span><span>Escale MUC · Escale 2h50</span>
+        </div>
+        <div class="flight-child-wrap">
+          <div class="flight-child-connector">
+            <div class="flight-child-connector-dot"></div>
+            
+          </div>
+          <div class="flight-child-card" id="seg-card-seg_36_1">
+            <div class="flight-child-head">
+              <span class="flight-child-num">LH 2266 (Cityline)</span>
+              <span class="flight-child-route">MUC → MRS</span>
+              <button class="flight-child-btn" id="seg-btn-seg_36_1" onclick="openSegModal(36,1)" title="Fiche de ce vol">📋 Fiche</button>
+            </div>
+            <div class="flight-child-times">
+              <span class="flight-child-dep">21 août 20:00</span>
+              <span style="opacity:.3">→</span>
+              <span class="flight-child-arr">21 août 21:45</span>
+              <span style="margin-left:auto;opacity:.4">⏱ 1h45</span>
+            </div>
+            <div class="flight-child-tags">
+              <span class="flight-child-tag">A319</span>
+              <span class="flight-child-tag">Boissons à la vente</span>
+            </div>
+            <div class="flight-child-qr" onclick="openSegModal(36,1)" id="qr-seg_36_1">
+              <div class="flight-child-qr-icon">▣</div>
+              <div class="flight-child-qr-text">Carte d'embarquement / QR code<br><span style="font-size:10px;opacity:.6">Cliquer pour ajouter</span></div>
+            </div>
+          </div>
+        </div>
+        
+          </div>
+          <div class="card-alerts"><div class="alert-pill info">
+      <span class="pill-icon">🔵</span>
+      <div><span class="pill-label">Enregistrement à l'avance recommandé</span><span class="pill-detail">Départ 21h05 · Terminal International SFO</span></div>
+    </div></div>
+        </div></div><div class="entry" id="step-37" style="display: none;"></div></div>
   </div>
 </main>
 
 <!-- FAB — Bouton nouvelle activité -->
-<button id="fab-btn" onclick="toggleFab()" title="Nouvelle activité"
-  style="position:fixed;bottom:28px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--amber);color:white;border:none;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(196,125,42,.5);z-index:1500;transition:transform .2s,background .2s;display:flex;align-items:center;justify-content:center;"
-  onmouseover="this.style.background='var(--ink)'" onmouseout="this.style.background='var(--amber)'">
+<button id="fab-btn" onclick="toggleFab()" title="Nouvelle activité" style="position:fixed;bottom:28px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--amber);color:white;border:none;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(196,125,42,.5);z-index:1500;transition:transform .2s,background .2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='var(--ink)'" onmouseout="this.style.background='var(--amber)'">
   +
 </button>
 
@@ -939,23 +1719,19 @@
 <div id="fab-menu" style="position:fixed;bottom:90px;right:24px;display:none;flex-direction:column;gap:8px;align-items:flex-end;z-index:1500;">
   <div style="display:flex;align-items:center;gap:8px;">
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouvelle note libre</span>
-    <button onclick="openNewActivity('note');closeFab();"
-      style="width:40px;height:40px;border-radius:50%;background:var(--slate);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">📝</button>
+    <button onclick="openNewActivity('note');closeFab();" style="width:40px;height:40px;border-radius:50%;background:var(--slate);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">📝</button>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouvelle activité / visite</span>
-    <button onclick="openNewActivity('visite');closeFab();"
-      style="width:40px;height:40px;border-radius:50%;background:var(--teal);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">🗺</button>
+    <button onclick="openNewActivity('visite');closeFab();" style="width:40px;height:40px;border-radius:50%;background:var(--teal);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">🗺</button>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouvelle dépense</span>
-    <button onclick="openNewActivity('depense');closeFab();"
-      style="width:40px;height:40px;border-radius:50%;background:var(--green);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">💰</button>
+    <button onclick="openNewActivity('depense');closeFab();" style="width:40px;height:40px;border-radius:50%;background:var(--green);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">💰</button>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouvelle étape</span>
-    <button onclick="openNewActivity('etape');closeFab();"
-      style="width:40px;height:40px;border-radius:50%;background:var(--amber);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">🏨</button>
+    <button onclick="openNewActivity('etape');closeFab();" style="width:40px;height:40px;border-radius:50%;background:var(--amber);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">🏨</button>
   </div>
 </div>
 </div>
@@ -966,7 +1742,7 @@
     <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--ink);">🗺 Map · <span id="trip-count-label" style="font-size:13px;font-weight:400;color:var(--slate-light);">– étapes</span></div>
     <div style="display:flex;gap:6px;align-items:center;">
       <button onclick="openGoogleMaps()" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid #4285F4;background:#4285F4;color:white;cursor:pointer;display:flex;align-items:center;gap:5px;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path></svg>
         Google Maps
       </button>
       <button onclick="closeTrip()" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--sand-dark);background:white;color:var(--ink-light);cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--sand-dark)'">✕ Fermer</button>
@@ -974,16 +1750,11 @@
   </div>
   <!-- Filtres Trip -->
   <div style="max-width:860px;margin:.5rem auto 0;padding:0 1.5rem;display:flex;gap:6px;flex-wrap:wrap;">
-    <input type="text" id="trip-search-city" placeholder="🔍 Ville, hôtel, activité…" oninput="renderTrip()"
-      style="flex:1;min-width:140px;font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid var(--sand-dark);background:white;color:var(--ink);outline:none;transition:border-color .15s;"
-      onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--sand-dark)'">
-    <input type="date" id="trip-date-from" onchange="renderTrip()" min="2026-07-28" max="2026-08-20"
-      style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 8px;border-radius:8px;border:1px solid var(--sand-dark);background:white;color:var(--ink);outline:none;">
+    <input type="text" id="trip-search-city" placeholder="🔍 Ville, hôtel, activité…" oninput="renderTrip()" style="flex:1;min-width:140px;font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid var(--sand-dark);background:white;color:var(--ink);outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--sand-dark)'">
+    <input type="date" id="trip-date-from" onchange="renderTrip()" min="2026-07-28" max="2026-08-20" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 8px;border-radius:8px;border:1px solid var(--sand-dark);background:white;color:var(--ink);outline:none;">
     <span style="color:var(--slate-light);font-size:11px;align-self:center;">→</span>
-    <input type="date" id="trip-date-to" onchange="renderTrip()" min="2026-07-28" max="2026-08-20"
-      style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 8px;border-radius:8px;border:1px solid var(--sand-dark);background:white;color:var(--ink);outline:none;">
-    <button onclick="resetTripFilters()"
-      style="font-family:'DM Sans',sans-serif;font-size:11px;padding:7px 10px;border-radius:8px;border:1px solid var(--sand-dark);background:white;color:var(--slate-light);cursor:pointer;">✕</button>
+    <input type="date" id="trip-date-to" onchange="renderTrip()" min="2026-07-28" max="2026-08-20" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 8px;border-radius:8px;border:1px solid var(--sand-dark);background:white;color:var(--ink);outline:none;">
+    <button onclick="resetTripFilters()" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:7px 10px;border-radius:8px;border:1px solid var(--sand-dark);background:white;color:var(--slate-light);cursor:pointer;">✕</button>
   </div>
   <!-- Carte -->
   <div id="trip-map" style="max-width:860px;margin:.75rem auto 0;height:380px;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);"></div>
@@ -996,12 +1767,7 @@
   <div style="max-width:720px;margin:0 auto;"><div class="modal" id="modal">
     <div class="modal-header">
       <div style="flex:1;min-width:0;">
-        <input type="text" id="modal-title"
-          style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:white;background:transparent;border:none;border-bottom:1.5px solid rgba(255,255,255,.25);outline:none;width:100%;padding:2px 0;transition:border-color .15s;"
-          onfocus="this.style.borderColor='rgba(255,255,255,.8)'"
-          onblur="this.style.borderColor='rgba(255,255,255,.25)';_saveModalTitle(this.value)"
-          title="Cliquer pour modifier le titre"
-          placeholder="Titre de l'étape">
+        <input type="text" id="modal-title" style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:white;background:transparent;border:none;border-bottom:1.5px solid rgba(255,255,255,.25);outline:none;width:100%;padding:2px 0;transition:border-color .15s;" onfocus="this.style.borderColor='rgba(255,255,255,.8)'" onblur="this.style.borderColor='rgba(255,255,255,.25)';_saveModalTitle(this.value)" title="Cliquer pour modifier le titre" placeholder="Titre de l'étape">
         <div class="modal-subtitle" id="modal-subtitle"></div>
       <div id="presence-badge" style="margin-top:4px;"></div>
       </div>
@@ -1830,6 +2596,64 @@ function _renderModalContent(idx) {
         </div>
       </div>
       <div class="modal-section">
+        <div class="modal-section-title">🔒 Dépôt de garantie</div>
+        ${(()=>{
+          const gStatut  = saved.gStatut  || 'attente';
+          const gLabels  = { attente:'⏳ En attente', verse:'💳 Versé', restitue:'✅ Restitué' };
+          const gColors  = { attente:'attente', verse:'verse', restitue:'restitue' };
+          return `
+          <div class="garantie-bloc ${gColors[gStatut]}" id="garantie-bloc-${idx}">
+            <div class="garantie-status-row">
+              <span class="garantie-badge ${gColors[gStatut]}" id="garantie-badge-${idx}">${gLabels[gStatut]}</span>
+              <select id="f-gStatut" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:4px 8px;border-radius:8px;border:.5px solid var(--sand-dark);background:white;color:var(--ink-light);cursor:pointer;"
+                onchange="_updateGarantieUI(this.value,${idx})">
+                <option value="attente" ${gStatut==='attente'?'selected':''}>⏳ En attente</option>
+                <option value="verse"   ${gStatut==='verse'  ?'selected':''}>💳 Versé</option>
+                <option value="restitue"${gStatut==='restitue'?'selected':''}>✅ Restitué</option>
+              </select>
+            </div>
+            <div class="garantie-grid">
+              <div class="field">
+                <label>Montant demandé (€)</label>
+                <input type="number" id="f-gMontant" value="${saved.gMontant||''}" placeholder="Ex. 200" min="0" step="1">
+              </div>
+              <div class="field">
+                <label>Mode de paiement</label>
+                <select id="f-gMode" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border-radius:8px;border:.5px solid var(--sand-dark);background:white;color:var(--ink);width:100%;">
+                  <option value="" ${!saved.gMode?'selected':''}>— Sélectionner —</option>
+                  <option value="Carte bancaire"  ${saved.gMode==='Carte bancaire' ?'selected':''}>Carte bancaire</option>
+                  <option value="Pré-autorisation"${saved.gMode==='Pré-autorisation'?'selected':''}>Pré-autorisation</option>
+                  <option value="Espèces"         ${saved.gMode==='Espèces'        ?'selected':''}>Espèces</option>
+                  <option value="Chèque"          ${saved.gMode==='Chèque'         ?'selected':''}>Chèque</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Date de versement</label>
+                <input type="date" id="f-gDateVers" value="${saved.gDateVers||''}">
+              </div>
+              <div class="field">
+                <label>Date de restitution prévue</label>
+                <input type="date" id="f-gDateRest" value="${saved.gDateRest||''}">
+              </div>
+              <div class="field">
+                <label>Montant restitué (€)</label>
+                <input type="number" id="f-gMontantRest" value="${saved.gMontantRest||''}" placeholder="Ex. 200" min="0" step="1"
+                  ${gStatut!=='restitue'?'style="opacity:.5"':''}>
+              </div>
+              <div class="field">
+                <label>Retenue éventuelle (€)</label>
+                <input type="number" id="f-gRetenue" value="${saved.gRetenue||''}" placeholder="0" min="0" step="1"
+                  ${gStatut!=='restitue'?'style="opacity:.5"':''}>
+              </div>
+            </div>
+            <div class="field" style="margin-top:6px;">
+              <label>Remarque</label>
+              <input type="text" id="f-gNote" value="${saved.gNote||''}" placeholder="Ex. Carte VISA d'Éric, pré-autorisé à l'arrivée…">
+            </div>
+          </div>`;
+        })()}
+      </div>
+      <div class="modal-section">
         <div class="modal-section-title">Finances</div>
         ${(()=>{
           const budget = saved.budget !== undefined ? parseFloat(saved.budget) : (step.price || 0);
@@ -2339,6 +3163,16 @@ function updateCardInTimeline(idx, data) {
     if (data.modepay) extras.push(`<span class="tag" style="background:var(--slate-pale);color:var(--slate)">${data.modepay}</span>`);
     if (data.payepar) extras.push(`<span class="tag" style="background:var(--amber-pale);color:var(--amber)">👤 ${data.payepar}</span>`);
     if (data.note)    extras.push(`<span class="tag" style="background:var(--amber-pale);color:var(--amber)">📝 Note</span>`);
+
+    // Badge dépôt de garantie
+    if (data.gMontant && parseFloat(data.gMontant) > 0) {
+      const gs = data.gStatut || 'attente';
+      const gColors = { attente:'background:var(--slate-pale);color:var(--slate)', verse:'background:var(--amber-pale);color:var(--amber)', restitue:'background:var(--green-pale);color:var(--green)' };
+      const gIcons  = { attente:'🔒', verse:'💳', restitue:'✅' };
+      const gLabels = { attente:'Caution en attente', verse:'Caution versée', restitue:'Caution restituée' };
+      extras.push(`<span class="tag" style="${gColors[gs]}" title="${gLabels[gs]}">${gIcons[gs]} ${parseFloat(data.gMontant).toFixed(0)} €</span>`);
+    }
+
     extraTags.innerHTML = extras.join('');
 
     // Rafraîchir le total budget dans la sidebar
@@ -2364,6 +3198,21 @@ function updateCardInTimeline(idx, data) {
   }
 }
 
+// ── DÉPÔT DE GARANTIE — UI dynamique ──
+function _updateGarantieUI(statut, idx) {
+  const bloc  = document.getElementById('garantie-bloc-'  + idx);
+  const badge = document.getElementById('garantie-badge-' + idx);
+  const labels = { attente:'⏳ En attente', verse:'💳 Versé', restitue:'✅ Restitué' };
+  const colors = { attente:'attente', verse:'verse', restitue:'restitue' };
+  if (bloc)  { bloc.className  = 'garantie-bloc '  + colors[statut]; }
+  if (badge) { badge.className = 'garantie-badge ' + colors[statut]; badge.textContent = labels[statut]; }
+  // Activer/désactiver les champs restitution
+  ['f-gMontantRest','f-gRetenue'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.opacity = statut === 'restitue' ? '1' : '0.5';
+  });
+}
+
 async function saveModal() {
   if (currentModalIdx === null) return;
 
@@ -2371,11 +3220,16 @@ async function saveModal() {
   const data = Object.assign({}, loadFiche(currentModalIdx));
 
   // Mettre à jour uniquement les champs du formulaire
-  const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte'];
+  const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte',
+                  'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote'];
   fields.forEach(f => {
     const el = document.getElementById('f-' + f);
     if (el) data[f] = el.value;
   });
+
+  // Statut dépôt de garantie
+  const gStatutEl = document.getElementById('f-gStatut');
+  if (gStatutEl) data.gStatut = gStatutEl.value;
 
   // Budget modifiable
   const budgetEl = document.getElementById('f-budget');
@@ -3992,7 +4846,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.2 · 27/04/26
+        Version : v2.3 · 17/05/26
       </div>
     </div>`;
 }
@@ -7572,7 +8426,7 @@ function _testNavMenus() { (async () => {
   // Rapport
   const grp = console.group || console.log;
   const grpEnd = console.groupEnd || function(){};
-  grp('🧪 Tests Navigation v2.2');
+  grp('🧪 Tests Navigation v2.3');
   let allOk = true;
   results.forEach(r => {
     if (r.ok) {
@@ -7904,7 +8758,7 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
         <div class="pay-field">
           <label>Nature <span class="req">*</span></label>
           <select id="pay-type" onchange="updatePaySummary()">
-            <option value="paiement">Paiement</option>
+            <option value="paiement" selected="selected">Paiement</option>
             <option value="acompte">Acompte</option>
           </select>
         </div>
@@ -7918,7 +8772,7 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
         <div class="pay-field">
           <label>Payé par <span class="req">*</span></label>
           <select id="pay-payepar">
-            <option value="">— Choisir —</option>
+            <option value="" selected="selected">— Choisir —</option>
             <option value="Éric">Éric</option>
             <option value="Pascale">Pascale</option>
             <option value="Carole">Carole</option>
@@ -7937,10 +8791,10 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
             <button type="button" onclick="_selectAllParticipants(false)" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:2px 8px;border-radius:6px;border:1px solid var(--sand-dark);background:var(--sand);color:var(--slate-light);cursor:pointer;">Aucun</button>
           </div>
           <div class="pay-participants" id="pay-participants">
-            <label class="pay-part-option"><input type="checkbox" value="Éric" checked onchange="_updatePersoBadge()"> Éric</label>
-            <label class="pay-part-option"><input type="checkbox" value="Pascale" checked onchange="_updatePersoBadge()"> Pascale</label>
-            <label class="pay-part-option"><input type="checkbox" value="Carole" checked onchange="_updatePersoBadge()"> Carole</label>
-            <label class="pay-part-option"><input type="checkbox" value="Léa" checked onchange="_updatePersoBadge()"> Léa</label>
+            <label class="pay-part-option"><input type="checkbox" value="Éric" checked="checked" onchange="_updatePersoBadge()"> Éric</label>
+            <label class="pay-part-option"><input type="checkbox" value="Pascale" checked="checked" onchange="_updatePersoBadge()"> Pascale</label>
+            <label class="pay-part-option"><input type="checkbox" value="Carole" checked="checked" onchange="_updatePersoBadge()"> Carole</label>
+            <label class="pay-part-option"><input type="checkbox" value="Léa" checked="checked" onchange="_updatePersoBadge()"> Léa</label>
           </div>
           <span class="pay-error-msg" id="err-participants">Sélectionnez au moins un participant.</span>
         </div>
@@ -7948,7 +8802,7 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
         <div class="pay-field">
           <label>Mode de paiement <span class="req">*</span></label>
           <select id="pay-modepay">
-            <option value="">— Choisir —</option>
+            <option value="" selected="selected">— Choisir —</option>
             <option value="Carte bancaire">Carte bancaire</option>
             <option value="Virement">Virement</option>
             <option value="Espèces">Espèces</option>
@@ -7990,14 +8844,13 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
       <div class="del-pay-info" id="del-pay-info">–</div>
       <div class="pay-field">
         <label>Motif de suppression <span class="req">*</span></label>
-        <input type="text" id="del-pay-motif" placeholder="Ex. Erreur de saisie, doublon, annulation…"
-          oninput="document.getElementById('del-pay-confirm-btn').disabled = !this.value.trim()">
+        <input type="text" id="del-pay-motif" placeholder="Ex. Erreur de saisie, doublon, annulation…" oninput="document.getElementById('del-pay-confirm-btn').disabled = !this.value.trim()">
         <span class="pay-error-msg" id="err-del-motif" style="display:none">Le motif est obligatoire.</span>
       </div>
     </div>
     <div class="del-pay-actions">
       <button class="pay-btn-cancel" onclick="closeDelPayModal()">Annuler</button>
-      <button class="del-pay-btn-ok" id="del-pay-confirm-btn" onclick="confirmDeletePayment()" disabled>Confirmer la suppression</button>
+      <button class="del-pay-btn-ok" id="del-pay-confirm-btn" onclick="confirmDeletePayment()" disabled="disabled">Confirmer la suppression</button>
     </div>
   </div>
 </div>
@@ -8016,14 +8869,13 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
       <div id="fiche-action-info" style="font-size:13px;border-radius:8px;padding:.75rem 1rem;border-left:3px solid;"></div>
       <div class="pay-field">
         <label id="fiche-action-reason-label">Motif <span class="req">*</span></label>
-        <input type="text" id="fiche-action-reason" placeholder=""
-          style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;transition:border-color .15s;">
+        <input type="text" id="fiche-action-reason" placeholder="" style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;transition:border-color .15s;">
         <span style="font-size:11px;color:var(--red);display:none;" id="err-fiche-action">Ce champ est obligatoire.</span>
       </div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;padding:1rem 1.5rem;border-top:.5px solid var(--sand-dark);background:white;border-radius:0 0 16px 16px;">
       <button class="pay-btn-cancel" onclick="closeFicheActionModal()">Annuler</button>
-      <button id="fiche-action-btn" onclick="confirmFicheAction()" disabled style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:9px 22px;border-radius:10px;border:none;cursor:pointer;transition:opacity .15s;color:white;"></button>
+      <button id="fiche-action-btn" onclick="confirmFicheAction()" disabled="disabled" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:9px 22px;border-radius:10px;border:none;cursor:pointer;transition:opacity .15s;color:white;"></button>
     </div>
   </div>
 </div>
@@ -8040,7 +8892,10 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
     </div>
     <div style="padding:1.5rem;display:flex;flex-direction:column;gap:14px;">
       <div style="font-size:13px;color:var(--ink-light);background:var(--teal-pale);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--teal);">
-        Une copie de cette fiche sera créée avec les mêmes informations (hôtel, dates, remarques…) mais sans les règlements ni la validation. Vous pourrez ensuite la modifier librement pour y détailler les activités de la journée.
+        Une copie de cette fiche sera créée avec les mêmes informations 
+(hôtel, dates, remarques…) mais sans les règlements ni la validation. 
+Vous pourrez ensuite la modifier librement pour y détailler les 
+activités de la journée.
       </div>
       <div class="pay-field">
         <label>Nom de la nouvelle fiche <span class="req">*</span></label>
@@ -8101,14 +8956,32 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
         <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;">🗺 Road Trip USA · Été 2026</div>
         <div style="font-size:11px;color:rgba(245,240,232,.45);margin-top:2px;">À propos de l'application</div>
       </div>
-      <button onclick="closeAboutModal()" style="background:none;border:none;color:rgba(245,240,232,.5);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:4px;"
-        onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(245,240,232,.5)'">✕</button>
+      <button onclick="closeAboutModal()" style="background:none;border:none;color:rgba(245,240,232,.5);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:4px;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(245,240,232,.5)'">✕</button>
     </div>
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.0</div><div style="font-size:10px;color:var(--slate-light);">25/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Compte Amis pleine page · Virements par activité · Remboursements multi-participants · Filtres date &amp; recherche · Réinitialisation admin · Mails automatiques · Journal exportable · Nouvelles activités FAB · Titre fiches éditable</div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.3</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Dépôt de garantie dans fiches hôtel · Statut versé/restitué/en attente · Badge 🔒 sur carte timeline · Correction dépendances CDN</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.2</div><div style="font-size:10px;color:var(--slate-light);">27/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correction bugs navigation · Vues hors modal-overlay · Fix opacity overlays · Fix openModal/closeModal</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.1</div><div style="font-size:10px;color:var(--slate-light);">28/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Map Pro BETA · Checklist · Chat · Logs · Réservations pleine page · Menu Administration sécurisé</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.0</div><div style="font-size:10px;color:var(--slate-light);">25/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Compte
+ Amis pleine page · Virements par activité · Remboursements 
+multi-participants · Filtres date &amp; recherche · Réinitialisation 
+admin · Mails automatiques · Journal exportable · Nouvelles activités 
+FAB · Titre fiches éditable</div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
@@ -8173,12 +9046,10 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
   <div style="font-size:13px;font-weight:600;margin-bottom:.4rem;">⚠️ Démarches en retard</div>
   <div id="checklist-alert-body" style="font-size:12px;color:rgba(245,240,232,.7);margin-bottom:.75rem;line-height:1.5;"></div>
   <div style="display:flex;gap:8px;">
-    <button onclick="openChecklist();document.getElementById('checklist-alert').style.display='none'"
-      style="font-family:'DM Sans',sans-serif;flex:1;padding:7px;border-radius:8px;border:none;background:var(--amber);color:var(--ink);cursor:pointer;font-size:12px;font-weight:600;">
+    <button onclick="openChecklist();document.getElementById('checklist-alert').style.display='none'" style="font-family:'DM Sans',sans-serif;flex:1;padding:7px;border-radius:8px;border:none;background:var(--amber);color:var(--ink);cursor:pointer;font-size:12px;font-weight:600;">
       Voir la checklist
     </button>
-    <button onclick="_snoozeChecklistAlert()"
-      style="font-family:'DM Sans',sans-serif;flex:1;padding:7px;border-radius:8px;border:1px solid rgba(245,240,232,.2);background:transparent;color:var(--sand);cursor:pointer;font-size:12px;">
+    <button onclick="_snoozeChecklistAlert()" style="font-family:'DM Sans',sans-serif;flex:1;padding:7px;border-radius:8px;border:1px solid rgba(245,240,232,.2);background:transparent;color:var(--sand);cursor:pointer;font-size:12px;">
       Rappeler plus tard
     </button>
   </div>
@@ -8208,9 +9079,7 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
       <!-- Activité concernée -->
       <div class="pay-field">
         <label>Activité / Libellé <span class="req">*</span></label>
-        <input type="text" id="remb-label" placeholder="Ex. Hôtel Jackson, Dîner Monument Valley…"
-          style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;"
-          onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--sand-dark)'">
+        <input type="text" id="remb-label" placeholder="Ex. Hôtel Jackson, Dîner Monument Valley…" style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--sand-dark)'">
         <div id="remb-label-suggestions" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;"></div>
       </div>
 
@@ -8218,7 +9087,7 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
       <div class="pay-field">
         <label>Remboursé à (qui reçoit) <span class="req">*</span></label>
         <select id="remb-a" style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;">
-          <option value="">— Choisir —</option>
+          <option value="" selected="selected">— Choisir —</option>
           <option value="Éric">Éric</option>
           <option value="Pascale">Pascale</option>
           <option value="Carole">Carole</option>
@@ -8246,9 +9115,7 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
       <!-- Montant total -->
       <div class="pay-field">
         <label>Montant total remboursé <span class="req">*</span></label>
-        <input type="number" id="remb-montant" min="0.01" step="0.01" placeholder="0.00"
-          oninput="_rembUpdateBadge()"
-          style="font-family:'DM Sans',sans-serif;font-size:16px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;">
+        <input type="number" id="remb-montant" min="0.01" step="0.01" placeholder="0.00" oninput="_rembUpdateBadge()" style="font-family:'DM Sans',sans-serif;font-size:16px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;">
         <div id="remb-share-info" style="font-size:11px;color:var(--teal);margin-top:4px;display:none;">
           Soit <strong id="remb-share-val">0</strong> € / personne
         </div>
@@ -8257,15 +9124,14 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
       <!-- Date -->
       <div class="pay-field">
         <label>Date</label>
-        <input type="date" id="remb-date"
-          style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;">
+        <input type="date" id="remb-date" style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;">
       </div>
 
       <!-- Mode de règlement -->
       <div class="pay-field">
         <label>Mode de règlement <span class="req">*</span></label>
         <select id="remb-mode" style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;">
-          <option value="">— Choisir —</option>
+          <option value="" selected="selected">— Choisir —</option>
           <option value="Virement">Virement bancaire</option>
           <option value="Espèces">Espèces</option>
           <option value="Lydia">Lydia</option>
@@ -8279,8 +9145,7 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
       <!-- Note -->
       <div class="pay-field">
         <label>Note</label>
-        <input type="text" id="remb-note" placeholder="Référence virement, commentaire…"
-          style="font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;">
+        <input type="text" id="remb-note" placeholder="Référence virement, commentaire…" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;">
       </div>
 
       <div id="remb-error" style="display:none;font-size:12px;color:var(--red);background:var(--red-pale);border-radius:6px;padding:6px 10px;"></div>
@@ -8313,8 +9178,7 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
         <h2 style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--ink);margin:0;">✅ Checklist Road Trip</h2>
         <div style="font-size:11px;color:var(--slate-light);margin-top:2px;">Suivi des démarches par participant</div>
       </div>
-      <button onclick="_addChecklistItem()"
-        style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 16px;border-radius:20px;border:none;background:var(--teal);color:white;cursor:pointer;font-weight:500;">
+      <button onclick="_addChecklistItem()" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 16px;border-radius:20px;border:none;background:var(--teal);color:white;cursor:pointer;font-weight:500;">
         + Ajouter une démarche
       </button>
     </div>
@@ -8374,14 +9238,11 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
         </div>
         <div style="padding:.75rem 1rem;background:white;border-top:1px solid var(--sand-dark);display:flex;gap:8px;align-items:flex-end;">
           <select id="chat-sender" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 8px;border:1.5px solid var(--sand-dark);border-radius:10px;background:var(--sand);color:var(--ink);outline:none;cursor:pointer;flex-shrink:0;">
-            <option value="Éric">Éric</option><option value="Pascale">Pascale</option><option value="Carole">Carole</option><option value="Léa">Léa</option>
+            <option value="Éric" selected="selected">Éric</option><option value="Pascale">Pascale</option><option value="Carole">Carole</option><option value="Léa">Léa</option>
           </select>
           <input type="file" id="chat-file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" style="display:none;position:absolute;" onchange="_chatAttachFile(this)">
           <label for="chat-file-input" style="cursor:pointer;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;border:1.5px solid var(--sand-dark);background:var(--sand);color:var(--slate-light);flex-shrink:0;font-size:18px;user-select:none;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--sand-dark)';this.style.color='var(--slate-light)'">📎</label>
-          <textarea id="chat-input" placeholder="Votre message…" rows="1"
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_chatSend();}"
-            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"
-            style="font-family:'DM Sans',sans-serif;font-size:13px;flex:1;padding:8px 12px;border:1.5px solid var(--sand-dark);border-radius:10px;outline:none;resize:none;background:white;color:var(--ink);line-height:1.4;"></textarea>
+          <textarea id="chat-input" placeholder="Votre message…" rows="1" onkeydown="if(event.key==='Enter'&amp;&amp;!event.shiftKey){event.preventDefault();_chatSend();}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'" style="font-family:'DM Sans',sans-serif;font-size:13px;flex:1;padding:8px 12px;border:1.5px solid var(--sand-dark);border-radius:10px;outline:none;resize:none;background:white;color:var(--ink);line-height:1.4;"></textarea>
           <button onclick="_chatSend()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 14px;border-radius:10px;border:none;background:var(--teal);color:white;cursor:pointer;font-weight:500;flex-shrink:0;height:36px;">➤</button>
         </div>
       </div>
@@ -8393,12 +9254,10 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
     <div style="background:var(--sand);border-radius:14px;padding:1.25rem;width:100%;max-width:420px;box-shadow:0 10px 40px rgba(0,0,0,.3);">
       <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.75rem;">💬 Nouvelle discussion</div>
       <select id="chat-thread-sender" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:8px 10px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;margin-bottom:.5rem;">
-        <option value="Éric">Éric</option><option value="Pascale">Pascale</option><option value="Carole">Carole</option><option value="Léa">Léa</option>
+        <option value="Éric" selected="selected">Éric</option><option value="Pascale">Pascale</option><option value="Carole">Carole</option><option value="Léa">Léa</option>
       </select>
-      <input id="chat-thread-title" type="text" placeholder="Titre de la discussion…" maxlength="60"
-        style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;outline:none;width:100%;box-sizing:border-box;margin-bottom:.5rem;color:var(--ink);">
-      <textarea id="chat-thread-msg" placeholder="Premier message…" rows="3"
-        style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;outline:none;width:100%;box-sizing:border-box;resize:none;color:var(--ink);margin-bottom:.75rem;"></textarea>
+      <input id="chat-thread-title" type="text" placeholder="Titre de la discussion…" maxlength="60" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;outline:none;width:100%;box-sizing:border-box;margin-bottom:.5rem;color:var(--ink);">
+      <textarea id="chat-thread-msg" placeholder="Premier message…" rows="3" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;outline:none;width:100%;box-sizing:border-box;resize:none;color:var(--ink);margin-bottom:.75rem;"></textarea>
       <div style="display:flex;gap:8px;">
         <button onclick="document.getElementById('chat-new-thread-modal').style.display='none'" style="flex:1;font-family:'DM Sans',sans-serif;font-size:12px;padding:8px;border-radius:8px;border:1px solid var(--sand-dark);background:white;color:var(--slate-light);cursor:pointer;">Annuler</button>
         <button onclick="_chatCreateThread()" style="flex:2;font-family:'DM Sans',sans-serif;font-size:12px;padding:8px;border-radius:8px;border:none;background:var(--teal);color:white;cursor:pointer;font-weight:600;">Créer la discussion</button>
@@ -8420,11 +9279,9 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
 
   <!-- Timeline horizontale en bas -->
   <div style="display:flex;align-items:center;background:var(--ink);flex-shrink:0;">
-    <button onclick="_mapProNav(-1)" style="background:none;border:none;color:rgba(245,240,232,.5);font-size:20px;padding:0 12px;cursor:pointer;height:110px;flex-shrink:0;transition:color .15s;"
-      onmouseover="this.style.color='var(--amber)'" onmouseout="this.style.color='rgba(245,240,232,.5)'">‹</button>
+    <button onclick="_mapProNav(-1)" style="background:none;border:none;color:rgba(245,240,232,.5);font-size:20px;padding:0 12px;cursor:pointer;height:110px;flex-shrink:0;transition:color .15s;" onmouseover="this.style.color='var(--amber)'" onmouseout="this.style.color='rgba(245,240,232,.5)'">‹</button>
     <div id="mappro-timeline" style="height:110px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:8px 4px;display:flex;align-items:center;gap:6px;flex:1;"></div>
-    <button onclick="_mapProNav(1)" style="background:none;border:none;color:rgba(245,240,232,.5);font-size:20px;padding:0 12px;cursor:pointer;height:110px;flex-shrink:0;transition:color .15s;"
-      onmouseover="this.style.color='var(--amber)'" onmouseout="this.style.color='rgba(245,240,232,.5)'">›</button>
+    <button onclick="_mapProNav(1)" style="background:none;border:none;color:rgba(245,240,232,.5);font-size:20px;padding:0 12px;cursor:pointer;height:110px;flex-shrink:0;transition:color .15s;" onmouseover="this.style.color='var(--amber)'" onmouseout="this.style.color='rgba(245,240,232,.5)'">›</button>
   </div>
 
 </div>
@@ -8894,9 +9751,9 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
     </div>
   </div>
 </div>
-</div><!-- /app -->
+<!-- /app -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 // ── SUPABASE AUTH ──
@@ -9380,5 +10237,6 @@ async function importJSON(input) {
 setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!=='none') createBackup(true); }, 30*60*1000);
 </script>
 
-</body>
-</html>
+
+
+</body></html>
