@@ -743,7 +743,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.8 · 17/05/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9 · 21/05/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -2805,6 +2805,7 @@ function _renderModalContent(idx) {
         </div>
       </div>
 
+      ${_renderDocsSection(idx, saved)}
       <!-- ── POINTS D'INTÉRÊT ── -->
       <div class="modal-section">
         <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
@@ -2940,6 +2941,135 @@ function _addHotelImages(idx, input) {
     reader.readAsDataURL(file);
   });
   input.value = '';
+}
+async function _addHotelDocs(idx, input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  const d = loadFiche(idx);
+  d.docs = d.docs || [];
+  const MAX_SIZE = 20 * 1024 * 1024; // 20 Mo
+  const ALLOWED = ['application/pdf','image/jpeg','image/png','image/jpg'];
+  let done = 0;
+  for (const file of files) {
+    if (!ALLOWED.includes(file.type)) {
+      alert(file.name + ' : format non supporté (PDF, JPG, PNG uniquement)');
+      done++;
+      if (done === files.length) { _cache[idx] = d; try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(e) {} saveFiche(idx, d); _renderModalContent(idx); }
+      continue;
+    }
+    if (file.size > MAX_SIZE) {
+      alert(file.name + ' trop grand (max 20 Mo)');
+      done++;
+      if (done === files.length) { _cache[idx] = d; try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(e) {} saveFiche(idx, d); _renderModalContent(idx); }
+      continue;
+    }
+    const timestamp = Date.now();
+    const path = `etape-${idx}/${timestamp}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    try {
+      const res = await fetch(`${SUPA_URL}/storage/v1/object/roadtrip-docs/${path}`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': file.type, 'x-upsert': 'true' },
+        body: file
+      });
+      if (!res.ok) throw new Error('Upload échoué HTTP ' + res.status);
+      const url = `${SUPA_URL}/storage/v1/object/public/roadtrip-docs/${path}`;
+      d.docs.push({ url, path, name: file.name, type: file.type, size: file.size, caption: file.name.replace(/\.[^/.]+$/,''), addedAt: new Date().toISOString() });
+    } catch(e) {
+      alert('Erreur upload ' + file.name + ' : ' + e.message);
+    }
+    done++;
+    if (done === files.length) {
+      _cache[idx] = d;
+      try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(er) {}
+      saveFiche(idx, d);
+      _renderModalContent(idx);
+    }
+  }
+  input.value = '';
+}
+
+async function _deleteHotelDoc(idx, docIndex) {
+  if (!confirm('Supprimer ce document ?')) return;
+  const d = loadFiche(idx);
+  const docs = d.docs || [];
+  const doc = docs[docIndex];
+  if (!doc) return;
+  if (doc.path && SUPA_READY) {
+    try {
+      await fetch(`${SUPA_URL}/storage/v1/object/roadtrip-docs/${doc.path}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + SUPA_KEY }
+      });
+    } catch(e) { console.warn('Erreur suppression Supabase Storage:', e.message); }
+  }
+  d.docs = docs.filter((_, i) => i !== docIndex);
+  _cache[idx] = d;
+  try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(e) {}
+  await saveFiche(idx, d);
+  _renderModalContent(idx);
+}
+
+function _openDocViewer(url, name, type) {
+  const existing = document.getElementById('doc-viewer-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'doc-viewer-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(26,22,16,.92);z-index:9000;display:flex;flex-direction:column;';
+  const isPDF = type === 'application/pdf' || name.toLowerCase().endsWith('.pdf');
+  const isImage = type.startsWith('image/');
+  overlay.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;padding:.75rem 1rem;background:var(--ink);flex-shrink:0;">
+      <div style="font-size:13px;font-weight:600;color:var(--sand);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
+      <a href="${url}" download="${name}" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 12px;border-radius:8px;border:1px solid rgba(245,240,232,.2);background:transparent;color:rgba(245,240,232,.7);text-decoration:none;white-space:nowrap;" onmouseover="this.style.background='rgba(245,240,232,.1)'" onmouseout="this.style.background='transparent'">⬇️ Télécharger</a>
+      <button onclick="document.getElementById('doc-viewer-overlay').remove()" style="background:none;border:none;color:rgba(245,240,232,.5);font-size:20px;cursor:pointer;padding:2px 8px;border-radius:4px;font-family:'DM Sans',sans-serif;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(245,240,232,.5)'">✕</button>
+    </div>
+    <div style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:1rem;">
+      ${isPDF
+        ? `<iframe src="${url}" style="width:100%;height:100%;max-width:900px;border:none;border-radius:8px;background:white;" title="${name}"></iframe>`
+        : isImage
+          ? `<img src="${url}" style="max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.4);" alt="${name}">`
+          : `<div style="text-align:center;color:rgba(245,240,232,.5);"><div style="font-size:3rem;margin-bottom:1rem;">📄</div><div style="font-size:14px;margin-bottom:1rem;">${name}</div><a href="${url}" download="${name}" style="font-family:'DM Sans',sans-serif;padding:10px 20px;border-radius:10px;background:var(--amber);color:white;text-decoration:none;font-weight:500;">⬇️ Télécharger le fichier</a></div>`
+      }
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.remove(); });
+}
+
+function _renderDocsSection(idx, saved) {
+  const docs = saved.docs || [];
+  const iconFor = (type, name) => {
+    if (type === 'application/pdf' || name.toLowerCase().endsWith('.pdf')) return '📄';
+    if (type.startsWith('image/')) return '🖼';
+    return '📎';
+  };
+  const sizeStr = (bytes) => {
+    if (!bytes) return '';
+    if (bytes < 1024) return bytes + ' o';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(0) + ' Ko';
+    return (bytes/(1024*1024)).toFixed(1) + ' Mo';
+  };
+  return `<div class="modal-section">
+    <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+      <span>📑 Documents PDF</span>
+      <label style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;">
+        + Ajouter
+        <input type="file" accept=".pdf,image/jpeg,image/png" multiple style="display:none;" onchange="_addHotelDocs(${idx},this)">
+      </label>
+    </div>
+    <div id="hotel-docs-${idx}" style="display:flex;flex-direction:column;gap:6px;">
+      ${docs.length ? docs.map((doc, di) => `
+        <div style="display:flex;align-items:center;gap:8px;background:white;border:.5px solid var(--sand-dark);border-radius:8px;padding:7px 10px;">
+          <span style="font-size:18px;flex-shrink:0;">${iconFor(doc.type, doc.name)}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${doc.caption || doc.name}</div>
+            <div style="font-size:10px;color:var(--slate-light);">${sizeStr(doc.size)}${doc.addedAt ? ' · ' + new Date(doc.addedAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : ''}</div>
+          </div>
+          <button onclick="_openDocViewer('${doc.url}','${(doc.name||'').replace(/'/g,"\\'")}','${doc.type}')" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 9px;border-radius:6px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;white-space:nowrap;flex-shrink:0;">Ouvrir</button>
+          <button onclick="_deleteHotelDoc(${idx},${di})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:13px;padding:2px 4px;border-radius:4px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
+        </div>`).join('')
+      : '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucun document. Ajoutez vos confirmations de réservation, bons de commande…</div>'}
+    </div>
+  </div>`;
 }
 
 async function _removeHotelImage(idx, ii) {
@@ -5090,7 +5220,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.8 · 17/05/26
+        Version : v2.9 · 21/05/26
       </div>
     </div>`;
 }
