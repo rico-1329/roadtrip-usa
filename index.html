@@ -743,7 +743,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9 · 21/05/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9.1 · 21/05/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -3771,7 +3771,7 @@ function matchesFilter(step, idx) {
   // Multi-select types
   if (activeTypes.size > 0) {
     let typeMatch = false;
-    if (activeTypes.has('hotel') && step.type === 'hotel' && !step.visits) typeMatch = true;
+    if (activeTypes.has('hotel') && step.type === 'hotel') typeMatch = true;
     if (activeTypes.has('visit') && step.type === 'hotel' && step.visits) typeMatch = true;
     if (activeTypes.has('drive') && (step.type === 'drive' || step.type === 'car-pickup' || step.type === 'car-return' || step.type === 'flight')) typeMatch = true;
     if (activeTypes.has('ptdej') && step.type === 'hotel' && step.ptdej) typeMatch = true;
@@ -5220,7 +5220,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.9 · 21/05/26
+        Version : v2.9.1 · 21/05/26
       </div>
     </div>`;
 }
