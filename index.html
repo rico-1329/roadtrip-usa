@@ -743,7 +743,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9.4 · 21/05/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9.6 · 21/05/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -2576,8 +2576,35 @@ function _renderModalContent(idx) {
         <div class="field-grid">
           <div class="field"><label>Date d'arrivée</label><input type="date" id="f-ddeb" value="${saved.ddeb || step.dateDebut || ''}"></div>
           <div class="field"><label>Date de départ</label><input type="date" id="f-dfin" value="${saved.dfin || step.dateFin || ''}"></div>
-          <div class="field"><label>Heure d'arrivée (check-in)</label><input type="time" id="f-hdep" value="${saved.hdep||''}"></div>
+        </div>
+        <!-- Plage check-in -->
+        <div style="margin-top:10px;">
+          <div style="font-size:11px;color:var(--slate-light);font-weight:500;margin-bottom:6px;">🕐 Plage de check-in</div>
+          <div style="display:flex;align-items:center;gap:8px;background:var(--sand);border-radius:10px;padding:.75rem 1rem;border:.5px solid var(--sand-dark);">
+            <div class="field" style="flex:1;margin:0;">
+              <label>À partir de</label>
+              <input type="time" id="f-hdep" value="${saved.hdep||''}"
+                style="margin-top:4px;"
+                oninput="_updateCheckinDisplay()">
+            </div>
+            <div style="font-size:18px;color:var(--slate-light);padding-top:18px;">→</div>
+            <div class="field" style="flex:1;margin:0;">
+              <label>Jusqu'à (max)</label>
+              <input type="time" id="f-hdep-max" value="${saved.hdepMax||''}"
+                style="margin-top:4px;"
+                oninput="_updateCheckinDisplay()">
+            </div>
+            <div id="checkin-display" style="font-size:12px;font-weight:600;color:var(--teal);padding-top:18px;white-space:nowrap;min-width:80px;text-align:center;">
+              ${saved.hdep && saved.hdepMax ? saved.hdep+' – '+saved.hdepMax : saved.hdep ? 'Dès '+saved.hdep : '–'}
+            </div>
+          </div>
+        </div>
+        <!-- Check-out + commentaire horaires -->
+        <div class="field-grid" style="margin-top:10px;">
           <div class="field"><label>Heure de départ (check-out)</label><input type="time" id="f-harr" value="${saved.harr||''}"></div>
+          <div class="field"><label>Commentaire horaires</label>
+            <input type="text" id="f-horaires-commentaire" placeholder="Ex. Check-in tardif possible, code porte 2026…" value="${saved.horairesCommentaire||''}">
+          </div>
         </div>
       </div>
       <div class="modal-section">
@@ -3150,29 +3177,16 @@ async function _deleteHotelDoc(idx, docIndex) {
 }
 
 function _openDocViewer(url, name, type) {
-  const existing = document.getElementById('doc-viewer-overlay');
-  if (existing) existing.remove();
-  const overlay = document.createElement('div');
-  overlay.id = 'doc-viewer-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(26,22,16,.92);z-index:9000;display:flex;flex-direction:column;';
   const isPDF = type === 'application/pdf' || name.toLowerCase().endsWith('.pdf');
   const isImage = type.startsWith('image/');
-  overlay.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;padding:.75rem 1rem;background:var(--ink);flex-shrink:0;">
-      <div style="font-size:13px;font-weight:600;color:var(--sand);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
-      <a href="${url}" download="${name}" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 12px;border-radius:8px;border:1px solid rgba(245,240,232,.2);background:transparent;color:rgba(245,240,232,.7);text-decoration:none;white-space:nowrap;" onmouseover="this.style.background='rgba(245,240,232,.1)'" onmouseout="this.style.background='transparent'">⬇️ Télécharger</a>
-      <button onclick="document.getElementById('doc-viewer-overlay').remove()" style="background:none;border:none;color:rgba(245,240,232,.5);font-size:20px;cursor:pointer;padding:2px 8px;border-radius:4px;font-family:'DM Sans',sans-serif;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(245,240,232,.5)'">✕</button>
-    </div>
-    <div style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:1rem;">
-      ${isPDF
-        ? `<iframe src="${url}" style="width:100%;height:100%;max-width:900px;border:none;border-radius:8px;background:white;" title="${name}"></iframe>`
-        : isImage
-          ? `<img src="${url}" style="max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.4);" alt="${name}">`
-          : `<div style="text-align:center;color:rgba(245,240,232,.5);"><div style="font-size:3rem;margin-bottom:1rem;">📄</div><div style="font-size:14px;margin-bottom:1rem;">${name}</div><a href="${url}" download="${name}" style="font-family:'DM Sans',sans-serif;padding:10px 20px;border-radius:10px;background:var(--amber);color:white;text-decoration:none;font-weight:500;">⬇️ Télécharger le fichier</a></div>`
-      }
-    </div>`;
-  document.body.appendChild(overlay);
-  overlay.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.remove(); });
+  if (isPDF || isImage) {
+    window.open(url, '_blank');
+  } else {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.click();
+  }
 }
 
 function _renderDocsSection(idx, saved) {
@@ -3630,7 +3644,10 @@ function updateCardInTimeline(idx, data) {
     const extras = [];
     if (data.resanum) extras.push(`<span class="tag" style="background:var(--slate-pale);color:var(--slate)">🔑 ${data.resanum}</span>`);
     if (data.tel)     extras.push(`<span class="tag" style="background:var(--slate-pale);color:var(--slate)">📞 ${data.tel}</span>`);
-    if (data.hdep)    extras.push(`<span class="tag" style="background:var(--teal-pale);color:var(--teal)">Check-in ${data.hdep}</span>`);
+    if (data.hdep) {
+      const checkinLabel = data.hdepMax ? 'Check-in ' + data.hdep + ' – ' + data.hdepMax : 'Check-in ' + data.hdep;
+      extras.push('<span class="tag" style="background:var(--teal-pale);color:var(--teal)">'+checkinLabel+'</span>');
+    }
     if (data.harr)    extras.push(`<span class="tag" style="background:var(--teal-pale);color:var(--teal)">Check-out ${data.harr}</span>`);
     if (data.dannul)  extras.push(`<span class="tag tag-annul">Annul. limite ${data.dannul}</span>`);
 
@@ -3785,6 +3802,17 @@ function _updateWifiUI() {
     labelPayant.style.color       = isPayant ? 'var(--amber)' : 'var(--ink-light)';
   }
 }
+
+function _updateCheckinDisplay() {
+  const dep    = document.getElementById('f-hdep')?.value;
+  const depMax = document.getElementById('f-hdep-max')?.value;
+  const el     = document.getElementById('checkin-display');
+  if (!el) return;
+  if (dep && depMax) el.textContent = dep + ' – ' + depMax;
+  else if (dep)      el.textContent = 'Dès ' + dep;
+  else if (depMax)   el.textContent = 'Avant ' + depMax;
+  else               el.textContent = '–';
+}
 async function saveModal() {
   if (currentModalIdx === null) return;
 
@@ -3792,7 +3820,7 @@ async function saveModal() {
   const data = Object.assign({}, loadFiche(currentModalIdx));
 
   // Mettre à jour uniquement les champs du formulaire
-  const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps','parking-montant','parking-note',
+  const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps','parking-montant','parking-note','hdep-max','horaires-commentaire',
                   'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName'];
   fields.forEach(f => {
     const el = document.getElementById('f-' + f);
@@ -5461,7 +5489,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.9.4 · 21/05/26
+        Version : v2.9.6 · 21/05/26
       </div>
     </div>`;
 }
