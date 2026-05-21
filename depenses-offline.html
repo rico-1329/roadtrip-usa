@@ -24,6 +24,13 @@ header h1 span { color: #C8622A; }
   font-size: 16px; color: #2C2416; background: #F9F7F3; outline: none;
   -webkit-appearance: none; appearance: none; font-family: inherit;
 }
+.field input[type=checkbox] {
+  width: 24px; height: 24px; padding: 0;
+  border: 2.5px solid #1A7A65; border-radius: 6px;
+  background: white; cursor: pointer;
+  -webkit-appearance: checkbox; appearance: checkbox;
+  accent-color: #1A7A65; flex-shrink: 0;
+}
 .field textarea { min-height: 60px; resize: vertical; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
@@ -71,7 +78,6 @@ button.btn-imp { background: #E0DBD0; color: #2C2416; }
 .pos { color: #2E7D32; font-weight: 700; }
 .neg { color: #C0392B; font-weight: 700; }
 
-#debug { position: fixed; bottom: 0; left: 0; right: 0; background: #111; color: #0f0; font-size: 11px; padding: 6px 10px; max-height: 100px; overflow-y: auto; z-index: 9999; font-family: monospace; }
 </style>
 </head>
 <body>
@@ -178,29 +184,20 @@ button.btn-imp { background: #E0DBD0; color: #2C2416; }
 
 </div>
 
-<div id="debug"></div>
 
 <script>
 const PARTS = ['Éric','Pascale','Carole','Léa'];
 const KEY = 'rt_dep_v3';
 let data = [];
 
-function log(msg) {
-  const d = document.getElementById('debug');
-  const line = document.createElement('div');
-  line.textContent = new Date().toLocaleTimeString('fr') + ' ' + msg;
-  d.insertBefore(line, d.firstChild);
-}
 
 // Init
-log('init start');
 try {
   document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
   const s = localStorage.getItem(KEY);
-  if (s) { data = JSON.parse(s); log('loaded ' + data.length + ' items'); }
-} catch(e) { log('init error: ' + e.message); }
+  if (s) { data = JSON.parse(s); }
+} catch(e) {}
 render();
-log('init done');
 
 // Checkboxes participants
 const cbTous = document.getElementById('cb-tous');
@@ -213,7 +210,6 @@ function syncVisuel() {
     const row = document.getElementById('row-' + cb.id.replace('cb-',''));
     if (row) row.classList.toggle('checked', cb.checked);
   });
-  log('syncVisuel: tous=' + cbTous.checked + ' indiv=' + cbIndiv.map(c=>c.value+'='+c.checked).join(','));
 }
 
 cbTous.addEventListener('change', function() {
@@ -249,9 +245,7 @@ function getParticipants() {
 }
 
 // Bouton Ajouter
-log('attaching btn-add listener');
 document.getElementById('btn-add').addEventListener('click', function(e) {
-  log('btn-add CLICK fired');
   const desc    = document.getElementById('f-desc').value.trim();
   const montant = parseFloat(document.getElementById('f-montant').value);
   const payepar = document.getElementById('f-payepar').value;
@@ -260,11 +254,9 @@ document.getElementById('btn-add').addEventListener('click', function(e) {
   const note    = document.getElementById('f-note').value.trim();
   const parts   = getParticipants();
 
-  log('desc=' + desc + ' montant=' + montant + ' payepar=' + payepar);
-
-  if (!desc)    { log('ERR: no desc'); alert('Description manquante'); return; }
-  if (!montant || montant <= 0) { log('ERR: bad montant'); alert('Montant invalide'); return; }
-  if (!payepar) { log('ERR: no payepar'); alert('Payé par manquant'); return; }
+  if (!desc)    { alert('Description manquante'); return; }
+  if (!montant || montant <= 0) { alert('Montant invalide'); return; }
+  if (!payepar) { alert('Payé par manquant'); return; }
 
   const entry = {
     id: Date.now(), label: desc, montant, payepar,
@@ -272,12 +264,10 @@ document.getElementById('btn-add').addEventListener('click', function(e) {
     perso: parts.length === 1 ? 'perso' : 'groupe',
     _at: new Date().toISOString()
   };
-  log('saving entry: ' + JSON.stringify(entry).slice(0,80));
   data.unshift(entry);
-  try { localStorage.setItem(KEY, JSON.stringify(data)); log('saved to localStorage'); } catch(e) { log('save error: ' + e.message); }
+  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {}
   render();
   resetForm();
-  log('done');
 });
 
 // Supprimer
@@ -287,12 +277,10 @@ document.getElementById('liste').addEventListener('click', function(e) {
   data = data.filter(d => d.id !== parseInt(btn.dataset.id));
   localStorage.setItem(KEY, JSON.stringify(data));
   render();
-  log('deleted');
 });
 
 // Export
 document.getElementById('btn-exp').addEventListener('click', function() {
-  log('export click');
   if (!data.length) { alert('Aucune dépense'); return; }
   const ts = new Date().toISOString().slice(0,16).replace('T','-').replace(':','h');
   const blob = new Blob([JSON.stringify({ _source:'roadtrip-offline', _at: new Date().toISOString(), payments: data }, null, 2)], { type:'application/json' });
@@ -300,7 +288,6 @@ document.getElementById('btn-exp').addEventListener('click', function() {
   a.href = URL.createObjectURL(blob);
   a.download = 'depenses-' + ts + '.json';
   a.click();
-  log('exported');
 });
 
 // Import
@@ -319,9 +306,8 @@ document.getElementById('f-import').addEventListener('change', function() {
       payments.forEach(p => { if (!ids.has(String(p.id))) { data.push(p); n++; } });
       localStorage.setItem(KEY, JSON.stringify(data));
       render();
-      log('imported ' + n);
       alert(n + ' dépense(s) importée(s)');
-    } catch(err) { log('import error: ' + err.message); alert('Fichier invalide'); }
+    } catch(err) { alert('Fichier invalide'); }
   };
   reader.readAsText(file);
   this.value = '';
@@ -338,9 +324,8 @@ function resetForm() {
 }
 
 function render() {
-  log('render() called, data.length=' + data.length);
   const liste = document.getElementById('liste');
-  if (!liste) { log('ERR: liste element not found'); return; }
+  if (!liste) { return; }
   const total = data.reduce((s,d) => s + (d.montant||0), 0);
   document.getElementById('compteur').textContent = data.length;
   document.getElementById('total').textContent = data.length ? total.toFixed(2) + ' €' : '';
@@ -367,8 +352,7 @@ function render() {
       + '<button class="btn-del" data-id="' + d.id + '">✕</button>'
       + '</div>';
   }).join('');
-  log('render: liste.innerHTML set, length=' + liste.innerHTML.length);
-  } catch(e) { log('render ERROR: ' + e.message); }
+  } catch(e) { console.error('render error', e); }
 
   renderSoldes();
 }
