@@ -743,7 +743,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9.2 · 21/05/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9.4 · 21/05/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -2872,6 +2872,136 @@ function _renderModalContent(idx) {
       </div>
 
       <div class="modal-section">
+        <div class="modal-section-title">🅿️ Parking</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <!-- Checkbox Parking disponible -->
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:.75rem 1rem;background:${saved.parking?'var(--teal-pale)':'var(--sand)'};border-radius:10px;border:.5px solid ${saved.parking?'var(--teal)':'var(--sand-dark)'};transition:all .2s;font-size:13px;font-weight:500;color:${saved.parking?'var(--teal)':'var(--ink-light)'};">
+            <input type="checkbox" id="f-parking" ${saved.parking?'checked':''}
+              style="width:18px;height:18px;cursor:pointer;accent-color:var(--teal);"
+              onchange="
+                const sec=document.getElementById('parking-detail');
+                sec.style.display=this.checked?'flex':'none';
+                this.closest('label').style.background=this.checked?'var(--teal-pale)':'var(--sand)';
+                this.closest('label').style.borderColor=this.checked?'var(--teal)':'var(--sand-dark)';
+                this.closest('label').style.color=this.checked?'var(--teal)':'var(--ink-light)';
+              ">
+            🅿️ Parking disponible à l'hôtel
+          </label>
+          <!-- Détails parking — visible uniquement si coché -->
+          <div id="parking-detail" style="display:${saved.parking?'flex':'none'};flex-direction:column;gap:10px;padding:.85rem 1rem;background:white;border-radius:10px;border:.5px solid var(--sand-dark);">
+            <!-- Gratuit / Payant -->
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:6px 14px;border-radius:20px;border:1.5px solid ${saved.parkingType==='gratuit'?'var(--green)':'var(--sand-dark)'};background:${saved.parkingType==='gratuit'?'var(--green-pale)':'white'};font-size:12px;font-weight:500;color:${saved.parkingType==='gratuit'?'var(--green)':'var(--ink-light)'};transition:all .15s;"
+                onmouseover="if(document.getElementById('f-parking-gratuit').checked)return;this.style.borderColor='var(--green)'" onmouseout="if(document.getElementById('f-parking-gratuit').checked)return;this.style.borderColor='var(--sand-dark)'">
+                <input type="radio" id="f-parking-gratuit" name="parking-type" value="gratuit" ${saved.parkingType==='gratuit'||!saved.parkingType?'checked':''}
+                  style="accent-color:var(--green);cursor:pointer;"
+                  onchange="_updateParkingUI()">
+                ✅ Gratuit
+              </label>
+              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:6px 14px;border-radius:20px;border:1.5px solid ${saved.parkingType==='payant'?'var(--amber)':'var(--sand-dark)'};background:${saved.parkingType==='payant'?'var(--amber-pale)':'white'};font-size:12px;font-weight:500;color:${saved.parkingType==='payant'?'var(--amber)':'var(--ink-light)'};transition:all .15s;"
+                onmouseover="if(document.getElementById('f-parking-payant').checked)return;this.style.borderColor='var(--amber)'" onmouseout="if(document.getElementById('f-parking-payant').checked)return;this.style.borderColor='var(--sand-dark)'">
+                <input type="radio" id="f-parking-payant" name="parking-type" value="payant" ${saved.parkingType==='payant'?'checked':''}
+                  style="accent-color:var(--amber);cursor:pointer;"
+                  onchange="_updateParkingUI()">
+                💳 Payant
+              </label>
+            </div>
+            <!-- Montant — visible si Payant -->
+            <div id="parking-montant-row" style="display:${saved.parkingType==='payant'?'flex':'none'};align-items:center;gap:10px;flex-wrap:wrap;">
+              <div class="field" style="flex:1;min-width:150px;margin:0;">
+                <label>Tarif / nuit</label>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                  <input type="number" id="f-parking-montant" min="0" step="0.5" placeholder="0.00"
+                    value="${saved.parkingMontant||''}"
+                    style="font-family:'DM Sans',sans-serif;font-size:14px;padding:7px 10px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;transition:border-color .15s;"
+                    onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--sand-dark)'">
+                  <span style="font-size:13px;color:var(--slate-light);white-space:nowrap;">€ / nuit</span>
+                </div>
+              </div>
+              <div class="field" style="flex:1;min-width:180px;margin:0;">
+                <label>Note parking</label>
+                <input type="text" id="f-parking-note" placeholder="Ex. Couvert, vidéosurveilé…"
+                  value="${saved.parkingNote||''}"
+                  style="margin-top:4px;font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 10px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;transition:border-color .15s;"
+                  onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--sand-dark)'">
+              </div>
+            </div>
+            <!-- Commentaire parking -->
+            <div class="field" style="margin:0;">
+              <label>Commentaire parking</label>
+              <textarea id="f-parking-commentaire" placeholder="Ex. Réservation nécessaire, accès par le parking sud, hauteur limitée…"
+                style="margin-top:4px;font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 10px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;resize:vertical;min-height:60px;transition:border-color .15s;"
+                onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--sand-dark)'">${saved.parkingCommentaire||''}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── WIFI ── -->
+      <div class="modal-section">
+        <div class="modal-section-title">📶 Wifi</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:.75rem 1rem;background:${saved.wifi?'var(--teal-pale)':'var(--sand)'};border-radius:10px;border:.5px solid ${saved.wifi?'var(--teal)':'var(--sand-dark)'};transition:all .2s;font-size:13px;font-weight:500;color:${saved.wifi?'var(--teal)':'var(--ink-light)'};">
+            <input type="checkbox" id="f-wifi" ${saved.wifi?'checked':''}
+              style="width:18px;height:18px;cursor:pointer;accent-color:var(--teal);"
+              onchange="
+                const sec=document.getElementById('wifi-detail');
+                sec.style.display=this.checked?'flex':'none';
+                this.closest('label').style.background=this.checked?'var(--teal-pale)':'var(--sand)';
+                this.closest('label').style.borderColor=this.checked?'var(--teal)':'var(--sand-dark)';
+                this.closest('label').style.color=this.checked?'var(--teal)':'var(--ink-light)';
+              ">
+            📶 Wifi disponible
+          </label>
+          <div id="wifi-detail" style="display:${saved.wifi?'flex':'none'};flex-direction:column;gap:10px;padding:.85rem 1rem;background:white;border-radius:10px;border:.5px solid var(--sand-dark);">
+            <!-- Gratuit / Payant -->
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:6px 14px;border-radius:20px;border:1.5px solid ${saved.wifiType==='payant'?'var(--sand-dark)':'var(--green)'};background:${saved.wifiType==='payant'?'white':'var(--green-pale)'};font-size:12px;font-weight:500;color:${saved.wifiType==='payant'?'var(--ink-light)':'var(--green)'};transition:all .15s;">
+                <input type="radio" id="f-wifi-gratuit" name="wifi-type" value="gratuit" ${saved.wifiType==='payant'?'':'checked'}
+                  style="accent-color:var(--green);cursor:pointer;"
+                  onchange="_updateWifiUI()">
+                ✅ Gratuit
+              </label>
+              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:6px 14px;border-radius:20px;border:1.5px solid ${saved.wifiType==='payant'?'var(--amber)':'var(--sand-dark)'};background:${saved.wifiType==='payant'?'var(--amber-pale)':'white'};font-size:12px;font-weight:500;color:${saved.wifiType==='payant'?'var(--amber)':'var(--ink-light)'};transition:all .15s;">
+                <input type="radio" id="f-wifi-payant" name="wifi-type" value="payant" ${saved.wifiType==='payant'?'checked':''}
+                  style="accent-color:var(--amber);cursor:pointer;"
+                  onchange="_updateWifiUI()">
+                💳 Payant
+              </label>
+            </div>
+            <!-- Montant wifi — visible si Payant -->
+            <div id="wifi-montant-row" style="display:${saved.wifiType==='payant'?'flex':'none'};align-items:center;gap:10px;flex-wrap:wrap;">
+              <div class="field" style="flex:1;min-width:150px;margin:0;">
+                <label>Tarif</label>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                  <input type="number" id="f-wifi-montant" min="0" step="0.5" placeholder="0.00"
+                    value="${saved.wifiMontant||''}"
+                    style="font-family:'DM Sans',sans-serif;font-size:14px;padding:7px 10px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;transition:border-color .15s;"
+                    onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--sand-dark)'">
+                  <span style="font-size:13px;color:var(--slate-light);white-space:nowrap;">€ / nuit</span>
+                </div>
+              </div>
+              <div class="field" style="flex:1;min-width:180px;margin:0;">
+                <label>Note wifi</label>
+                <input type="text" id="f-wifi-note" placeholder="Ex. Code en réception…"
+                  value="${saved.wifiNote||''}"
+                  style="margin-top:4px;font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 10px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;transition:border-color .15s;"
+                  onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--sand-dark)'">
+              </div>
+            </div>
+            <!-- Commentaire wifi -->
+            <div class="field" style="margin:0;">
+              <label>Commentaire wifi</label>
+              <textarea id="f-wifi-commentaire" placeholder="Ex. Uniquement dans le lobby, débit limité, code WiFi : HOTEL2026…"
+                style="margin-top:4px;font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 10px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;resize:vertical;min-height:60px;transition:border-color .15s;"
+                onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor='var(--sand-dark)'">${saved.wifiCommentaire||''}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="modal-section">
         <div class="modal-section-title">Validation</div>
         <div style="display:flex;align-items:center;gap:14px;background:${saved.validated?'var(--green-pale)':'var(--sand)'};border-radius:10px;padding:.85rem 1rem;border:.5px solid ${saved.validated?'var(--green)':'var(--sand-dark)'};transition:all .2s;">
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1;font-size:13px;font-weight:500;color:${saved.validated?'var(--green)':'var(--ink-light)'};">
@@ -3514,6 +3644,20 @@ function updateCardInTimeline(idx, data) {
       extras.push(`<span class="tag" style="background:${solde?'var(--green-pale)':'var(--orange-pale)'};color:${solde?'var(--green)':'var(--orange)'}" title="Montant budgété : ${budget} €${solde?' · Soldé':' · Reste '+reste.toFixed(2)+' €'}">💳 Réglé ${regle.toFixed(2)} €${solde?' ✅':''}</span>`);
     }
 
+    // Badge wifi
+    if (data.wifi) {
+      const wfLabel = data.wifiType === 'payant'
+        ? '📶 Wifi ' + (data.wifiMontant ? data.wifiMontant + ' €/nuit' : 'payant')
+        : '📶 Wifi gratuit';
+      extras.push('<span class="tag" style="background:var(--slate-pale);color:var(--slate)">'+wfLabel+'</span>');
+    }
+    // Badge parking
+    if (data.parking) {
+      const pkLabel = data.parkingType === 'payant'
+        ? '🅿️ Parking ' + (data.parkingMontant ? data.parkingMontant + ' €/nuit' : 'payant')
+        : '🅿️ Parking gratuit';
+      extras.push('<span class="tag" style="background:var(--teal-pale);color:var(--teal)">'+pkLabel+'</span>');
+    }
     if (data.modepay) extras.push(`<span class="tag" style="background:var(--slate-pale);color:var(--slate)">${data.modepay}</span>`);
     if (data.payepar) extras.push(`<span class="tag" style="background:var(--amber-pale);color:var(--amber)">👤 ${data.payepar}</span>`);
     if (data.note)    extras.push(`<span class="tag" style="background:var(--amber-pale);color:var(--amber)">📝 Note</span>`);
@@ -3604,6 +3748,43 @@ function _validateGPS(input) {
     if (valid) linkEl.href = _gpsToMapsUrl(val);
   }
 }
+
+function _updateParkingUI() {
+  const isPayant = document.getElementById('f-parking-payant')?.checked;
+  const row = document.getElementById('parking-montant-row');
+  if (row) row.style.display = isPayant ? 'flex' : 'none';
+  // Mettre à jour le style des labels radio
+  const labelGratuit = document.getElementById('f-parking-gratuit')?.closest('label');
+  const labelPayant  = document.getElementById('f-parking-payant')?.closest('label');
+  if (labelGratuit) {
+    labelGratuit.style.borderColor = isPayant ? 'var(--sand-dark)' : 'var(--green)';
+    labelGratuit.style.background  = isPayant ? 'white' : 'var(--green-pale)';
+    labelGratuit.style.color       = isPayant ? 'var(--ink-light)' : 'var(--green)';
+  }
+  if (labelPayant) {
+    labelPayant.style.borderColor = isPayant ? 'var(--amber)' : 'var(--sand-dark)';
+    labelPayant.style.background  = isPayant ? 'var(--amber-pale)' : 'white';
+    labelPayant.style.color       = isPayant ? 'var(--amber)' : 'var(--ink-light)';
+  }
+}
+
+function _updateWifiUI() {
+  const isPayant = document.getElementById('f-wifi-payant')?.checked;
+  const row = document.getElementById('wifi-montant-row');
+  if (row) row.style.display = isPayant ? 'flex' : 'none';
+  const labelGratuit = document.getElementById('f-wifi-gratuit')?.closest('label');
+  const labelPayant  = document.getElementById('f-wifi-payant')?.closest('label');
+  if (labelGratuit) {
+    labelGratuit.style.borderColor = isPayant ? 'var(--sand-dark)' : 'var(--green)';
+    labelGratuit.style.background  = isPayant ? 'white' : 'var(--green-pale)';
+    labelGratuit.style.color       = isPayant ? 'var(--ink-light)' : 'var(--green)';
+  }
+  if (labelPayant) {
+    labelPayant.style.borderColor = isPayant ? 'var(--amber)' : 'var(--sand-dark)';
+    labelPayant.style.background  = isPayant ? 'var(--amber-pale)' : 'white';
+    labelPayant.style.color       = isPayant ? 'var(--amber)' : 'var(--ink-light)';
+  }
+}
 async function saveModal() {
   if (currentModalIdx === null) return;
 
@@ -3611,7 +3792,7 @@ async function saveModal() {
   const data = Object.assign({}, loadFiche(currentModalIdx));
 
   // Mettre à jour uniquement les champs du formulaire
-  const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps',
+  const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps','parking-montant','parking-note',
                   'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName'];
   fields.forEach(f => {
     const el = document.getElementById('f-' + f);
@@ -3627,6 +3808,28 @@ async function saveModal() {
       const hotelEl = entry.querySelector('.card-hotel');
       if (hotelEl) hotelEl.textContent = data.hotelName;
     }
+  }
+
+  // Parking
+  const parkingEl = document.getElementById('f-parking');
+  if (parkingEl !== null) {
+    data.parking = parkingEl.checked;
+    const parkingPayantEl = document.getElementById('f-parking-payant');
+    data.parkingType = parkingPayantEl?.checked ? 'payant' : 'gratuit';
+    data.parkingMontant = document.getElementById('f-parking-montant')?.value || '';
+    data.parkingNote         = document.getElementById('f-parking-note')?.value         || '';
+    data.parkingCommentaire  = document.getElementById('f-parking-commentaire')?.value  || '';
+  }
+
+  // Wifi
+  const wifiEl = document.getElementById('f-wifi');
+  if (wifiEl !== null) {
+    data.wifi     = wifiEl.checked;
+    const wifiPayantEl = document.getElementById('f-wifi-payant');
+    data.wifiType        = wifiPayantEl?.checked ? 'payant' : 'gratuit';
+    data.wifiMontant     = document.getElementById('f-wifi-montant')?.value     || '';
+    data.wifiNote        = document.getElementById('f-wifi-note')?.value        || '';
+    data.wifiCommentaire = document.getElementById('f-wifi-commentaire')?.value || '';
   }
 
   // Statut dépôt de garantie
@@ -5258,7 +5461,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.9.2 · 21/05/26
+        Version : v2.9.4 · 21/05/26
       </div>
     </div>`;
 }
