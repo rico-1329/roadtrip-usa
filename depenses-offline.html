@@ -2,90 +2,76 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dépenses Road Trip</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: #F5F0E8; color: #2C2416; min-height: 100vh; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, sans-serif; background: #F5F0E8; color: #2C2416; padding-bottom: 80px; }
 
-header { background: #2C2416; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+header { background: #2C2416; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
 header h1 { color: #F5F0E8; font-size: 16px; font-weight: 600; }
 header h1 span { color: #C8622A; }
 #compteur { background: #C8622A; color: white; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
 
 .page { max-width: 480px; margin: 0 auto; padding: 12px; }
-
 .card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
 .card-title { font-size: 11px; font-weight: 700; color: #8A95A5; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
 
 .field { margin-bottom: 14px; }
-.field label { display: block; font-size: 11px; font-weight: 600; color: #8A95A5; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
+.field label { display: block; font-size: 11px; font-weight: 600; color: #8A95A5; margin-bottom: 5px; text-transform: uppercase; }
 .field input, .field select, .field textarea {
   width: 100%; padding: 12px; border: 2px solid #E0DBD0; border-radius: 10px;
-  font-family: inherit; font-size: 16px; color: #2C2416; background: #F9F7F3;
-  outline: none; appearance: none; -webkit-appearance: none;
+  font-size: 16px; color: #2C2416; background: #F9F7F3; outline: none;
+  -webkit-appearance: none; appearance: none; font-family: inherit;
 }
-.field input:focus, .field select:focus, .field textarea:focus { border-color: #C8622A; background: white; }
-.field textarea { min-height: 70px; resize: vertical; }
+.field textarea { min-height: 60px; resize: vertical; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-/* Chips */
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-.chip {
-  padding: 10px 16px; border-radius: 24px;
-  border: 2px solid #E0DBD0; background: #F5F0E8;
-  font-size: 14px; font-weight: 500; color: #5A6475;
-  cursor: pointer; user-select: none;
-  transition: all .1s;
-  min-height: 44px; min-width: 60px;
-  display: flex; align-items: center; justify-content: center;
+/* Checkboxes participants */
+.checks { display: flex; flex-direction: column; gap: 0; margin-top: 4px; border: 2px solid #E0DBD0; border-radius: 10px; overflow: hidden; }
+.check-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: white; border-bottom: 1px solid #F0EDE6; }
+.check-row:last-child { border-bottom: none; }
+.check-row input[type=checkbox] {
+  width: 24px; height: 24px; flex-shrink: 0;
+  accent-color: #1A7A65;
+  cursor: pointer;
+  margin: 0;
 }
-.chip.on { border-color: #1A7A65; background: #E0F2EE; color: #1A7A65; font-weight: 700; }
+.check-row label { font-size: 16px; font-weight: 500; cursor: pointer; flex: 1; padding: 2px 0; }
+.check-row.checked { background: #E0F2EE; }
 
 /* Bouton */
-#btn-add {
-  width: 100%; padding: 16px; border: none; border-radius: 12px;
-  background: #C8622A; color: white;
-  font-family: inherit; font-size: 16px; font-weight: 700;
-  cursor: pointer; touch-action: manipulation;
-  min-height: 52px;
+button.btn-main {
+  display: block; width: 100%; padding: 16px;
+  background: #C8622A; color: white; border: none; border-radius: 12px;
+  font-size: 17px; font-weight: 700; font-family: inherit;
+  cursor: pointer;
 }
-#btn-add:active { background: #a84e20; }
 
 /* Liste */
-.dep-item { background: white; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,.07); display: flex; gap: 12px; align-items: flex-start; }
+.dep-item { background: white; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
 .dep-montant { font-size: 20px; font-weight: 800; color: #C8622A; white-space: nowrap; }
-.dep-montant small { font-size: 12px; font-weight: 500; }
 .dep-info { flex: 1; }
 .dep-desc { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
 .dep-meta { font-size: 12px; color: #8A95A5; }
-.dep-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+.dep-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
 .tag { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; background: #E0F2EE; color: #1A7A65; }
-.btn-del { background: none; border: none; color: #E0DBD0; font-size: 18px; cursor: pointer; padding: 4px; touch-action: manipulation; }
-.btn-del:active { color: #C0392B; }
+.tag-gray { background: #f0f2f5; color: #5A6475; }
+button.btn-del { background: none; border: none; color: #ccc; font-size: 20px; cursor: pointer; padding: 2px 6px; }
 
-.empty { text-align: center; padding: 30px; color: #8A95A5; }
+.empty { text-align: center; padding: 30px; color: #8A95A5; font-size: 14px; }
 
-/* Actions */
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
-.btn-act {
-  padding: 14px; border: none; border-radius: 12px;
-  font-family: inherit; font-size: 14px; font-weight: 700;
-  cursor: pointer; touch-action: manipulation; min-height: 48px;
-}
-.btn-act:active { opacity: .7; }
-.btn-exp { background: #1A7A65; color: white; }
-.btn-imp { background: #E0DBD0; color: #2C2416; }
+button.btn-act { padding: 14px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; }
+button.btn-exp { background: #1A7A65; color: white; }
+button.btn-imp { background: #E0DBD0; color: #2C2416; }
 
-/* Toast */
-#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: #2C2416; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; opacity: 0; transition: all .25s; pointer-events: none; white-space: nowrap; z-index: 100; }
-#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-/* Soldes */
 .solde-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F5F0E8; font-size: 13px; }
 .solde-row:last-child { border: none; }
 .pos { color: #2E7D32; font-weight: 700; }
 .neg { color: #C0392B; font-weight: 700; }
+
+#debug { position: fixed; bottom: 0; left: 0; right: 0; background: #111; color: #0f0; font-size: 11px; padding: 6px 10px; max-height: 100px; overflow-y: auto; z-index: 9999; font-family: monospace; }
 </style>
 </head>
 <body>
@@ -129,12 +115,27 @@ header h1 span { color: #C8622A; }
 
     <div class="field">
       <label>Participants</label>
-      <div class="chips" id="chips">
-        <div class="chip on" data-v="tous">Tous</div>
-        <div class="chip" data-v="Éric">Éric</div>
-        <div class="chip" data-v="Pascale">Pascale</div>
-        <div class="chip" data-v="Carole">Carole</div>
-        <div class="chip" data-v="Léa">Léa</div>
+      <div class="checks" id="checks">
+        <div class="check-row" id="row-tous">
+          <input type="checkbox" id="cb-tous" checked>
+          <label for="cb-tous">Tous</label>
+        </div>
+        <div class="check-row" id="row-eric">
+          <input type="checkbox" id="cb-eric" value="Éric">
+          <label for="cb-eric">Éric</label>
+        </div>
+        <div class="check-row" id="row-pascale">
+          <input type="checkbox" id="cb-pascale" value="Pascale">
+          <label for="cb-pascale">Pascale</label>
+        </div>
+        <div class="check-row" id="row-carole">
+          <input type="checkbox" id="cb-carole" value="Carole">
+          <label for="cb-carole">Carole</label>
+        </div>
+        <div class="check-row" id="row-lea">
+          <input type="checkbox" id="cb-lea" value="Léa">
+          <label for="cb-lea">Léa</label>
+        </div>
       </div>
     </div>
 
@@ -153,12 +154,12 @@ header h1 span { color: #C8622A; }
       <textarea id="f-note" placeholder="Précisions…"></textarea>
     </div>
 
-    <button id="btn-add">＋ Ajouter</button>
+    <button class="btn-main" id="btn-add">＋ Ajouter la dépense</button>
   </div>
 
-  <div id="liste-wrap">
+  <div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <div style="font-size:14px;font-weight:700;">Dépenses</div>
+      <div style="font-size:14px;font-weight:700;">Dépenses enregistrées</div>
       <div id="total" style="font-size:14px;font-weight:700;color:#C8622A;"></div>
     </div>
     <div id="liste"></div>
@@ -177,84 +178,132 @@ header h1 span { color: #C8622A; }
 
 </div>
 
-<div id="toast"></div>
-<div id="debug" style="position:fixed;bottom:0;left:0;right:0;background:#000;color:#0f0;font-size:11px;padding:6px 10px;max-height:120px;overflow-y:auto;z-index:999;font-family:monospace;"></div>
+<div id="debug"></div>
 
 <script>
 const PARTS = ['Éric','Pascale','Carole','Léa'];
-const KEY   = 'rt_depenses_v2';
-let data    = [];
+const KEY = 'rt_dep_v3';
+let data = [];
 
-// ── Init ──
-document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
-log('PAGE LOADED - data=' + data.length + ' entries');
-try { const s = localStorage.getItem(KEY); if (s) data = JSON.parse(s); } catch(e) {}
-render();
-
-// ── Chips ──
-document.getElementById('chips').addEventListener('click', function(e) {
-  log('CHIP CLICK target=' + e.target.tagName + ' v=' + (e.target.dataset.v||'?'));
-  const chip = e.target.closest('.chip');
-  if (!chip) { log('no chip found'); return; }
-  const v = chip.dataset.v;
-  if (v === 'tous') {
-    this.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
-    chip.classList.add('on');
-  } else {
-    this.querySelector('[data-v="tous"]').classList.remove('on');
-    chip.classList.toggle('on');
-    const any = Array.from(this.querySelectorAll('.chip:not([data-v="tous"])')).some(c => c.classList.contains('on'));
-    if (!any) { this.querySelectorAll('.chip').forEach(c => c.classList.remove('on')); this.querySelector('[data-v="tous"]').classList.add('on'); }
-  }
-});
-
-function getChips() {
-  const tous = document.querySelector('#chips [data-v="tous"]').classList.contains('on');
-  if (tous) return [...PARTS];
-  return Array.from(document.querySelectorAll('#chips .chip:not([data-v="tous"]).on')).map(c => c.dataset.v);
+function log(msg) {
+  const d = document.getElementById('debug');
+  const line = document.createElement('div');
+  line.textContent = new Date().toLocaleTimeString('fr') + ' ' + msg;
+  d.insertBefore(line, d.firstChild);
 }
 
-// ── Ajouter ──
-document.getElementById('btn-add').addEventListener('click', function() {
-  log('BTN-ADD clicked');
+// Init
+log('init start');
+try {
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+  const s = localStorage.getItem(KEY);
+  if (s) { data = JSON.parse(s); log('loaded ' + data.length + ' items'); }
+} catch(e) { log('init error: ' + e.message); }
+render();
+log('init done');
+
+// Checkboxes participants
+const cbTous = document.getElementById('cb-tous');
+const cbIndiv = ['cb-eric','cb-pascale','cb-carole','cb-lea'].map(id => document.getElementById(id));
+
+function syncVisuel() {
+  // Met à jour la classe .checked sur chaque ligne selon l'état de la checkbox
+  document.getElementById('row-tous').classList.toggle('checked', cbTous.checked);
+  cbIndiv.forEach(cb => {
+    const row = document.getElementById('row-' + cb.id.replace('cb-',''));
+    if (row) row.classList.toggle('checked', cb.checked);
+  });
+  log('syncVisuel: tous=' + cbTous.checked + ' indiv=' + cbIndiv.map(c=>c.value+'='+c.checked).join(','));
+}
+
+cbTous.addEventListener('change', function() {
+  if (this.checked) {
+    // Décocher tous les individuels
+    cbIndiv.forEach(cb => { cb.checked = false; });
+  } else {
+    // Si on décoche Tous sans rien d'autre → remettre Tous
+    this.checked = true;
+  }
+  syncVisuel();
+});
+
+cbIndiv.forEach(cb => {
+  cb.addEventListener('change', function() {
+    // Décocher Tous si un individuel est coché
+    if (this.checked) cbTous.checked = false;
+    // Si plus rien de coché → remettre Tous
+    const anyChecked = cbIndiv.some(c => c.checked);
+    if (!anyChecked) cbTous.checked = true;
+    syncVisuel();
+  });
+});
+
+// Init : Tous coché par défaut
+cbTous.checked = true;
+cbIndiv.forEach(cb => { cb.checked = false; });
+syncVisuel();
+
+function getParticipants() {
+  if (cbTous.checked) return [...PARTS];
+  return cbIndiv.filter(cb => cb.checked).map(cb => cb.value);
+}
+
+// Bouton Ajouter
+log('attaching btn-add listener');
+document.getElementById('btn-add').addEventListener('click', function(e) {
+  log('btn-add CLICK fired');
   const desc    = document.getElementById('f-desc').value.trim();
   const montant = parseFloat(document.getElementById('f-montant').value);
   const payepar = document.getElementById('f-payepar').value;
   const date    = document.getElementById('f-date').value;
   const mode    = document.getElementById('f-mode').value;
   const note    = document.getElementById('f-note').value.trim();
-  const parts   = getChips();
+  const parts   = getParticipants();
 
-  log('desc='+desc+' montant='+montant+' payepar='+payepar);
-  if (!desc)           return toast('⚠ Description manquante');
-  if (!montant || montant <= 0) return toast('⚠ Montant invalide');
-  if (!payepar)        return toast('⚠ Payé par manquant');
+  log('desc=' + desc + ' montant=' + montant + ' payepar=' + payepar);
 
-  data.unshift({ id: Date.now(), label: desc, montant, payepar, participants: parts, date, modepay: mode, note, perso: parts.length === 1 ? 'perso' : 'groupe', _at: new Date().toISOString() });
-  save(); render(); reset();
-  toast('✓ Dépense ajoutée');
+  if (!desc)    { log('ERR: no desc'); alert('Description manquante'); return; }
+  if (!montant || montant <= 0) { log('ERR: bad montant'); alert('Montant invalide'); return; }
+  if (!payepar) { log('ERR: no payepar'); alert('Payé par manquant'); return; }
+
+  const entry = {
+    id: Date.now(), label: desc, montant, payepar,
+    participants: parts, date, modepay: mode, note,
+    perso: parts.length === 1 ? 'perso' : 'groupe',
+    _at: new Date().toISOString()
+  };
+  log('saving entry: ' + JSON.stringify(entry).slice(0,80));
+  data.unshift(entry);
+  try { localStorage.setItem(KEY, JSON.stringify(data)); log('saved to localStorage'); } catch(e) { log('save error: ' + e.message); }
+  render();
+  resetForm();
+  log('done');
 });
 
-// ── Supprimer ──
+// Supprimer
 document.getElementById('liste').addEventListener('click', function(e) {
   const btn = e.target.closest('.btn-del');
   if (!btn) return;
-  const id = parseInt(btn.dataset.id);
-  data = data.filter(d => d.id !== id);
-  save(); render();
-  toast('Supprimée');
+  data = data.filter(d => d.id !== parseInt(btn.dataset.id));
+  localStorage.setItem(KEY, JSON.stringify(data));
+  render();
+  log('deleted');
 });
 
-// ── Export ──
+// Export
 document.getElementById('btn-exp').addEventListener('click', function() {
-  if (!data.length) return toast('Aucune dépense');
+  log('export click');
+  if (!data.length) { alert('Aucune dépense'); return; }
   const ts = new Date().toISOString().slice(0,16).replace('T','-').replace(':','h');
   const blob = new Blob([JSON.stringify({ _source:'roadtrip-offline', _at: new Date().toISOString(), payments: data }, null, 2)], { type:'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'depenses-' + ts + '.json'; a.click();
-  toast('✓ Export téléchargé');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'depenses-' + ts + '.json';
+  a.click();
+  log('exported');
 });
 
-// ── Import ──
+// Import
 document.getElementById('btn-imp').addEventListener('click', function() {
   document.getElementById('f-import').click();
 });
@@ -268,55 +317,58 @@ document.getElementById('f-import').addEventListener('change', function() {
       const ids = new Set(data.map(d => String(d.id)));
       let n = 0;
       payments.forEach(p => { if (!ids.has(String(p.id))) { data.push(p); n++; } });
-      save(); render();
-      toast('✓ ' + n + ' dépense' + (n>1?'s':'') + ' importée' + (n>1?'s':''));
-    } catch(err) { toast('❌ Fichier invalide'); }
+      localStorage.setItem(KEY, JSON.stringify(data));
+      render();
+      log('imported ' + n);
+      alert(n + ' dépense(s) importée(s)');
+    } catch(err) { log('import error: ' + err.message); alert('Fichier invalide'); }
   };
   reader.readAsText(file);
   this.value = '';
 });
 
-// ── Reset ──
-function reset() {
+function resetForm() {
   document.getElementById('f-desc').value = '';
   document.getElementById('f-montant').value = '';
   document.getElementById('f-note').value = '';
   document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
-log('PAGE LOADED - data=' + data.length + ' entries');
-  document.querySelectorAll('#chips .chip').forEach(c => c.classList.remove('on'));
-  document.querySelector('#chips [data-v="tous"]').classList.add('on');
+  cbIndiv.forEach(cb => { cb.checked = false; updateRow(cb); });
+  cbTous.checked = true;
+  document.getElementById('row-tous').classList.add('checked');
 }
 
-// ── Save ──
-function save() { localStorage.setItem(KEY, JSON.stringify(data)); }
-
-// ── Render ──
 function render() {
+  log('render() called, data.length=' + data.length);
   const liste = document.getElementById('liste');
-  const total = data.reduce((s,d) => s + d.montant, 0);
+  if (!liste) { log('ERR: liste element not found'); return; }
+  const total = data.reduce((s,d) => s + (d.montant||0), 0);
   document.getElementById('compteur').textContent = data.length;
   document.getElementById('total').textContent = data.length ? total.toFixed(2) + ' €' : '';
 
   if (!data.length) {
-    liste.innerHTML = '<div class="empty">🧾<br>Aucune dépense</div>';
+    liste.innerHTML = '<div class="empty">🧾 Aucune dépense enregistrée</div>';
     document.getElementById('soldes-card').style.display = 'none';
     return;
   }
 
+  try {
   liste.innerHTML = data.map(d => {
-    const date = d.date ? new Date(d.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
-    return `<div class="dep-item">
-      <div>
-        <div class="dep-montant">${d.montant.toFixed(2)}<small> €</small></div>
-      </div>
-      <div class="dep-info">
-        <div class="dep-desc">${d.label}</div>
-        <div class="dep-meta">${date ? date + ' · ' : ''}${d.payepar}</div>
-        <div class="dep-tags"><span class="tag">${(d.participants||[]).join(', ')}</span>${d.modepay?'<span class="tag" style="background:#f0f2f5;color:#5A6475">'+d.modepay+'</span>':''}</div>
-      </div>
-      <button class="btn-del" data-id="${d.id}">✕</button>
-    </div>`;
+    const dateStr = d.date ? new Date(d.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
+    const parts = (d.participants||[]).join(', ');
+    return '<div class="dep-item">'
+      + '<div><div class="dep-montant">' + (d.montant||0).toFixed(2) + ' €</div></div>'
+      + '<div class="dep-info">'
+      + '<div class="dep-desc">' + (d.label||'') + '</div>'
+      + '<div class="dep-meta">' + (dateStr ? dateStr + ' · ' : '') + (d.payepar||'') + '</div>'
+      + '<div class="dep-tags"><span class="tag">' + parts + '</span>'
+      + (d.modepay ? '<span class="tag tag-gray">' + d.modepay + '</span>' : '')
+      + (d.note ? '<span class="tag tag-gray">' + d.note + '</span>' : '')
+      + '</div></div>'
+      + '<button class="btn-del" data-id="' + d.id + '">✕</button>'
+      + '</div>';
   }).join('');
+  log('render: liste.innerHTML set, length=' + liste.innerHTML.length);
+  } catch(e) { log('render ERROR: ' + e.message); }
 
   renderSoldes();
 }
@@ -326,13 +378,13 @@ function renderSoldes() {
   PARTS.forEach(p => { paye[p] = 0; doit[p] = 0; });
   data.forEach(d => {
     const parts = d.participants && d.participants.length ? d.participants : PARTS;
-    const m = d.montant;
+    const m = d.montant || 0;
     if (paye[d.payepar] !== undefined) paye[d.payepar] += m;
     parts.forEach(p => { if (doit[p] !== undefined) doit[p] += m / parts.length; });
   });
   let html = '';
   PARTS.forEach(p => {
-    const s = paye[p] - doit[p];
+    const s = (paye[p] || 0) - (doit[p] || 0);
     if (Math.abs(s) < 0.01) return;
     html += `<div class="solde-row"><span>${p}</span><span class="${s>0?'pos':'neg'}">${s>0?'+':''}${s.toFixed(2)} €</span></div>`;
   });
@@ -340,20 +392,6 @@ function renderSoldes() {
   if (!html) { card.style.display = 'none'; return; }
   document.getElementById('soldes').innerHTML = html;
   card.style.display = 'block';
-}
-
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
-  log(msg);
-}
-
-function log(msg) {
-  const d = document.getElementById('debug');
-  const line = document.createElement('div');
-  line.textContent = new Date().toLocaleTimeString() + ' ' + msg;
-  d.insertBefore(line, d.firstChild);
 }
 </script>
 </body>
