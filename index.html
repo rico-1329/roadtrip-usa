@@ -7586,7 +7586,158 @@ function printJournal() {
     <h2>Remboursements (${rembs.length})</h2>
     <table><tr><th>Date</th><th>Libellé</th><th>Montant</th><th>Par</th><th>À</th><th>Mode</th><th>Statut</th></tr>
     ${rembs.map(r=>`<tr style="${r._cancelled?'text-decoration:line-through;color:gray':''}"><td>${r.date||''}</td><td>${r.label||''}</td><td>${(r.payers?.length>1?parseFloat(r.montantTotal||0):parseFloat(r.montant||0)).toFixed(2)} €</td><td>${(Array.isArray(r.payers)?r.payers:[r.de]).join(', ')}</td><td>${r.a||''}</td><td>${r.mode||''}</td><td>${r._cancelled?'Annulé':'Actif'}</td></tr>`).join('')}
-    </table></body></html>`);
+    </table>
+
+<!-- À PROPOS MODAL -->
+<div id="about-overlay" onclick="if(event.target===this)closeAboutModal()" style="display:none;">
+  <div style="background:var(--sand);border-radius:16px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+    <div style="background:var(--ink);color:var(--sand);padding:1.1rem 1.5rem;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;">
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;">🗺 Road Trip USA · Été 2026</div>
+        <div style="font-size:11px;color:rgba(245,240,232,.45);margin-top:2px;">À propos de l'application</div>
+      </div>
+      <button onclick="closeAboutModal()" style="background:none;border:none;color:rgba(245,240,232,.5);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:4px;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(245,240,232,.5)'">✕</button>
+    </div>
+    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.9.6</div><div style="font-size:10px;color:var(--slate-light);">21/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Documents PDF · ouverture dans un nouvel onglet (viewer natif navigateur)</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.9.5</div><div style="font-size:10px;color:var(--slate-light);">21/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Check-in : plage horaire (à partir de / jusqu'à) · Commentaire horaires</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.9.4</div><div style="font-size:10px;color:var(--slate-light);">21/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Commentaire parking · Section Wifi (gratuit/payant, tarif, commentaire) · Badge 📶 timeline</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.9.3</div><div style="font-size:10px;color:var(--slate-light);">21/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Parking dans fiches hôtel · Gratuit/Payant · Tarif €/nuit · Badge 🅿️ timeline</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.9.2</div><div style="font-size:10px;color:var(--slate-light);">21/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Champ GPS · Format N 044° 39.838, W 111° 05.999 · Validation temps réel · Lien Google Maps automatique</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.9.1</div><div style="font-size:10px;color:var(--slate-light);">21/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fix filtre Hôtels · Toutes les étapes hotel affichées quelle que soit la présence de visites</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.9</div><div style="font-size:10px;color:var(--slate-light);">21/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Documents PDF dans fiches hôtel · Upload Supabase Storage · Visualisation · Suppression</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.8</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fix sous-titre modale — hotelName prioritaire sur step.hotel dans openModal et _renderModalContent</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.7</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Nom d'hôtel éditable dans fiche · Mise à jour temps réel carte timeline · hotelName sauvegardé en base</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.6</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fix titre timeline — _customTitle lu dans renderTimeline · Fix alertes en doublon — pillsHTML filtre les alertes masquées et intègre les alertes custom</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.5</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Alertes éditables dans les fiches · Ajout / modification / suppression · Alertes initiales masquables · Badge timeline mis à jour en temps réel</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.4</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fix titre fiche — _customTitle prioritaire sur step.city dans _renderModalContent</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.3</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Dépôt de garantie dans fiches hôtel · Statut versé/restitué/en attente · Badge 🔒 sur carte timeline · Correction dépendances CDN</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.2</div><div style="font-size:10px;color:var(--slate-light);">27/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correction bugs navigation · Vues hors modal-overlay · Fix opacity overlays · Fix openModal/closeModal</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.1</div><div style="font-size:10px;color:var(--slate-light);">28/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Map Pro BETA · Checklist · Chat · Logs · Réservations pleine page · Menu Administration sécurisé</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.0</div><div style="font-size:10px;color:var(--slate-light);">25/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Compte
+ Amis pleine page · Virements par activité · Remboursements 
+multi-participants · Filtres date &amp; recherche · Réinitialisation 
+admin · Mails automatiques · Journal exportable · Nouvelles activités 
+FAB · Titre fiches éditable</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.9</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Carte Map Leaflet avec marqueurs numérotés · Navigation Préc/Suiv dans fiches · Filtres multi-sélection type et alertes</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.8</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Vue Map inline · Carte CartoDB · Budget et Réservations en menu · Suppression sidebar</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.7</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Menu Map avec carte et liste filtrée · Nœuds journaliers · Responsive mobile complet</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.6</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Compte à rebours login · Menu Réservations et Budget · QR code par segment vol</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.5</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Annulation et suppression des fiches · Duplication avec persistance · Nœuds journaliers</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.4</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Gestion multi-paiements · Section finances dans chaque fiche · Budget hébergement</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.3</div><div style="font-size:10px;color:var(--slate-light);">22/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Sauvegarde Supabase · Authentification · Administration et backup · Import/export JSON</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.2</div><div style="font-size:10px;color:var(--slate-light);">22/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Filtres timeline · Modales fiches hôtels et trajets · Carte Leaflet dans fiches trajets</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.1</div><div style="font-size:10px;color:var(--slate-light);">22/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Timeline interactive · 14 étapes · Bandeaux vols et voiture · Compte à rebours</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.0</div><div style="font-size:10px;color:var(--slate-light);">22/04/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Version initiale — Structure de base du road trip USA été 2026</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body></html>`);
   w.document.close();
   w.print();
 }
@@ -9630,120 +9781,6 @@ activités de la journée.
   </div>
 </div>
 
-<!-- À PROPOS MODAL -->
-<div id="about-overlay" onclick="if(event.target===this)closeAboutModal()" style="position:fixed;inset:0;background:rgba(26,22,16,.65);z-index:6000;display:none;align-items:center;justify-content:center;padding:1rem;">
-  <div style="background:var(--sand);border-radius:16px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">
-    <div style="background:var(--ink);color:var(--sand);padding:1.1rem 1.5rem;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;">
-      <div>
-        <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;">🗺 Road Trip USA · Été 2026</div>
-        <div style="font-size:11px;color:rgba(245,240,232,.45);margin-top:2px;">À propos de l'application</div>
-      </div>
-      <button onclick="closeAboutModal()" style="background:none;border:none;color:rgba(245,240,232,.5);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:4px;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(245,240,232,.5)'">✕</button>
-    </div>
-    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.8</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fix sous-titre modale — hotelName prioritaire sur step.hotel dans openModal et _renderModalContent</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.7</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Nom d'hôtel éditable dans fiche · Mise à jour temps réel carte timeline · hotelName sauvegardé en base</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.6</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fix titre timeline — _customTitle lu dans renderTimeline · Fix alertes en doublon — pillsHTML filtre les alertes masquées et intègre les alertes custom</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.5</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Alertes éditables dans les fiches · Ajout / modification / suppression · Alertes initiales masquables · Badge timeline mis à jour en temps réel</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.4</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fix titre fiche — _customTitle prioritaire sur step.city dans _renderModalContent</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.3</div><div style="font-size:10px;color:var(--slate-light);">17/05/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Dépôt de garantie dans fiches hôtel · Statut versé/restitué/en attente · Badge 🔒 sur carte timeline · Correction dépendances CDN</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.2</div><div style="font-size:10px;color:var(--slate-light);">27/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correction bugs navigation · Vues hors modal-overlay · Fix opacity overlays · Fix openModal/closeModal</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.1</div><div style="font-size:10px;color:var(--slate-light);">28/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Map Pro BETA · Checklist · Chat · Logs · Réservations pleine page · Menu Administration sécurisé</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.0</div><div style="font-size:10px;color:var(--slate-light);">25/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Compte
- Amis pleine page · Virements par activité · Remboursements 
-multi-participants · Filtres date &amp; recherche · Réinitialisation 
-admin · Mails automatiques · Journal exportable · Nouvelles activités 
-FAB · Titre fiches éditable</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.9</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Carte Map Leaflet avec marqueurs numérotés · Navigation Préc/Suiv dans fiches · Filtres multi-sélection type et alertes</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.8</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Vue Map inline · Carte CartoDB · Budget et Réservations en menu · Suppression sidebar</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.7</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Menu Map avec carte et liste filtrée · Nœuds journaliers · Responsive mobile complet</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.6</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Compte à rebours login · Menu Réservations et Budget · QR code par segment vol</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.5</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Annulation et suppression des fiches · Duplication avec persistance · Nœuds journaliers</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.4</div><div style="font-size:10px;color:var(--slate-light);">23/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Gestion multi-paiements · Section finances dans chaque fiche · Budget hébergement</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.3</div><div style="font-size:10px;color:var(--slate-light);">22/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Sauvegarde Supabase · Authentification · Administration et backup · Import/export JSON</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.2</div><div style="font-size:10px;color:var(--slate-light);">22/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Filtres timeline · Modales fiches hôtels et trajets · Carte Leaflet dans fiches trajets</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.1</div><div style="font-size:10px;color:var(--slate-light);">22/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Timeline interactive · 14 étapes · Bandeaux vols et voiture · Compte à rebours</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v1.0</div><div style="font-size:10px;color:var(--slate-light);">22/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Version initiale — Structure de base du road trip USA été 2026</div>
-      </div>
-
-    </div>
-  </div>
-</div>
 
 <!-- VUE CHECKLIST — pleine page -->
 
