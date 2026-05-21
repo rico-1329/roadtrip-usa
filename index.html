@@ -743,7 +743,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9.1 · 21/05/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9.2 · 21/05/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -2585,6 +2585,16 @@ function _renderModalContent(idx) {
         <div class="field-grid single">
           <div class="field"><label>Adresse de l'hôtel</label><input type="text" id="f-adrarr" placeholder="Numéro, rue, ville, état…" value="${saved.adrarr||''}"></div>
           <div class="field"><label>Adresse de départ (étape précédente)</label><input type="text" id="f-adrdep" placeholder="Adresse de départ…" value="${saved.adrdep||''}"></div>
+          <div class="field">
+            <label>📍 Coordonnées GPS</label>
+            <div style="display:flex;gap:8px;align-items:flex-start;">
+              <div style="flex:1;">
+                <input type="text" id="f-gps" placeholder="ex. N 044° 39.838, W 111° 05.999" value="${saved.gps||''}" oninput="_validateGPS(this)" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 10px;border:1px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;transition:border-color .15s;">
+                <div id="gps-error" style="display:none;font-size:11px;color:var(--orange);margin-top:3px;">⚠️ Format attendu : N 044° 39.838, W 111° 05.999</div>
+              </div>
+              <a id="gps-maps-link" href="${saved.gps?_gpsToMapsUrl(saved.gps):'#'}" target="_blank" style="display:${saved.gps?'inline-flex':'none'};align-items:center;gap:4px;padding:7px 12px;border-radius:8px;border:1px solid #4285F4;background:#4285F4;color:white;text-decoration:none;font-size:11px;font-weight:500;white-space:nowrap;flex-shrink:0;">🗺 Maps</a>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-section">
@@ -3566,6 +3576,34 @@ function _updateGarantieUI(statut, idx) {
   });
 }
 
+
+function _gpsToMapsUrl(gpsStr) {
+  if (!gpsStr) return '#';
+  const m = gpsStr.match(/([NS])\s*(\d+)°\s*([\d.]+)[,\s]+([EW])\s*(\d+)°\s*([\d.]+)/i);
+  if (!m) return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(gpsStr);
+  const lat = (parseFloat(m[2]) + parseFloat(m[3])/60) * (m[1].toUpperCase()==='S'?-1:1);
+  const lng = (parseFloat(m[5]) + parseFloat(m[6])/60) * (m[4].toUpperCase()==='W'?-1:1);
+  return 'https://www.google.com/maps?q=' + lat.toFixed(6) + ',' + lng.toFixed(6);
+}
+
+function _validateGPS(input) {
+  const val = input.value.trim();
+  const errEl = document.getElementById('gps-error');
+  const linkEl = document.getElementById('gps-maps-link');
+  if (!val) {
+    input.style.borderColor = 'var(--sand-dark)';
+    if (errEl) errEl.style.display = 'none';
+    if (linkEl) linkEl.style.display = 'none';
+    return;
+  }
+  const valid = /([NS])\s*\d+°\s*[\d.]+[,\s]+([EW])\s*\d+°\s*[\d.]+/i.test(val);
+  input.style.borderColor = valid ? 'var(--teal)' : 'var(--orange)';
+  if (errEl) errEl.style.display = valid ? 'none' : 'block';
+  if (linkEl) {
+    linkEl.style.display = valid ? 'inline-flex' : 'none';
+    if (valid) linkEl.href = _gpsToMapsUrl(val);
+  }
+}
 async function saveModal() {
   if (currentModalIdx === null) return;
 
@@ -3573,7 +3611,7 @@ async function saveModal() {
   const data = Object.assign({}, loadFiche(currentModalIdx));
 
   // Mettre à jour uniquement les champs du formulaire
-  const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte',
+  const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps',
                   'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName'];
   fields.forEach(f => {
     const el = document.getElementById('f-' + f);
@@ -5220,7 +5258,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.9.1 · 21/05/26
+        Version : v2.9.2 · 21/05/26
       </div>
     </div>`;
 }
