@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Road Trip USA — Dépenses</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #2C2416;
+    --sand: #F5F0E8;
+    --sand-dark: #E0DBD0;
+    --amber: #C8622A;
+    --amber-pale: #FDF0E0;
+    --teal: #1A7A65;
+    --teal-pale: #E0F2EE;
+    --green: #2E7D32;
+    --green-pale: #E8F5E9;
+    --red: #C0392B;
+    --red-pale: #FDE8E8;
+    --slate: #5A6475;
+    --slate-light: #8A95A5;
+    --white: #FFFFFF;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(44,36,22,.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* Header */
+  .header {
+    background: var(--ink);
+    padding: 14px 16px 12px;
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-title { color: var(--sand); font-size: 15px; font-weight: 600; }
+  .header-title span { color: var(--amber); font-family: 'Playfair Display', serif; }
+  .header-count {
+    background: var(--amber); color: white;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+  }
+
+  /* Main */
+  .main { max-width: 480px; margin: 0 auto; padding: 16px; }
+
+  /* Form card */
+  .form-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .form-card-title {
+    font-size: 13px; font-weight: 600; color: var(--slate);
+    text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--sand-dark);
+  }
+
+  .field { margin-bottom: 12px; }
+  .field label {
+    display: block; font-size: 11px; font-weight: 500;
+    color: var(--slate-light); margin-bottom: 4px;
+    text-transform: uppercase; letter-spacing: .05em;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--ink);
+    background: var(--sand);
+    outline: none;
+    transition: border-color .15s, background .15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--amber);
+    background: white;
+  }
+  .field textarea { resize: vertical; min-height: 60px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Participants */
+  .participants-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .participant-chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 20px;
+    border: 1.5px solid var(--sand-dark);
+    background: var(--sand); cursor: pointer;
+    font-size: 12px; font-weight: 500; color: var(--slate);
+    transition: all .15s; user-select: none;
+  }
+  .participant-chip input[type=checkbox] { display: none; }
+  .participant-chip.active {
+    border-color: var(--teal);
+    background: var(--teal-pale);
+    color: var(--teal);
+  }
+  .chip-all { font-size: 11px; }
+
+  /* Perso toggle */
+  .perso-toggle {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: 8px;
+    background: var(--sand); cursor: pointer;
+    font-size: 12px; font-weight: 500; color: var(--slate);
+    border: 1.5px solid var(--sand-dark);
+    transition: all .15s; user-select: none;
+  }
+  .perso-toggle.active { border-color: var(--amber); background: var(--amber-pale); color: var(--amber); }
+  .perso-toggle input { display: none; }
+
+  /* Bouton ajouter */
+  .btn-add {
+    width: 100%; padding: 13px;
+    background: var(--amber); color: white;
+    border: none; border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: opacity .15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-add:active { opacity: .8; }
+
+  /* Liste des dépenses */
+  .list-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .list-title { font-size: 14px; font-weight: 600; }
+  .list-total {
+    font-size: 13px; font-weight: 700; color: var(--amber);
+  }
+
+  .depense-card {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 12px 14px;
+    margin-bottom: 10px;
+    display: flex; align-items: flex-start; gap: 12px;
+    animation: slideIn .2s ease;
+  }
+  @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+
+  .depense-montant {
+    font-size: 18px; font-weight: 700; color: var(--amber);
+    white-space: nowrap; padding-top: 2px;
+  }
+  .depense-montant span { font-size: 12px; font-weight: 500; }
+
+  .depense-info { flex: 1; min-width: 0; }
+  .depense-desc { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .depense-meta { font-size: 11px; color: var(--slate-light); }
+
+  .depense-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+  .tag {
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; font-weight: 500;
+  }
+  .tag-amber { background: var(--amber-pale); color: var(--amber); }
+  .tag-teal  { background: var(--teal-pale);  color: var(--teal); }
+  .tag-slate { background: #f0f2f5; color: var(--slate); }
+  .tag-perso { background: var(--red-pale); color: var(--red); }
+
+  .btn-delete {
+    background: none; border: none; color: var(--sand-dark);
+    font-size: 16px; cursor: pointer; padding: 4px;
+    border-radius: 6px; transition: color .15s;
+    flex-shrink: 0;
+  }
+  .btn-delete:hover { color: var(--red); }
+
+  /* Actions export/import */
+  .actions-bar {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-top: 16px;
+  }
+  .btn-action {
+    padding: 12px; border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: opacity .15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    border: none;
+  }
+  .btn-export { background: var(--teal); color: white; }
+  .btn-import { background: var(--sand-dark); color: var(--ink); }
+  .btn-action:active { opacity: .8; }
+
+  /* Empty state */
+  .empty {
+    text-align: center; padding: 32px 16px;
+    color: var(--slate-light);
+  }
+  .empty-icon { font-size: 36px; margin-bottom: 8px; }
+  .empty-text { font-size: 13px; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: white;
+    padding: 10px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 500;
+    opacity: 0; transition: opacity .25s;
+    z-index: 999; white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Info banner */
+  .banner {
+    background: var(--teal-pale); border: 1px solid var(--teal);
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 12px; color: var(--teal);
+    margin-bottom: 14px; line-height: 1.5;
+  }
+
+  /* Soldes */
+  .solde-card {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 14px;
+    margin-top: 16px;
+  }
+  .solde-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; border-bottom: 1px solid var(--sand);
+    font-size: 13px;
+  }
+  .solde-row:last-child { border-bottom: none; }
+  .solde-pos { color: var(--green); font-weight: 700; }
+  .solde-neg { color: var(--red); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title"><span>Road Trip USA</span> · Dépenses</div>
+  <div class="header-count" id="count">0 dépense</div>
+</div>
+
+<div class="main">
+
+  <div class="banner">
+    📴 Mode hors ligne — Les données sont sauvegardées sur cet appareil.<br>
+    Exportez en JSON pour importer dans l'appli Road Trip.
+  </div>
+
+  <!-- Formulaire -->
+  <div class="form-card">
+    <div class="form-card-title">Nouvelle dépense</div>
+
+    <div class="field">
+      <label>Description *</label>
+      <input type="text" id="f-desc" placeholder="Ex. Restaurant Jackson Hole, Entrée Yellowstone…">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Montant (€) *</label>
+        <input type="number" id="f-montant" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="f-date">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Payé par *</label>
+      <select id="f-payepar">
+        <option value="">— Choisir —</option>
+        <option value="Éric">Éric</option>
+        <option value="Pascale">Pascale</option>
+        <option value="Carole">Carole</option>
+        <option value="Léa">Léa</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Participants (tous par défaut)</label>
+      <div class="participants-grid">
+        <label class="participant-chip chip-all active" onclick="toggleAll(this)">
+          <input type="checkbox" checked> Tous
+        </label>
+        <label class="participant-chip" data-name="Éric" onclick="toggleChip(this)">
+          <input type="checkbox"> Éric
+        </label>
+        <label class="participant-chip" data-name="Pascale" onclick="toggleChip(this)">
+          <input type="checkbox"> Pascale
+        </label>
+        <label class="participant-chip" data-name="Carole" onclick="toggleChip(this)">
+          <input type="checkbox"> Carole
+        </label>
+        <label class="participant-chip" data-name="Léa" onclick="toggleChip(this)">
+          <input type="checkbox"> Léa
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Mode de paiement</label>
+      <select id="f-modepay">
+        <option value="">— Optionnel —</option>
+        <option value="Carte bancaire">Carte bancaire</option>
+        <option value="Espèces">Espèces</option>
+        <option value="Virement">Virement</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label style="margin-bottom:6px;">Options</label>
+      <label class="perso-toggle" id="perso-toggle" onclick="togglePerso()">
+        <input type="checkbox" id="f-perso"> Dépense personnelle (non partagée)
+      </label>
+    </div>
+
+    <div class="field">
+      <label>Note (optionnel)</label>
+      <textarea id="f-note" placeholder="Précisions, numéro de reçu…"></textarea>
+    </div>
+
+    <button class="btn-add" onclick="addDepense()">
+      ＋ Ajouter la dépense
+    </button>
+  </div>
+
+  <!-- Liste -->
+  <div class="list-header">
+    <div class="list-title" id="list-title">Dépenses enregistrées</div>
+    <div class="list-total" id="list-total"></div>
+  </div>
+
+  <div id="depenses-list"></div>
+
+  <!-- Soldes -->
+  <div class="solde-card" id="soldes-card" style="display:none;">
+    <div class="form-card-title" style="margin-bottom:10px;">Soldes provisoires</div>
+    <div id="soldes-body"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions-bar">
+    <button class="btn-action btn-export" onclick="exportJSON()">⬇ Exporter JSON</button>
+    <button class="btn-action btn-import" onclick="document.getElementById('import-input').click()">⬆ Importer JSON</button>
+  </div>
+  <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(this)">
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PARTICIPANTS = ['Éric','Pascale','Carole','Léa'];
+const STORAGE_KEY = 'roadtrip_offline_depenses';
+
+let depenses = [];
+
+// ── Init ──
+window.addEventListener('load', () => {
+  // Date par défaut = aujourd'hui
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+  // Charger depuis localStorage
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) depenses = JSON.parse(saved);
+  } catch(e) {}
+  render();
+});
+
+// ── Participants chips ──
+function toggleAll(el) {
+  // Activer "Tous" = désactiver les individuels
+  document.querySelectorAll('.participant-chip[data-name]').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleChip(el) {
+  const allChip = document.querySelector('.chip-all');
+  el.classList.toggle('active');
+  // Si aucun individuel sélectionné → remettre Tous
+  const anyActive = Array.from(document.querySelectorAll('.participant-chip[data-name]')).some(c => c.classList.contains('active'));
+  if (!anyActive) {
+    allChip.classList.add('active');
+  } else {
+    allChip.classList.remove('active');
+  }
+}
+
+function getSelectedParticipants() {
+  const allActive = document.querySelector('.chip-all')?.classList.contains('active');
+  if (allActive) return [...PARTICIPANTS];
+  return Array.from(document.querySelectorAll('.participant-chip[data-name].active')).map(c => c.dataset.name);
+}
+
+// ── Perso ──
+function togglePerso() {
+  const el = document.getElementById('perso-toggle');
+  el.classList.toggle('active');
+  document.getElementById('f-perso').checked = el.classList.contains('active');
+}
+
+// ── Ajouter ──
+function addDepense() {
+  const desc    = document.getElementById('f-desc').value.trim();
+  const montant = parseFloat(document.getElementById('f-montant').value);
+  const payepar = document.getElementById('f-payepar').value;
+  const date    = document.getElementById('f-date').value;
+  const modepay = document.getElementById('f-modepay').value;
+  const note    = document.getElementById('f-note').value.trim();
+  const perso   = document.getElementById('f-perso').checked;
+  const participants = getSelectedParticipants();
+
+  if (!desc)    { showToast('⚠️ Description manquante'); return; }
+  if (!montant || montant <= 0) { showToast('⚠️ Montant invalide'); return; }
+  if (!payepar) { showToast('⚠️ Payé par manquant'); return; }
+
+  const entry = {
+    id: Date.now(),
+    label: desc,
+    montant,
+    payepar,
+    participants: perso ? [payepar] : participants,
+    date,
+    modepay,
+    note,
+    perso: perso ? 'perso' : 'groupe',
+    _createdOffline: true,
+    _createdAt: new Date().toISOString()
+  };
+
+  depenses.unshift(entry);
+  save();
+  render();
+  resetForm();
+  showToast('✓ Dépense ajoutée');
+}
+
+// ── Supprimer ──
+function deleteDepense(id) {
+  depenses = depenses.filter(d => d.id !== id);
+  save();
+  render();
+  showToast('Dépense supprimée');
+}
+
+// ── Reset form ──
+function resetForm() {
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-montant').value = '';
+  document.getElementById('f-note').value = '';
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+  // Remettre Tous
+  document.querySelectorAll('.participant-chip[data-name]').forEach(c => c.classList.remove('active'));
+  document.querySelector('.chip-all').classList.add('active');
+  // Perso off
+  document.getElementById('perso-toggle').classList.remove('active');
+  document.getElementById('f-perso').checked = false;
+  document.getElementById('f-desc').focus();
+}
+
+// ── Sauvegarder ──
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(depenses));
+}
+
+// ── Rendu ──
+function render() {
+  const list = document.getElementById('depenses-list');
+  const count = document.getElementById('count');
+  const total = depenses.reduce((s,d) => s + d.montant, 0);
+
+  count.textContent = depenses.length + ' dépense' + (depenses.length !== 1 ? 's' : '');
+  document.getElementById('list-total').textContent = depenses.length ? total.toFixed(2) + ' €' : '';
+
+  if (!depenses.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🧾</div><div class="empty-text">Aucune dépense enregistrée</div></div>`;
+    document.getElementById('soldes-card').style.display = 'none';
+    return;
+  }
+
+  list.innerHTML = depenses.map(d => {
+    const dateStr = d.date ? new Date(d.date + 'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
+    const parts = (d.participants||[]).join(', ');
+    const persoTag = d.perso === 'perso' ? '<span class="tag tag-perso">Perso</span>' : '';
+    const modeTag = d.modepay ? `<span class="tag tag-slate">${d.modepay}</span>` : '';
+    const noteTag = d.note ? `<span class="tag tag-slate">${d.note}</span>` : '';
+    return `
+      <div class="depense-card">
+        <div>
+          <div class="depense-montant">${d.montant.toFixed(2)}<span> €</span></div>
+        </div>
+        <div class="depense-info">
+          <div class="depense-desc">${d.label}</div>
+          <div class="depense-meta">${dateStr ? dateStr + ' · ' : ''}Payé par <strong>${d.payepar}</strong></div>
+          <div class="depense-tags">
+            <span class="tag tag-teal">${parts}</span>
+            ${persoTag}${modeTag}${noteTag}
+          </div>
+        </div>
+        <button class="btn-delete" onclick="deleteDepense(${d.id})">✕</button>
+      </div>`;
+  }).join('');
+
+  // Soldes
+  renderSoldes();
+}
+
+function renderSoldes() {
+  const card = document.getElementById('soldes-card');
+  const body = document.getElementById('soldes-body');
+  if (!depenses.length) { card.style.display = 'none'; return; }
+
+  const paye = {}, doit = {};
+  PARTICIPANTS.forEach(p => { paye[p] = 0; doit[p] = 0; });
+
+  depenses.forEach(d => {
+    const parts = Array.isArray(d.participants) && d.participants.length ? d.participants : PARTICIPANTS;
+    const m = d.montant;
+    if (d.perso === 'perso' && parts.length === 1) {
+      if (paye[d.payepar] !== undefined) paye[d.payepar] += m;
+      if (doit[parts[0]]  !== undefined) doit[parts[0]]  += m;
+    } else {
+      const share = m / parts.length;
+      if (paye[d.payepar] !== undefined) paye[d.payepar] += m;
+      parts.forEach(p => { if (doit[p] !== undefined) doit[p] += share; });
+    }
+  });
+
+  let html = '';
+  PARTICIPANTS.forEach(p => {
+    const solde = paye[p] - doit[p];
+    if (Math.abs(solde) < 0.01) return;
+    const cls = solde > 0 ? 'solde-pos' : 'solde-neg';
+    const sign = solde > 0 ? '+' : '';
+    html += `<div class="solde-row"><span>${p}</span><span class="${cls}">${sign}${solde.toFixed(2)} €</span></div>`;
+  });
+
+  if (!html) { card.style.display = 'none'; return; }
+  body.innerHTML = html;
+  card.style.display = 'block';
+}
+
+// ── Export JSON ──
+function exportJSON() {
+  if (!depenses.length) { showToast('Aucune dépense à exporter'); return; }
+
+  const ts = new Date().toISOString().slice(0,16).replace('T','-').replace(':','h');
+  const payload = {
+    _source: 'roadtrip-offline',
+    _exportedAt: new Date().toISOString(),
+    _count: depenses.length,
+    _total: depenses.reduce((s,d) => s + d.montant, 0).toFixed(2),
+    payments: depenses.map(d => ({
+      id:           d.id,
+      label:        d.label,
+      montant:      d.montant,
+      payepar:      d.payepar,
+      participants: d.participants,
+      date:         d.date,
+      modepay:      d.modepay,
+      note:         d.note,
+      perso:        d.perso,
+      _createdOffline: true,
+      _createdAt:   d._createdAt
+    }))
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `depenses-offline-${ts}.json`;
+  a.click();
+  showToast('✓ Export téléchargé');
+}
+
+// ── Import JSON ──
+function importJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Accepter soit un tableau direct, soit le format exporté
+      const payments = Array.isArray(data) ? data : (data.payments || []);
+      if (!payments.length) { showToast('Aucune dépense dans ce fichier'); return; }
+
+      // Éviter les doublons
+      const existingIds = new Set(depenses.map(d => d.id));
+      let added = 0;
+      payments.forEach(p => {
+        if (!existingIds.has(p.id)) {
+          depenses.push({
+            id:           p.id || Date.now() + Math.random(),
+            label:        p.label || '',
+            montant:      parseFloat(p.montant) || 0,
+            payepar:      p.payepar || '',
+            participants: p.participants || PARTICIPANTS,
+            date:         p.date || '',
+            modepay:      p.modepay || '',
+            note:         p.note || '',
+            perso:        p.perso || 'groupe',
+            _createdOffline: true,
+            _createdAt:   p._createdAt || new Date().toISOString()
+          });
+          added++;
+        }
+      });
+      save();
+      render();
+      showToast(`✓ ${added} dépense${added>1?'s':''} importée${added>1?'s':''}`);
+    } catch(err) {
+      showToast('❌ Fichier invalide');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+</script>
+</body>
+</html>

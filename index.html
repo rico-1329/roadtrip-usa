@@ -743,7 +743,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9.6 · 21/05/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.9.7 · 21/05/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -5489,7 +5489,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.9.6 · 21/05/26
+        Version : v2.9.7 · 21/05/26
       </div>
     </div>`;
 }
@@ -9923,6 +9923,9 @@ activités de la journée.
           <button class="admin-btn primary" onclick="createBackup()">💾 Créer une sauvegarde maintenant</button>
           <button class="admin-btn" onclick="exportJSON()">⬇️ Exporter en JSON</button>
           <button class="admin-btn" onclick="document.getElementById('import-file').click()">⬆️ Importer un JSON</button>
+          <button class="admin-btn primary" onclick="exportPDF()" style="background:var(--teal);border-color:var(--teal);">📄 Exporter en PDF</button>
+          <button class="admin-btn" onclick="document.getElementById('import-offline-file').click()" style="background:var(--slate);border-color:var(--slate);color:white;">📲 Importer dépenses hors ligne</button>
+          <input type="file" id="import-offline-file" accept=".json" style="display:none" onchange="importOfflineDepenses(this)">
           <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(this)">
         </div>
         <div class="admin-status" id="backup-status"></div>
@@ -10350,6 +10353,7 @@ activités de la journée.
 <!-- /app -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 // ── SUPABASE AUTH ──
@@ -10764,6 +10768,377 @@ async function restoreBackup(id, label) {
     statusEl.className='admin-status err show';
     statusEl.textContent='❌ Erreur restauration : '+e.message;
   }
+}
+
+
+async function exportPDF() {
+  if (!SUPA_READY) { alert('Connexion Supabase requise'); return; }
+
+  const clean = (str) => {
+    if (!str) return '';
+    return String(str)
+      .replace(/[\u{1F000}-\u{1FFFF}]/gu, '')
+      .replace(/[\u2600-\u27BF]/g, '')
+      .replace(/[\uFE00-\uFE0F]/g, '')
+      .replace(/[^\x00-\xFF]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+  const statusEl = document.getElementById('backup-status');
+  statusEl.className = 'admin-status info show';
+  statusEl.textContent = '⏳ Chargement des donnees…';
+
+  const now = new Date();
+  const ts = now.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'})
+           + ' ' + now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const tsFile = now.toISOString().slice(0,16).replace('T','-').replace(':','h');
+
+  // Charger les fiches Supabase
+  let saved = {};
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/fiches?select=*`, { headers: SUPA_HEADERS });
+    const fiches = await res.json();
+    fiches.forEach(f => { if (f.data) saved[f.id] = f.data; });
+  } catch(e) {}
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+
+  const PW = 210, PH = 297;
+  const ML = 14, MR = 14, MT = 14;
+  const CW = PW - ML - MR;  // largeur utile
+  let y = MT;
+  let pageNum = 1;
+
+  // ── Helpers ──
+  const newPage = () => {
+    doc.addPage();
+    y = MT;
+    pageNum++;
+    // Pied de page
+    doc.setFontSize(8).setTextColor(180);
+    doc.text(`Road Trip USA - Éte 2026 - ${ts}`, ML, PH - 6);
+    doc.text(`${pageNum}`, PW - MR, PH - 6, {align:'right'});
+    doc.setTextColor(44, 36, 22);
+  };
+
+  const checkY = (needed) => { if (y + needed > PH - 14) newPage(); };
+
+  const line = (color = [224,221,214]) => {
+    doc.setDrawColor(...color).setLineWidth(0.3).line(ML, y, PW - MR, y);
+    y += 3;
+  };
+
+  const sectionTitle = (icon, title, sub = '') => { title = clean(title); sub = clean(sub);
+    checkY(20);
+    doc.setFillColor(44, 36, 22).roundedRect(ML, y, CW, sub ? 16 : 12, 2, 2, 'F');
+    doc.setFontSize(13).setFont('helvetica','bold').setTextColor(245, 240, 232);
+    doc.text(`${icon} ${title}`, ML + 4, y + 8);
+    if (sub) { doc.setFontSize(9).setFont('helvetica','normal').setTextColor(180,170,150); doc.text(sub, ML + 4, y + 13); }
+    doc.setTextColor(44, 36, 22);
+    y += (sub ? 16 : 12) + 4;
+  };
+
+  const blockTitle = (t) => { t = clean(t);
+    checkY(8);
+    doc.setFontSize(8).setFont('helvetica','bold').setTextColor(150);
+    doc.text(t.toUpperCase(), ML, y);
+    y += 4;
+    doc.setTextColor(44, 36, 22);
+  };
+
+  const field = (label, value, x = ML, w = CW) => {
+    if (!value || value === '-') return 0;
+    checkY(10);
+    const cv = clean(String(value)); if(!cv) return 0;
+    doc.setFontSize(8).setFont('helvetica','normal').setTextColor(150);
+    doc.text(clean(String(label)), x, y);
+    doc.setFontSize(10).setFont('helvetica','bold').setTextColor(44,36,22);
+    const lines = doc.splitTextToSize(cv, w - 2);
+    doc.text(lines, x, y + 4);
+    const h = 5 + lines.length * 4.5;
+    y += h;
+    return h;
+  };
+
+  const field2 = (pairs) => {
+    // 2 colonnes
+    const hw = CW / 2 - 2;
+    const left = pairs.filter((_,i) => i%2===0);
+    const right = pairs.filter((_,i) => i%2===1);
+    const maxRows = Math.max(left.length, right.length);
+    for (let i=0; i<maxRows; i++) {
+      const startY = y;
+      if (left[i]) field(left[i][0], left[i][1], ML, hw);
+      const afterLeft = y;
+      y = startY;
+      if (right[i]) field(right[i][0], right[i][1], ML + hw + 4, hw);
+      y = Math.max(afterLeft, y);
+    }
+  };
+
+  const alertBox = (a) => {
+    checkY(10);
+    const colors = { urgent:[253,232,232], info:[232,240,254], ok:[232,245,233] };
+    const borders = { urgent:[192,57,43], info:[26,115,232], ok:[46,125,50] };
+    const bg = colors[a.kind] || colors.info;
+    const br = borders[a.kind] || borders.info;
+    const txt = clean(a.label||'') + (a.detail ? ' - ' + clean(a.detail) : '');
+    const lines = doc.splitTextToSize(txt, CW - 8);
+    const h = lines.length * 4.5 + 5;
+    doc.setFillColor(...bg).roundedRect(ML, y, CW, h, 1, 1, 'F');
+    doc.setDrawColor(...br).setLineWidth(1).line(ML + 1, y, ML + 1, y + h);
+    doc.setLineWidth(0.3);
+    doc.setFontSize(9).setFont('helvetica','normal').setTextColor(44,36,22);
+    doc.text(lines, ML + 4, y + 4);
+    y += h + 2;
+  };
+
+  // ── PAGE DE COUVERTURE ──
+  doc.setFillColor(44, 36, 22).rect(0, 0, PW, 80, 'F');
+  doc.setFontSize(28).setFont('helvetica','bold').setTextColor(245,240,232);
+  doc.text('Road Trip USA', PW/2, 35, {align:'center'});
+  doc.setFontSize(14).setFont('helvetica','normal').setTextColor(200,98,42);
+  doc.text('Éte 2026 - Carnet de voyage', PW/2, 46, {align:'center'});
+  doc.setFontSize(10).setTextColor(180,170,150);
+  doc.text('Marseille -> Jackson Hole -> San Francisco -> Marseille', PW/2, 56, {align:'center'});
+  doc.setFontSize(9).setTextColor(150);
+  doc.text(`Exporte le ${ts}`, PW/2, 70, {align:'center'});
+
+  y = 95;
+  doc.setFontSize(11).setFont('helvetica','bold').setTextColor(44,36,22);
+  doc.text('SOMMAIRE', ML, y); y += 6;
+  line();
+
+  const hotelSteps = steps.map((s,i)=>({s,i})).filter(({s})=>s.type==='hotel');
+  const flightSteps = steps.map((s,i)=>({s,i})).filter(({s})=>s.type==='flight');
+
+  flightSteps.forEach(({s}) => {
+    doc.setFontSize(10).setFont('helvetica','normal').setTextColor(44,36,22);
+    doc.text(`[VOL]  Vol ${s.direction==='aller'?'Aller':'Retour'} - ${s.dates}`, ML + 2, y);
+    doc.setFontSize(9).setTextColor(150);
+    doc.text(`Ref. ${s.ref||'-'}`, PW - MR, y, {align:'right'});
+    doc.setTextColor(44,36,22); y += 6;
+  });
+
+  hotelSteps.forEach(({s,i}) => {
+    const d = saved[`roadtrip_fiche_${i}`] || {};
+    const name = d.hotelName || s.hotel || s.city || '';
+    doc.setFontSize(10).setFont('helvetica','normal').setTextColor(44,36,22);
+    doc.text(`[HOTEL]  ${name}`, ML + 2, y);
+    doc.setFontSize(9).setTextColor(150);
+    doc.text(clean(s.dates||''), PW - MR, y, {align:'right'});
+    doc.setTextColor(44,36,22); y += 6;
+    if (y > PH - 20) newPage();
+  });
+
+  // ── FICHES VOLS ──
+  statusEl.textContent = '⏳ Generation des vols…';
+  flightSteps.forEach(({s,i}) => {
+    newPage();
+    sectionTitle('[VOL]', `Vol ${s.direction==='aller'?'Aller':'Retour'} - ${s.dates}`, `Ref. ${s.ref||'-'} - ${s.billet||''}`);
+
+    blockTitle('Segments');
+    (s.segments||[]).forEach(seg => {
+      checkY(32);
+      doc.setFillColor(249,247,243).roundedRect(ML, y, CW, 30, 2, 2, 'F');
+      doc.setFontSize(12).setFont('helvetica','bold').setTextColor(44,36,22);
+      doc.text(clean(seg.from||'') + ' -> ' + clean(seg.to||''), ML + 3, y + 7);
+      doc.setFontSize(9).setFont('helvetica','normal').setTextColor(120);
+      doc.text(clean(seg.num||''), ML + 3, y + 12);
+      doc.setFontSize(8).setTextColor(80);
+      const routeTxt = doc.splitTextToSize(clean(seg.fromName||'') + ' -> ' + clean(seg.toName||''), CW - 6);
+      doc.text(routeTxt, ML + 3, y + 17);
+      doc.setFontSize(8).setTextColor(60);
+      doc.text('Dep: '+clean(seg.dep||'')+'  Arr: '+clean(seg.arr||'')+'  Duree: '+clean(seg.duration||'')+'  Avion: '+clean(seg.aircraft||'-'), ML+3, y+22);
+      doc.text('Repas: '+clean(seg.meal||'-')+(seg.layover?' | '+clean(seg.layover):''), ML+3, y+27);
+      doc.setTextColor(44,36,22);
+      y += 33;
+    });;
+
+    const d = saved[`roadtrip_fiche_${i}`] || {};
+    const alerts = (d.alerts||s.alerts||[]).filter(a=>!a._masked);
+    if (alerts.length) { blockTitle('Alertes'); alerts.forEach(alertBox); }
+    if (d.prix||s.price) {
+      blockTitle('Finances');
+      field2([['Prix total', (d.prix||s.price||'-')+' €'], ['Paye par', d.payepar||'-']]);
+    }
+  });
+
+  // ── FICHES HÔTELS ──
+  let hotelNum = 0;
+  for (const {s,i} of hotelSteps) {
+    hotelNum++;
+    statusEl.textContent = `⏳ Hôtel ${hotelNum}/${hotelSteps.length}…`;
+    await new Promise(r => setTimeout(r, 0)); // laisser respirer l'UI
+
+    newPage();
+    const d = saved[`roadtrip_fiche_${i}`] || {};
+    const name = d.hotelName || s.hotel || s.city || '';
+    sectionTitle('[HOTEL]', name, `${s.city||''} - ${s.dates||''} - ${s.nights||1} nuit${(s.nights||1)>1?'s':''}`);
+
+    blockTitle('Dates & Horaires');
+    const checkin = d.hdep && d.hdepMax ? `${d.hdep} - ${d.hdepMax}` : d.hdep ? `Dès ${d.hdep}` : '-';
+    field2([
+      ['Arrivee', d.ddeb||s.dateDebut||'-'], ['Depart', d.dfin||s.dateFin||'-'],
+      ['Check-in', checkin], ['Check-out', d.harr||'-']
+    ]);
+    if (d.horairesCommentaire) field('Commentaire horaires', d.horairesCommentaire);
+    y += 2;
+
+    blockTitle('Adresses & Contact');
+    if (d.adrarr) field('Adresse hôtel', d.adrarr);
+    if (d.gps) field('GPS', d.gps);
+    if (d.adrdep) field('Adresse depart', d.adrdep);
+    field2([['N° reservation', d.resanum||'-'], ['Telephone', d.tel||'-']]);
+    field2([['Annulation avant', d.dannul||s.annul||'-'], ['Note', d.note||'-']]);
+    y += 2;
+
+    if (d.parking) {
+      blockTitle('[P] Parking');
+      const pkType = d.parkingType==='payant' ? `Payant${d.parkingMontant?' - '+d.parkingMontant+' €/nuit':''}` : 'Gratuit';
+      field2([['Type', pkType], ['Note', d.parkingNote||'-']]);
+      if (d.parkingCommentaire) field('Commentaire', d.parkingCommentaire);
+      y += 2;
+    }
+
+    if (d.wifi) {
+      blockTitle('[WIFI] Wifi');
+      const wfType = d.wifiType==='payant' ? `Payant${d.wifiMontant?' - '+d.wifiMontant+' €/nuit':''}` : 'Gratuit';
+      field2([['Type', wfType], ['Note', d.wifiNote||'-']]);
+      if (d.wifiCommentaire) field('Commentaire', d.wifiCommentaire);
+      y += 2;
+    }
+
+    const paiements = (d.paiements||[]).filter(p=>!p._deleted);
+    if (d.prix||s.price||paiements.length) {
+      blockTitle('[EUR] Finances');
+      field2([
+        ['Prix total', (d.prix||s.price||'-')+' €'], ['Paye par', d.payepar||'-'],
+        ['Mode paiement', d.modepay||'-'], ['Date paiement', d.datepay||'-'],
+        ...(d.acompte ? [['Acompte', d.acompte+' €']] : [])
+      ]);
+      paiements.forEach(p => {
+        checkY(6);
+        doc.setFontSize(9).setFont('helvetica','normal').setTextColor(80);
+        doc.text('- ' + clean(p.date||'') + ' - ' + clean(p.label||'') + ' - ' + clean(String(p.montant||'')) + ' EUR - ' + clean(p.payepar||''), ML + 2, y);
+        y += 5;
+      });
+      y += 2;
+    }
+
+    if (d.gStatut) {
+      blockTitle('[DEPOT] Depôt de garantie');
+      field2([['Statut', d.gStatut], ['Montant', d.budget ? d.budget+' €' : '-']]);
+      y += 2;
+    }
+
+    const pois = d.pois||[];
+    if (pois.length || s.visits) {
+      blockTitle("[POI] Points d'interêt");
+      if (pois.length) {
+        pois.forEach(p => {
+          checkY(6);
+          doc.setFontSize(9).setFont('helvetica','normal').setTextColor(44,36,22);
+          doc.text('[POI] ' + clean(p.nom||'') + (p.note?' - '+clean(p.note):''), ML+2, y);
+          y += 5;
+        });
+      } else if (s.visits) {
+        const lines = doc.splitTextToSize(s.visits, CW - 4);
+        checkY(lines.length * 4.5 + 2);
+        doc.setFontSize(9).setTextColor(80);
+        doc.text(lines, ML + 2, y);
+        y += lines.length * 4.5 + 2;
+      }
+      y += 2;
+    }
+
+    const alerts = (d.alerts||s.alerts||[]).filter(a=>!a._masked);
+    if (alerts.length) { blockTitle('[!] Alertes'); alerts.forEach(alertBox); }
+
+    if (d.validated) {
+      checkY(10);
+      doc.setFillColor(232,245,233).roundedRect(ML, y, CW, 8, 1, 1, 'F');
+      doc.setFontSize(9).setFont('helvetica','bold').setTextColor(46,125,50);
+      doc.text(`[OK] Fiche validee${d.validatedDate?' le '+d.validatedDate:''}`, ML+4, y+5);
+      y += 10;
+    }
+  }
+
+  // Pied de dernière page
+  doc.setFontSize(8).setTextColor(150);
+  doc.text(`Road Trip USA - Éte 2026 - Exporte le ${ts}`, PW/2, PH-6, {align:'center'});
+
+  doc.save(`roadtrip-carnet-${tsFile}.pdf`);
+  statusEl.className = 'admin-status ok show';
+  statusEl.textContent = `[OK] PDF exporte - ${hotelSteps.length} hôtels + ${flightSteps.length} vols`;
+}
+
+
+
+async function importOfflineDepenses(input) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = '';
+  const statusEl = document.getElementById('backup-status');
+
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const payments = Array.isArray(data) ? data : (data.payments || []);
+      if (!payments.length) {
+        statusEl.className = 'admin-status error show';
+        statusEl.textContent = '❌ Aucune dépense dans ce fichier';
+        return;
+      }
+
+      // Trouver ou créer une étape "Dépenses hors ligne" dans le Compte Amis
+      // On injecte les paiements dans une fiche spéciale roadtrip_offline_payments
+      let existing = {};
+      try {
+        const res = await fetch(`${SUPA_URL}/rest/v1/fiches?id=eq.roadtrip_offline_payments&select=*`, { headers: SUPA_HEADERS });
+        const rows = await res.json();
+        if (rows.length) existing = rows[0].data || {};
+      } catch(e) {}
+
+      const existingPayments = existing.payments || [];
+      const existingIds = new Set(existingPayments.map(p => String(p.id)));
+
+      let added = 0;
+      payments.forEach(p => {
+        if (!existingIds.has(String(p.id))) {
+          existingPayments.push({
+            id:           p.id,
+            label:        p.label || 'Dépense hors ligne',
+            montant:      parseFloat(p.montant) || 0,
+            payepar:      p.payepar || '',
+            participants: p.participants || ['Éric','Pascale','Carole','Léa'],
+            date:         p.date || '',
+            modepay:      p.modepay || '',
+            note:         p.note || (p._createdOffline ? '📴 Saisie hors ligne' : ''),
+            perso:        p.perso || 'groupe',
+          });
+          added++;
+        }
+      });
+
+      // Sauvegarder
+      const payload = { ...existing, payments: existingPayments, _label: 'Dépenses hors ligne', _updatedAt: new Date().toISOString() };
+      await saveFiche('roadtrip_offline_payments', payload);
+
+      statusEl.className = 'admin-status ok show';
+      statusEl.textContent = `✅ ${added} dépense${added>1?'s':''} importée${added>1?'s':''} dans le Compte Amis`;
+
+      // Rafraîchir le Compte Amis si ouvert
+      if (typeof renderCompteAmis === 'function') renderCompteAmis();
+
+    } catch(err) {
+      statusEl.className = 'admin-status error show';
+      statusEl.textContent = '❌ Fichier invalide : ' + err.message;
+    }
+  };
+  reader.readAsText(file);
 }
 
 async function exportJSON() {
