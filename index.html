@@ -2517,7 +2517,14 @@ function _renderModalContent(idx) {
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:0;">
         <a class="map-open-btn" href="${gmUrl}" target="_blank">🗺 Ouvrir l'itinéraire dans Google Maps</a>
-        <a class="map-open-btn" href="https://maps.apple.com/?saddr=${encodeURIComponent(step.from+', USA')}&daddr=${encodeURIComponent(step.to+', USA')}&dirflg=d" target="_blank" style="background:#000;color:white;border-color:#000;">🍎 Ouvrir l'itinéraire dans Plans</a>
+        ${(()=>{
+          const cFrom = findCoords(step.from);
+          const cTo   = findCoords(step.to);
+          const appleUrl = cFrom && cTo
+            ? `https://maps.apple.com/?saddr=${cFrom[0]},${cFrom[1]}&daddr=${cTo[0]},${cTo[1]}&dirflg=d`
+            : `https://maps.apple.com/?saddr=${encodeURIComponent(step.from+', USA')}&daddr=${encodeURIComponent(step.to+', USA')}&dirflg=d`;
+          return `<a class="map-open-btn" href="${appleUrl}" target="_blank" style="background:#000;color:white;border-color:#000;">🍎 Ouvrir l'itinéraire dans Plans</a>`;
+        })()}
         <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--orange-pale);border-left:3px solid var(--amber);border-radius:8px;">
           <span style="font-size:15px;flex-shrink:0;">🗺️</span>
           <div>
