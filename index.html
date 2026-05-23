@@ -2515,7 +2515,17 @@ function _renderModalContent(idx) {
       <div class="map-container">
         <div id="drive-map"></div>
       </div>
-      <a class="map-open-btn" href="${gmUrl}" target="_blank">🗺 Ouvrir l'itinéraire dans Google Maps</a>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:0;">
+        <a class="map-open-btn" href="${gmUrl}" target="_blank">🗺 Ouvrir l'itinéraire dans Google Maps</a>
+        <a class="map-open-btn" href="https://maps.apple.com/?saddr=${encodeURIComponent(step.from+', USA')}&daddr=${encodeURIComponent(step.to+', USA')}&dirflg=d" target="_blank" style="background:#000;color:white;border-color:#000;">🍎 Ouvrir l'itinéraire dans Plans</a>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--orange-pale);border-left:3px solid var(--amber);border-radius:8px;">
+          <span style="font-size:15px;flex-shrink:0;">🗺️</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--orange);margin-bottom:3px;">Carte hors ligne</div>
+            <div style="font-size:11px;color:var(--ink-light);line-height:1.5;">Pensez à télécharger la zone avant le départ dans Google Maps ou Apple Plans.</div>
+          </div>
+        </div>
+      </div>
       <div class="modal-section" style="margin-top:1rem;">
         <div class="modal-section-title">Horaires</div>
         <div class="field-grid">
