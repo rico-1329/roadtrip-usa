@@ -730,7 +730,7 @@
     </script>
     <div class="auth-field">
       <label>Email</label>
-      <input type="email" id="auth-email" placeholder="votre@email.com" autocomplete="email" value="bernarderic29@gmail.com">
+      <input type="email" id="auth-email" placeholder="votre@email.com" autocomplete="email" >
     </div>
     <div class="auth-field">
       <label>Mot de passe</label>
@@ -743,7 +743,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.10.0 · 23/05/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.11.3 · 28/05/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -2627,7 +2627,7 @@ function _renderModalContent(idx) {
       <div class="modal-section">
         <div class="modal-section-title">Adresses</div>
         <div class="field-grid single">
-          <div class="field"><label>Adresse de l'hôtel</label><input type="text" id="f-adrarr" placeholder="Numéro, rue, ville, état…" value="${saved.adrarr||''}"></div>
+          <div class="field"><label>Adresse de l'hôtel</label><div style="display:flex;gap:8px;align-items:center;"><input type="text" id="f-adrarr" placeholder="Numéro, rue, ville, état…" value="${saved.adrarr||''}" style="flex:1;">${saved.adrarr ? '<a href="https://maps.google.com/?q=' + encodeURIComponent(saved.adrarr) + '" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:7px 12px;border-radius:8px;border:1px solid #4285F4;background:#4285F4;color:white;text-decoration:none;font-size:11px;font-weight:500;white-space:nowrap;flex-shrink:0;">🗺️ Maps</a>' : ''}</div></div>
           <div class="field"><label>Adresse de départ (étape précédente)</label><input type="text" id="f-adrdep" placeholder="Adresse de départ…" value="${saved.adrdep||''}"></div>
           <div class="field">
             <label>📍 Coordonnées GPS</label>
@@ -5506,7 +5506,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.10.0 · 23/05/26
+        Version : v2.11.3 · 28/05/26
       </div>
     </div>`;
 }
@@ -10401,29 +10401,8 @@ async function handleLogin() {
   if (!email || !password) { errEl.textContent = 'Veuillez remplir tous les champs.'; errEl.classList.add('show'); return; }
 
   if (!_supaClient) {
-    btn.disabled = true;
-    if (loadEl) loadEl.classList.add('show');
-    try {
-      const res = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (loadEl) loadEl.classList.remove('show');
-      btn.disabled = false;
-      if (data.error || data.error_code) {
-        errEl.textContent = 'Email ou mot de passe incorrect.';
-        errEl.classList.add('show');
-      } else {
-        showApp({ email, id: data.user?.id });
-      }
-    } catch(e) {
-      if (loadEl) loadEl.classList.remove('show');
-      btn.disabled = false;
-      errEl.textContent = 'Erreur réseau : ' + e.message;
-      errEl.classList.add('show');
-    }
+    errEl.textContent = 'Erreur : connexion à Supabase non initialisée. Rechargez la page.';
+    errEl.classList.add('show');
     return;
   }
 
@@ -10458,15 +10437,26 @@ async function handleLogout() {
   document.getElementById('auth-password').value = '';
 }
 
-function showApp(user) {
+async function showApp(user) {
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('app').style.display = 'block';
   document.getElementById('user-email-display').textContent = user.email;
 
-  // Menu Administration réservé à Éric
-  const isAdmin = user.email === 'bernarderic29@gmail.com';
+  // Menu Administration : vérification du rôle en base (pas en dur dans le code)
   const adminBtn = document.getElementById('nav-admin-btn');
-  if (adminBtn) adminBtn.style.display = isAdmin ? 'flex' : 'none';
+  if (adminBtn) adminBtn.style.display = 'none'; // caché par défaut
+  try {
+    const { data: profile } = await _supaClient
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    window._isAdmin = profile?.role === 'admin';
+    if (adminBtn) adminBtn.style.display = window._isAdmin ? 'flex' : 'none';
+  } catch(e) {
+    window._isAdmin = false;
+  }
+
   const emailToName = {
     'bernarderic29@gmail.com': 'Éric',
     'kenavo13@laposte.net': 'Pascale'
@@ -10504,8 +10494,7 @@ document.getElementById('auth-email').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('auth-password').focus();
 });
 
-// Pré-remplir l'email par défaut (phase de test)
-document.getElementById('auth-email').value = 'bernarderic29@gmail.com';
+// Email non pré-rempli (sécurité)
 document.getElementById('auth-password').focus();
 
 // Vérifier session existante au chargement
@@ -10610,8 +10599,7 @@ async function adminReset(type) {
 // ══════════════════════════════════════════════════════
 
 function openAdmin() {
-  const email = document.getElementById('user-email-display')?.textContent;
-  if (email !== 'bernarderic29@gmail.com') {
+  if (!window._isAdmin) {
     alert("Accès réservé à l'administrateur.");
     return;
   }
@@ -10637,9 +10625,10 @@ function closeAdminOnBg(e) { /* plus utilisé */ }
 async function loadAdminStats() {
   if (!SUPA_READY) return;
   try {
+    const authH = await getAuthHeaders();
     const [fichesRes, backupsRes] = await Promise.all([
       fetch(`${SUPA_URL}/rest/v1/fiches?select=id,updated_at`, { headers: SUPA_HEADERS }),
-      fetch(`${SUPA_URL}/rest/v1/backups?select=id,created_at`, { headers: SUPA_HEADERS })
+      fetch(`${SUPA_URL}/rest/v1/backups?select=id,created_at`, { headers: authH })
     ]);
     const fiches  = fichesRes.ok  ? await fichesRes.json()  : [];
     const backups = backupsRes.ok ? await backupsRes.json() : [];
@@ -10655,6 +10644,32 @@ async function loadAdminStats() {
   } catch(e) { _log.warn('Erreur stats admin : ' + (e.message||e)); }
 }
 
+// Retourne les headers avec le JWT de la session en cours (nécessaire pour la RLS backups)
+async function getAuthHeaders() {
+  const { data } = await _supaClient.auth.getSession();
+  const token = data?.session?.access_token;
+  if (!token) throw new Error("Session expirée — reconnectez-vous");
+  return {
+    "Content-Type": "application/json",
+    "apikey": SUPA_KEY,
+    "Authorization": "Bearer " + token,
+    "Prefer": "return=representation"
+  };
+}
+
+// Retourne les headers avec le JWT de la session en cours (nécessaire pour la RLS backups)
+async function getAuthHeaders() {
+  const { data } = await _supaClient.auth.getSession();
+  const token = data?.session?.access_token;
+  if (!token) throw new Error("Session expirée — reconnectez-vous");
+  return {
+    "Content-Type": "application/json",
+    "apikey": SUPA_KEY,
+    "Authorization": "Bearer " + token,
+    "Prefer": "return=representation"
+  };
+}
+
 async function createBackup(auto = false) {
   const statusEl = document.getElementById('backup-status');
   if (statusEl && !auto) { statusEl.className='admin-status info show'; statusEl.textContent='⏳ Sauvegarde en cours…'; }
@@ -10663,7 +10678,8 @@ async function createBackup(auto = false) {
     const res = await fetch(`${SUPA_URL}/rest/v1/fiches?select=*`, { headers: SUPA_HEADERS });
     const fiches = res.ok ? await res.json() : [];
     const backup = { id:'backup_'+Date.now(), label:auto?'Auto':'Manuelle', fiches_count:fiches.length, data:fiches, created_at:new Date().toISOString() };
-    const saveRes = await fetch(`${SUPA_URL}/rest/v1/backups`, { method:'POST', headers:SUPA_HEADERS, body:JSON.stringify(backup) });
+    const authH = await getAuthHeaders();
+    const saveRes = await fetch(`${SUPA_URL}/rest/v1/backups`, { method:'POST', headers:authH, body:JSON.stringify(backup) });
     if (!saveRes.ok) throw new Error('HTTP ' + saveRes.status);
     if (statusEl && !auto) {
       statusEl.className='admin-status ok show';
@@ -10680,7 +10696,8 @@ async function loadBackupList() {
   const list = document.getElementById('backup-list');
   if (!list || !SUPA_READY) return;
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/backups?select=id,label,fiches_count,created_at&order=created_at.desc&limit=20`, { headers: SUPA_HEADERS });
+    const authH = await getAuthHeaders();
+    const res = await fetch(`${SUPA_URL}/rest/v1/backups?select=id,label,fiches_count,created_at&order=created_at.desc&limit=20`, { headers: authH });
     if (!res.ok) throw new Error('HTTP '+res.status);
     const backups = await res.json();
     if (!backups.length) { list.innerHTML='<div style="font-size:12px;color:var(--slate-light);padding:.5rem;text-align:center">Aucune sauvegarde</div>'; return; }
@@ -10706,7 +10723,8 @@ async function loadBackupList() {
 async function downloadBackup(id) {
   if (!SUPA_READY) return;
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=*`, { headers: SUPA_HEADERS });
+    const authH = await getAuthHeaders();
+    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=*`, { headers: authH });
     const rows = await res.json();
     if (!rows.length) return;
     const a = document.createElement('a');
@@ -10725,7 +10743,8 @@ async function restoreBackup(id, label) {
     await createBackup(true);
 
     statusEl.textContent='⏳ Récupération de la sauvegarde…';
-    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=data`, { headers: SUPA_HEADERS });
+    const authH = await getAuthHeaders();
+    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=data`, { headers: authH });
     const rows = await res.json();
     if (!rows.length || !rows[0].data) throw new Error('Sauvegarde introuvable');
     const fichesToRestore = rows[0].data;
@@ -11243,7 +11262,17 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.10.0</div><div style="font-size:10px;color:var(--slate-light);">23/05/26</div></div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.11.3</div><div style="font-size:10px;color:var(--slate-light);">28/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fiche hôtel · Bouton 🗺 Maps sur l'adresse postale · Fix login · Sécurité renforcée · RLS backups · Rôle admin en base · Token JWT · Suppression email codé en dur</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.11.0</div><div style="font-size:10px;color:var(--slate-light);">28/05/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Sécurité renforcée · RLS table backups (admin uniquement) · Vérification rôle admin en base de données · Token JWT sur appels backup · Suppression email admin codé en dur</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.10.0</div><div style="font-size:10px;color:var(--slate-light);">23/05/26</div></div>
         <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fiches Trajet · bouton Apple Plans (coordonnées GPS précises) · rappel carte hors ligne</div>
       </div>
 
