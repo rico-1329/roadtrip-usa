@@ -767,7 +767,7 @@
     </script>
     <div class="auth-field">
       <label>Email</label>
-      <input type="email" id="auth-email" placeholder="votre@email.com" autocomplete="email" value="bernarderic29@gmail.com">
+      <input type="email" id="auth-email" placeholder="votre@email.com" autocomplete="email" >
     </div>
     <div class="auth-field">
       <label>Mot de passe</label>
@@ -2794,7 +2794,7 @@ function _renderModalContent(idx) {
       <div class="modal-section">
         <div class="modal-section-title">Adresses</div>
         <div class="field-grid single">
-          <div class="field"><label>Adresse de l'hôtel</label><input type="text" id="f-adrarr" placeholder="Numéro, rue, ville, état…" value="${saved.adrarr||''}"></div>
+          <div class="field"><label>Adresse de l'hôtel</label><div style="display:flex;gap:8px;align-items:center;"><input type="text" id="f-adrarr" placeholder="Numéro, rue, ville, état…" value="${saved.adrarr||''}" style="flex:1;">${saved.adrarr ? '<a href="https://maps.google.com/?q=' + encodeURIComponent(saved.adrarr) + '" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:7px 12px;border-radius:8px;border:1px solid #4285F4;background:#4285F4;color:white;text-decoration:none;font-size:11px;font-weight:500;white-space:nowrap;flex-shrink:0;">🗺️ Maps</a>' : ''}</div></div>
           <div class="field"><label>Adresse de départ (étape précédente)</label><input type="text" id="f-adrdep" placeholder="Adresse de départ…" value="${saved.adrdep||''}"></div>
           <div class="field">
             <label>📍 Coordonnées GPS</label>
@@ -11296,12 +11296,25 @@ function closeAdmin() {
 }
 function closeAdminOnBg(e) { /* plus utilisé */ }
 
+async function getAuthHeaders() {
+  const { data } = await _supaClient.auth.getSession();
+  const token = data?.session?.access_token;
+  if (!token) throw new Error("Session expirée — reconnectez-vous");
+  return {
+    "Content-Type": "application/json",
+    "apikey": SUPA_KEY,
+    "Authorization": "Bearer " + token,
+    "Prefer": "return=representation"
+  };
+}
+
 async function loadAdminStats() {
   if (!SUPA_READY) return;
   try {
+    const authH = await getAuthHeaders();
     const [fichesRes, backupsRes] = await Promise.all([
       fetch(`${SUPA_URL}/rest/v1/fiches?select=id,updated_at`, { headers: SUPA_HEADERS }),
-      fetch(`${SUPA_URL}/rest/v1/backups?select=id,created_at`, { headers: SUPA_HEADERS })
+      fetch(`${SUPA_URL}/rest/v1/backups?select=id,created_at`, { headers: authH })
     ]);
     const fiches  = fichesRes.ok  ? await fichesRes.json()  : [];
     const backups = backupsRes.ok ? await backupsRes.json() : [];
@@ -11325,7 +11338,8 @@ async function createBackup(auto = false) {
     const res = await fetch(`${SUPA_URL}/rest/v1/fiches?select=*`, { headers: SUPA_HEADERS });
     const fiches = res.ok ? await res.json() : [];
     const backup = { id:'backup_'+Date.now(), label:auto?'Auto':'Manuelle', fiches_count:fiches.length, data:fiches, created_at:new Date().toISOString() };
-    const saveRes = await fetch(`${SUPA_URL}/rest/v1/backups`, { method:'POST', headers:SUPA_HEADERS, body:JSON.stringify(backup) });
+    const authH = await getAuthHeaders();
+    const saveRes = await fetch(`${SUPA_URL}/rest/v1/backups`, { method:'POST', headers:authH, body:JSON.stringify(backup) });
     if (!saveRes.ok) throw new Error('HTTP ' + saveRes.status);
     if (statusEl && !auto) {
       statusEl.className='admin-status ok show';
@@ -11342,7 +11356,8 @@ async function loadBackupList() {
   const list = document.getElementById('backup-list');
   if (!list || !SUPA_READY) return;
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/backups?select=id,label,fiches_count,created_at&order=created_at.desc&limit=20`, { headers: SUPA_HEADERS });
+    const authH = await getAuthHeaders();
+    const res = await fetch(`${SUPA_URL}/rest/v1/backups?select=id,label,fiches_count,created_at&order=created_at.desc&limit=20`, { headers: authH });
     if (!res.ok) throw new Error('HTTP '+res.status);
     const backups = await res.json();
     if (!backups.length) { list.innerHTML='<div style="font-size:12px;color:var(--slate-light);padding:.5rem;text-align:center">Aucune sauvegarde</div>'; return; }
@@ -11368,7 +11383,8 @@ async function loadBackupList() {
 async function downloadBackup(id) {
   if (!SUPA_READY) return;
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=*`, { headers: SUPA_HEADERS });
+    const authH = await getAuthHeaders();
+    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=*`, { headers: authH });
     const rows = await res.json();
     if (!rows.length) return;
     const a = document.createElement('a');
@@ -11387,7 +11403,8 @@ async function restoreBackup(id, label) {
     await createBackup(true);
 
     statusEl.textContent='⏳ Récupération de la sauvegarde…';
-    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=data`, { headers: SUPA_HEADERS });
+    const authH = await getAuthHeaders();
+    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=data`, { headers: authH });
     const rows = await res.json();
     if (!rows.length || !rows[0].data) throw new Error('Sauvegarde introuvable');
     const fichesToRestore = rows[0].data;
@@ -11906,7 +11923,7 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
         <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.11.0</div><div style="font-size:10px;color:var(--slate-light);">04/06/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fiche Activité distincte · header teal · programme, à emporter, finances · carte timeline bordure teal · Marqueur H sur les étapes hôtel · Sécurité : rôle admin vérifié en base de données (table profiles)</div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fiche Activité distincte · header teal · programme, à emporter, finances · Marqueur H sur les étapes hôtel · Bouton 🗺 Maps sur l'adresse postale · Sécurité : rôle admin en base (profiles) · Token JWT sur les appels backup · RLS table backups · Email non pré-rempli au login</div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
