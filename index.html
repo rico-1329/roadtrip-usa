@@ -780,7 +780,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.11.0 · 04/06/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.12.0 · 04/06/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -1836,7 +1836,7 @@ const ICONS = { urgent:'🔴', missing:'🟡', info:'🔵' };
 
 let steps = [
   // ── VOL ALLER ──
-  { type:'flight', direction:'aller', dates:'28 juil.', segments:[
+  { id:'fl-aller', type:'flight', direction:'aller', dates:'28 juil.', segments:[
       { num:'LH 2267', from:'MRS', fromName:'Marseille-Provence T1', dep:'06:05', to:'MUC', toName:'Munich T2', arr:'07:40', duration:'1h35', aircraft:'A319', meal:'Boissons à la vente', layover:'Escale 3h25' },
       { num:'LH 480',  from:'MUC', fromName:'Munich T2', dep:'11:05', to:'DEN', toName:'Denver International', arr:'13:45', duration:'10h40', aircraft:'A380-800', meal:'Repas inclus', layover:'Escale 2h35' },
       { num:'LH 8734 (UA 2200)', from:'DEN', fromName:'Denver International', dep:'16:20', to:'JAC', toName:'Jackson Hole Airport', arr:'17:53', duration:'1h33', aircraft:'A320', meal:'Pas de repas', layover:null }
@@ -1844,29 +1844,29 @@ let steps = [
     alerts:[{ kind:'info', label:'Récupération du véhicule à l\'arrivée', detail:'Budget JAC · 18h00 · 1250 E Airport Road' }] },
 
   // ── PRISE EN CHARGE VÉHICULE ──
-  { type:'car-pickup', dates:'28 juil. · 18h00', city:'Jackson Hole Airport (JAC)', label:'Prise en charge du véhicule', sub:'Budget · Volkswagen Passat ou similaire', address:'1250 E Airport Road, Jackson, WY 83001', ref:'35554355FR4', bsp:'8878530806', allianz:'950476', to:'Elk Country Inn Jackson',
+  { id:'car-pickup', type:'car-pickup', dates:'28 juil. · 18h00', city:'Jackson Hole Airport (JAC)', label:'Prise en charge du véhicule', sub:'Budget · Volkswagen Passat ou similaire', address:'1250 E Airport Road, Jackson, WY 83001', ref:'35554355FR4', bsp:'8878530806', allianz:'950476', to:'Elk Country Inn Jackson',
     alerts:[{ kind:'info', label:'Premier plein inclus', detail:'Restituer le véhicule réservoir vide à San Francisco (SFO)' }] },
 
   // ── J1 : JACKSON, WYOMING ──
-  { type:'drive', from:'Budget JAC · Airport Road', to:'Elk Country Inn Jackson', km:13, duration:'0h20' },
-  { type:'hotel', dates:'28 juil.', dateDebut:'2026-07-28', dateFin:'2026-07-29', nights:1, city:'Jackson, Wyoming', hotel:'Elk Country Inn Jackson ★', price:375, ptdej:true, annul:'avant le 25 juillet',
+  { id:'d-jac-elk', type:'drive', from:'Budget JAC · Airport Road', to:'Elk Country Inn Jackson', km:13, duration:'0h20' },
+  { id:'h-20260728', type:'hotel', dates:'28 juil.', dateDebut:'2026-07-28', dateFin:'2026-07-29', nights:1, city:'Jackson, Wyoming', hotel:'Elk Country Inn Jackson ★', price:375, ptdej:true, annul:'avant le 25 juillet',
     visits:'Centre-ville (arcs en bois de cerf, boutiques western), National Museum of Wildlife Art, Cache Creek / Snow King Mountain',
     alerts:[{ kind:'urgent', label:'Annulation imminente', detail:'Date limite : 25 juillet' }] },
 
   // ── J2-4 : YELLOWSTONE / GRAND TETON ──
-  { type:'drive', from:'Jackson', to:'Yellowstone / Grand Teton', km:100, duration:'1h30' },
-  { type:'hotel', dates:'29 juil. – 1er août', dateDebut:'2026-07-29', dateFin:'2026-08-01', nights:3, city:'Yellowstone / Grand Teton, Wyoming', hotel:'Best Western Weston Inn ★', price:723, ptdej:true, annul:'avant le 20 juillet',
+  { id:'d-jac-yst', type:'drive', from:'Jackson', to:'Yellowstone / Grand Teton', km:100, duration:'1h30' },
+  { id:'h-20260729', type:'hotel', dates:'29 juil. – 1er août', dateDebut:'2026-07-29', dateFin:'2026-08-01', nights:3, city:'Yellowstone / Grand Teton, Wyoming', hotel:'Best Western Weston Inn ★', price:723, ptdej:true, annul:'avant le 20 juillet',
     visits:'Old Faithful, Grand Prismatic Spring, Grand Canyon de Yellowstone, Lamar Valley (bisons, ours, loups), Mammoth Hot Springs, Hayden Valley',
     alerts:[{ kind:'urgent', label:'Date limite possiblement dépassée', detail:'Annulation avant le 20 juillet — à vérifier d\'urgence' }] },
 
   // ── ACTIVITÉS YELLOWSTONE ──
-  { type:'activity', dates:'30 juil.', dateDebut:'2026-07-30', title:'Journée Old Faithful & Grand Prismatic', heureDebut:'08:00', heureFin:'19:00',
+  { id:'act-20260730', type:'activity', dates:'30 juil.', dateDebut:'2026-07-30', title:'Journée Old Faithful & Grand Prismatic', heureDebut:'08:00', heureFin:'19:00',
     alerts:[] },
-  { type:'activity', dates:'31 juil.', dateDebut:'2026-07-31', title:'Journée Lamar Valley & Rodéo', heureDebut:'06:30', heureFin:'21:00',
+  { id:'act-20260731', type:'activity', dates:'31 juil.', dateDebut:'2026-07-31', title:'Journée Lamar Valley & Rodéo', heureDebut:'06:30', heureFin:'21:00',
     alerts:[{ kind:'info', label:'Départ Lamar Valley 17h30', detail:'Impératif pour arriver au rodéo à 19h00' }] },
 
   // ── J5 : GD TETON → ÉTAPE NUIT (CHOIX À FAIRE) ──
-  { type:'hotel', dates:'1er août', dateDebut:'2026-08-01', dateFin:'2026-08-02', nights:1, city:'Montpelier OU Rock Springs, Wyoming', hotel:'⚠️ CHOIX À FAIRE : Montpelier (opt. 1) / Four Points by Sheraton Rock Springs (opt. 2)', price:164, ptdej:true, annul:'avant le 29 juillet',
+  { id:'h-20260801', type:'hotel', dates:'1er août', dateDebut:'2026-08-01', dateFin:'2026-08-02', nights:1, city:'Montpelier OU Rock Springs, Wyoming', hotel:'⚠️ CHOIX À FAIRE : Montpelier (opt. 1) / Four Points by Sheraton Rock Springs (opt. 2)', price:164, ptdej:true, annul:'avant le 29 juillet',
     visits:'Oxbow Bend, Jenny Lake, Schwabacher Landing, Snake River Overlook, Mormon Row',
     alerts:[
       { kind:'urgent', label:'⚠️ Choix à réaliser', detail:'Option 1 : Montpelier (pas d\'hôtel défini) — Option 2 : Four Points Sheraton Rock Springs (102€) — décider et réserver' },
@@ -1874,44 +1874,44 @@ let steps = [
     ] },
 
   // ── J6-7 : MOAB / ARCHES ──
-  { type:'drive', from:'Étape nuit', to:'Moab / Arches', km:238, duration:'4h30' },
-  { type:'hotel', dates:'2 – 3 août', dateDebut:'2026-08-02', dateFin:'2026-08-04', nights:2, city:'Moab / Arches, Utah', hotel:'Hyatt Place (4 places)', price:377, ptdej:true, annul:'avant le 29 juillet',
+  { id:'d-nuit-moab', type:'drive', from:'Étape nuit', to:'Moab / Arches', km:238, duration:'4h30' },
+  { id:'h-20260802', type:'hotel', dates:'2 – 3 août', dateDebut:'2026-08-02', dateFin:'2026-08-04', nights:2, city:'Moab / Arches, Utah', hotel:'Hyatt Place (4 places)', price:377, ptdej:true, annul:'avant le 29 juillet',
     visits:'Delicate Arch, Landscape Arch & Devils Garden, Canyonlands, tour 4x4 ou VTT',
     alerts:[{ kind:'urgent', label:'Annulation imminente', detail:'Date limite : 29 juillet' }] },
 
   // ── J8 : MONUMENT VALLEY ──
-  { type:'drive', from:'Moab', to:'Monument Valley', km:204, duration:'2h29' },
-  { type:'hotel', dates:'4 août', dateDebut:'2026-08-04', dateFin:'2026-08-05', nights:1, city:'Monument Valley, Arizona', hotel:'The View Hotel', price:390, ptdej:false, annul:null,
+  { id:'d-moab-monument', type:'drive', from:'Moab', to:'Monument Valley', km:204, duration:'2h29' },
+  { id:'h-20260804', type:'hotel', dates:'4 août', dateDebut:'2026-08-04', dateFin:'2026-08-05', nights:1, city:'Monument Valley, Arizona', hotel:'The View Hotel', price:390, ptdej:false, annul:null,
     visits:'Tour 4x4 Navajo, Mittens & Merrick Butte, Forrest Gump Point (US163), coucher de soleil Artist\'s Point (6h-20h · 10€/pers)',
     alerts:[{ kind:'missing', label:'Politique d\'annulation manquante', detail:'Aucune date limite renseignée — contacter l\'hôtel' }] },
 
   // ── J9-10 : PAGE / ANTELOPE CANYON / LAC POWELL ──
-  { type:'drive', from:'Monument Valley', to:'Page / Antelope Canyon', km:145, duration:'3h16' },
-  { type:'hotel', dates:'5 – 6 août', dateDebut:'2026-08-05', dateFin:'2026-08-07', nights:2, city:'Page / Lac Powell, Arizona', hotel:'Days Inn & Suites by Wyndham', price:251, ptdej:true, annul:'avant le 4 août',
+  { id:'d-monument-page', type:'drive', from:'Monument Valley', to:'Page / Antelope Canyon', km:145, duration:'3h16' },
+  { id:'h-20260805', type:'hotel', dates:'5 – 6 août', dateDebut:'2026-08-05', dateFin:'2026-08-07', nights:2, city:'Page / Lac Powell, Arizona', hotel:'Days Inn & Suites by Wyndham', price:251, ptdej:true, annul:'avant le 4 août',
     visits:'Lower Antelope Canyon (déjà réservé), Upper Antelope Canyon, Horseshoe Bend, croisière ou kayak Lac Powell',
     alerts:[{ kind:'urgent', label:'Annulation proche', detail:'Date limite : 4 août' }] },
 
   // ── J11 : BRYCE CANYON / ZION ──
-  { type:'drive', from:'Page', to:'Bryce Canyon / Zion', km:251, duration:'2h55' },
-  { type:'hotel', dates:'7 août', dateDebut:'2026-08-07', dateFin:'2026-08-08', nights:1, city:'Bryce Canyon / Zion, Utah', hotel:'Bryce Pioneer Village ★', price:149, ptdej:false, annul:'avant le 6 août',
+  { id:'d-page-bryce', type:'drive', from:'Page', to:'Bryce Canyon / Zion', km:251, duration:'2h55' },
+  { id:'h-20260807', type:'hotel', dates:'7 août', dateDebut:'2026-08-07', dateFin:'2026-08-08', nights:1, city:'Bryce Canyon / Zion, Utah', hotel:'Bryce Pioneer Village ★', price:149, ptdej:false, annul:'avant le 6 août',
     visits:'Navajo Loop + Queen\'s Garden, lever de soleil Sunrise Point, amphithéâtre Bryce (2300-2800m), Watchman Trail Zion',
     alerts:[{ kind:'urgent', label:'Annulation proche', detail:'Date limite : 6 août' }] },
 
   // ── J12 : KANAB ──
-  { type:'drive', from:'Bryce Canyon', to:'Kanab', km:80, duration:'1h00' },
-  { type:'hotel', dates:'8 août', dateDebut:'2026-08-08', dateFin:'2026-08-09', nights:1, city:'Kanab, Utah', hotel:'La Quinta by Wyndham Kanab', price:100, ptdej:false, annul:null,
+  { id:'d-bryce-kanab', type:'drive', from:'Bryce Canyon', to:'Kanab', km:80, duration:'1h00' },
+  { id:'h-20260808', type:'hotel', dates:'8 août', dateDebut:'2026-08-08', dateFin:'2026-08-09', nights:1, city:'Kanab, Utah', hotel:'La Quinta by Wyndham Kanab', price:100, ptdej:false, annul:null,
     visits:'Best Friends Animal Sanctuary, The Wave (permis requis), passage Zion (50 km)',
     alerts:[{ kind:'missing', label:'Politique d\'annulation manquante', detail:'À confirmer · Passage possible à Zion (50 km)' }] },
 
   // ── J13 : GRAND CANYON ──
-  { type:'drive', from:'Kanab', to:'Grand Canyon / Seligman', km:210, duration:'4h30' },
-  { type:'hotel', dates:'9 août', dateDebut:'2026-08-09', dateFin:'2026-08-10', nights:1, city:'Grand Canyon, Arizona', hotel:'Grand Canyon Hotel & Suites ★', price:147, ptdej:true, annul:'avant le 3 août',
+  { id:'d-kanab-gc', type:'drive', from:'Kanab', to:'Grand Canyon / Seligman', km:210, duration:'4h30' },
+  { id:'h-20260809', type:'hotel', dates:'9 août', dateDebut:'2026-08-09', dateFin:'2026-08-10', nights:1, city:'Grand Canyon, Arizona', hotel:'Grand Canyon Hotel & Suites ★', price:147, ptdej:true, annul:'avant le 3 août',
     visits:'Grand Canyon South Rim, Bright Angel Trail, Seligman (Route 66, Roadkill Café)',
     alerts:[{ kind:'urgent', label:'Annulation imminente', detail:'Date limite : 3 août' }] },
 
   // ── J14 : WILLIAMS / SELIGMAN OU KINGMAN (CHOIX À FAIRE) ──
-  { type:'drive', from:'Grand Canyon', to:'Williams / Kingman', km:100, duration:'1h00' },
-  { type:'hotel', dates:'10 août', dateDebut:'2026-08-10', dateFin:'2026-08-11', nights:1, city:'Williams / Seligman OU Kingman, Arizona', hotel:'⚠️ CHOIX À FAIRE : Howard Johnson Williams (opt. 1) / Ramada Wyndham Kingman (opt. 2)', price:104, ptdej:true, annul:'avant le 7 août',
+  { id:'d-gc-williams', type:'drive', from:'Grand Canyon', to:'Williams / Kingman', km:100, duration:'1h00' },
+  { id:'h-20260810', type:'hotel', dates:'10 août', dateDebut:'2026-08-10', dateFin:'2026-08-11', nights:1, city:'Williams / Seligman OU Kingman, Arizona', hotel:'⚠️ CHOIX À FAIRE : Howard Johnson Williams (opt. 1) / Ramada Wyndham Kingman (opt. 2)', price:104, ptdej:true, annul:'avant le 7 août',
     visits:'Williams : Main Street, Bearizona Wildlife Park, Grand Canyon Railway · Seligman : Route 66 vintage · Laughlin si possible',
     alerts:[
       { kind:'urgent', label:'⚠️ Choix à réaliser', detail:'Option 1 : Howard Johnson Williams (Route 66) — Option 2 : Ramada Kingman (104€) — décider et réserver' },
@@ -1919,8 +1919,8 @@ let steps = [
     ] },
 
   // ── J15-16 : LAS VEGAS ──
-  { type:'drive', from:'Williams / Kingman', to:'Las Vegas', km:320, duration:'3h15' },
-  { type:'hotel', dates:'11 – 12 août', dateDebut:'2026-08-11', dateFin:'2026-08-13', nights:2, city:'Las Vegas, Nevada', hotel:'⚠️ CHOIX À FAIRE : New York New York (opt. 1) / Paris Las Vegas (opt. 2)', price:317, ptdej:false, annul:'avant le 8 août',
+  { id:'d-williams-lv', type:'drive', from:'Williams / Kingman', to:'Las Vegas', km:320, duration:'3h15' },
+  { id:'h-20260811', type:'hotel', dates:'11 – 12 août', dateDebut:'2026-08-11', dateFin:'2026-08-13', nights:2, city:'Las Vegas, Nevada', hotel:'⚠️ CHOIX À FAIRE : New York New York (opt. 1) / Paris Las Vegas (opt. 2)', price:317, ptdej:false, annul:'avant le 8 août',
     visits:'Old Vegas, street art, quartier Fremont, The Strip',
     alerts:[
       { kind:'urgent', label:'⚠️ Choix à réaliser', detail:'Option 1 : New York New York (317€) — Option 2 : Paris Las Vegas — décider et réserver' },
@@ -1928,8 +1928,8 @@ let steps = [
     ] },
 
   // ── J17 : DEATH VALLEY ──
-  { type:'drive', from:'Las Vegas', to:'Death Valley', km:416, duration:'4h37' },
-  { type:'hotel', dates:'13 août', dateDebut:'2026-08-13', dateFin:'2026-08-14', nights:1, city:'Death Valley, Californie', hotel:'Furnace Creek Ranch', price:189, ptdej:false, annul:'avant le 8 août',
+  { id:'d-lv-dv', type:'drive', from:'Las Vegas', to:'Death Valley', km:416, duration:'4h37' },
+  { id:'h-20260813', type:'hotel', dates:'13 août', dateDebut:'2026-08-13', dateFin:'2026-08-14', nights:1, city:'Death Valley, Californie', hotel:'Furnace Creek Ranch', price:189, ptdej:false, annul:'avant le 8 août',
     visits:'Badwater Basin, Zabriskie Point, visite Bagdad Café en route',
     alerts:[
       { kind:'urgent', label:'Annulation proche', detail:'Date limite : 8 août' },
@@ -1937,8 +1937,8 @@ let steps = [
     ] },
 
   // ── J18-19 : LOS ANGELES ──
-  { type:'drive', from:'Death Valley', to:'Los Angeles', km:400, duration:'4h00' },
-  { type:'hotel', dates:'14 – 15 août', dateDebut:'2026-08-14', dateFin:'2026-08-16', nights:2, city:'Los Angeles, Californie', hotel:'⚠️ CHOIX À FAIRE : Hollywood Celebrity Hotel (opt. 1) / Sure Stay Santa Monica (opt. 2)', price:387, ptdej:true, annul:'avant le 11 août',
+  { id:'d-dv-la', type:'drive', from:'Death Valley', to:'Los Angeles', km:400, duration:'4h00' },
+  { id:'h-20260814', type:'hotel', dates:'14 – 15 août', dateDebut:'2026-08-14', dateFin:'2026-08-16', nights:2, city:'Los Angeles, Californie', hotel:'⚠️ CHOIX À FAIRE : Hollywood Celebrity Hotel (opt. 1) / Sure Stay Santa Monica (opt. 2)', price:387, ptdej:true, annul:'avant le 11 août',
     visits:'Hollywood Walk of Fame, Dolby Theatre, TCL Chinese Theatre, Getty Center, Beverly Hills, Rodeo Drive, Griffith Observatoire (lettres Hollywood), Universal CityWalk',
     alerts:[
       { kind:'urgent', label:'⚠️ Choix à réaliser', detail:'Option 1 : Hollywood Celebrity Hotel ★ (300€ env.) — Option 2 : Sure Stay Santa Monica (273€ · annul. 8 août) — décider' },
@@ -1946,8 +1946,8 @@ let steps = [
     ] },
 
   // ── J20 : SOLVANG ──
-  { type:'drive', from:'Los Angeles', to:'Solvang', km:200, duration:'2h00' },
-  { type:'hotel', dates:'16 août', dateDebut:'2026-08-16', dateFin:'2026-08-17', nights:1, city:'Solvang, Californie', hotel:'Solvang Inn & Cottages ★', price:148, ptdej:true, annul:'avant le 12 août',
+  { id:'d-la-solvang', type:'drive', from:'Los Angeles', to:'Solvang', km:200, duration:'2h00' },
+  { id:'h-20260816', type:'hotel', dates:'16 août', dateDebut:'2026-08-16', dateFin:'2026-08-17', nights:1, city:'Solvang, Californie', hotel:'Solvang Inn & Cottages ★', price:148, ptdej:true, annul:'avant le 12 août',
     visits:'Village danois, dégustation de vins, balade à vélo dans la campagne',
     alerts:[
       { kind:'urgent', label:'Annulation proche', detail:'Date limite : 12 août' },
@@ -1955,14 +1955,14 @@ let steps = [
     ] },
 
   // ── J21 : MONTEREY ──
-  { type:'drive', from:'Solvang', to:'Monterey', km:190, duration:'2h00' },
-  { type:'hotel', dates:'17 août', dateDebut:'2026-08-17', dateFin:'2026-08-18', nights:1, city:'Monterey, Californie', hotel:'Colton Inn', price:192, ptdej:true, annul:'avant le 13 août',
+  { id:'d-solvang-monterey', type:'drive', from:'Solvang', to:'Monterey', km:190, duration:'2h00' },
+  { id:'h-20260817', type:'hotel', dates:'17 août', dateDebut:'2026-08-17', dateFin:'2026-08-18', nights:1, city:'Monterey, Californie', hotel:'Colton Inn', price:192, ptdej:true, annul:'avant le 13 août',
     visits:'Aquarium de Monterey (réserver à l\'avance), 17-Mile Drive, Cannery Row',
     alerts:[{ kind:'urgent', label:'Annulation proche', detail:'Date limite : 13 août' }] },
 
   // ── J22-23 : SAN FRANCISCO ──
-  { type:'drive', from:'Monterey', to:'San Francisco', km:190, duration:'2h00' },
-  { type:'hotel', dates:'18 – 19 août', dateDebut:'2026-08-18', dateFin:'2026-08-20', nights:2, city:'San Francisco, Californie', hotel:'⚠️ CHOIX À FAIRE : Hotel Caza Fisherman\'s Wharf (opt. 1) / Hotel Zetta San Francisco (opt. 2)', price:302, ptdej:false, annul:null,
+  { id:'d-monterey-sf', type:'drive', from:'Monterey', to:'San Francisco', km:190, duration:'2h00' },
+  { id:'h-20260818', type:'hotel', dates:'18 – 19 août', dateDebut:'2026-08-18', dateFin:'2026-08-20', nights:2, city:'San Francisco, Californie', hotel:'⚠️ CHOIX À FAIRE : Hotel Caza Fisherman\'s Wharf (opt. 1) / Hotel Zetta San Francisco (opt. 2)', price:302, ptdej:false, annul:null,
     visits:'Cable car Powell Street, Union Square, Alcatraz (réserver des semaines à l\'avance), Financial District, Nob Hill, Twin Peaks, Crissy Field (vue Golden Gate)',
     alerts:[
       { kind:'urgent', label:'⚠️ Choix à réaliser', detail:'Option 1 : Hotel Caza Fisherman\'s Wharf — Option 2 : Hotel Zetta SF — décider et réserver' },
@@ -1970,19 +1970,19 @@ let steps = [
     ] },
 
   // ── RESTITUTION VÉHICULE ──
-  { type:'drive', from:'Hôtel San Francisco', to:'San Francisco Airport SFO', km:22, duration:'0h30',
+  { id:'d-sf-sfo', type:'drive', from:'Hôtel San Francisco', to:'San Francisco Airport SFO', km:22, duration:'0h30',
     alerts:[{ kind:'info', label:'Restitution du véhicule', detail:'Budget SFO · 780 McDonnell Road · Réservoir vide' }] },
-  { type:'car-return', dates:'20 août · matin', city:'San Francisco Airport (SFO)', label:'Restitution du véhicule', sub:'Budget · 780 McDonnell Road, San Francisco', address:'780 McDonnell Road, San Francisco, CA', ref:'35554355FR4', bsp:'8878530806',
+  { id:'car-return', type:'car-return', dates:'20 août · matin', city:'San Francisco Airport (SFO)', label:'Restitution du véhicule', sub:'Budget · 780 McDonnell Road, San Francisco', address:'780 McDonnell Road, San Francisco, CA', ref:'35554355FR4', bsp:'8878530806',
     alerts:[{ kind:'info', label:'Restituer réservoir vide', detail:'Premier plein inclus à la prise en charge — restitution à vide autorisée' }] },
 
   // ── VOL RETOUR ──
-  { type:'flight', direction:'retour', dates:'20 – 21 août', segments:[
+  { id:'fl-retour', type:'flight', direction:'retour', dates:'20 – 21 août', segments:[
       { num:'LH 459',  from:'SFO', fromName:'San Francisco Intl · Terminal International', dep:'20 août 21:05', to:'MUC', toName:'Munich T2', arr:'21 août 17:10', duration:'11h05', aircraft:'A350-900', meal:'Repas inclus', layover:'Escale 2h50' },
       { num:'LH 2266 (Cityline)', from:'MUC', fromName:'Munich T2', dep:'21 août 20:00', to:'MRS', toName:'Marseille-Provence T1', arr:'21 août 21:45', duration:'1h45', aircraft:'A319', meal:'Boissons à la vente', layover:null }
     ], ref:'ZKUZPE', billet:'220 6059505613-14',
     alerts:[{ kind:'info', label:'Enregistrement à l\'avance recommandé', detail:'Départ 21h05 · Terminal International SFO' }] },
 
-  { type:'end' },
+  { id:'end', type:'end' },
 ];
 
 // ── SUPABASE CONFIG ──
@@ -2015,7 +2015,11 @@ function parseData(d) {
   return {};
 }
 
-function storageKey(idx) { return 'roadtrip_fiche_' + idx; }
+function storageKey(idx) {
+  const step = steps[idx];
+  if (step?.id) return 'roadtrip_fiche_' + step.id;
+  return 'roadtrip_fiche_' + idx; // fallback legacy
+}
 
 // Charge depuis cache → localStorage (toujours objet parsé)
 // ── PRÉSENCE & ACCÈS CONCURRENT ──
@@ -2152,6 +2156,53 @@ function ficheHasData(idx) {
   return Object.values(d).some(v => v && v.toString().trim() !== '');
 }
 
+
+// ── MIGRATION IDs STABLES (v2.12) ──
+// Renomme les fiches Supabase de "roadtrip_fiche_N" vers "roadtrip_fiche_{step.id}"
+// Exécutée une seule fois au démarrage.
+async function migrateToStableIds() {
+  if (!SUPA_READY) return;
+  if (localStorage.getItem('_stableIds_v1')) return; // déjà fait
+  let count = 0;
+  for (let idx = 0; idx < steps.length; idx++) {
+    const step = steps[idx];
+    if (!step?.id) continue;
+    const newKey = 'roadtrip_fiche_' + step.id;
+    const oldKey = 'roadtrip_fiche_' + idx;
+    if (newKey === oldKey) continue;
+    try {
+      // Vérifier si la nouvelle clé n'existe pas déjà
+      const chk = await fetch(`${SUPA_URL}/rest/v1/fiches?id=eq.${newKey}&select=id`, { headers: SUPA_HEADERS });
+      const chkRows = await chk.json();
+      if (chkRows.length > 0) {
+        // Migrer aussi le localStorage
+        const localOld = localStorage.getItem(oldKey);
+        if (localOld && !localStorage.getItem(newKey)) {
+          localStorage.setItem(newKey, localOld);
+          localStorage.removeItem(oldKey);
+        }
+        continue;
+      }
+      // Récupérer l'ancienne fiche
+      const old = await fetch(`${SUPA_URL}/rest/v1/fiches?id=eq.${oldKey}&select=*`, { headers: SUPA_HEADERS });
+      const oldRows = await old.json();
+      if (!oldRows.length) continue;
+      // Créer la nouvelle fiche
+      await fetch(`${SUPA_URL}/rest/v1/fiches`, {
+        method: 'POST',
+        headers: { ...SUPA_HEADERS, 'Prefer': 'resolution=merge-duplicates' },
+        body: JSON.stringify({ id: newKey, data: oldRows[0].data, updated_at: new Date().toISOString() })
+      });
+      // Migrer le localStorage
+      const localOld = localStorage.getItem(oldKey);
+      if (localOld) { localStorage.setItem(newKey, localOld); localStorage.removeItem(oldKey); }
+      count++;
+    } catch(e) { /* ignore erreurs individuelles */ }
+  }
+  localStorage.setItem('_stableIds_v1', '1');
+  if (count > 0) console.log(`✅ Migration IDs stables : ${count} fiche(s) renommée(s)`);
+}
+
 // Charge toutes les fiches depuis Supabase au démarrage
 // ── STEPS DYNAMIQUES (fiches dupliquées) ── persistance en Supabase/localStorage
 const EXTRA_STEPS_KEY = 'roadtrip_extra_steps';
@@ -2204,6 +2255,10 @@ async function loadExtraSteps() {
   sorted.forEach(s => {
     const insertAt = s._stepsIdx;
     const cleanStep = { ...s };
+    // Assigner un ID stable si le step n'en a pas (migration des anciens steps)
+    if (!cleanStep.id) {
+      cleanStep.id = 'dyn-' + (cleanStep._created ? new Date(cleanStep._created).getTime() : Date.now());
+    }
     delete cleanStep._stepsIdx;
     steps.splice(insertAt, 0, cleanStep);
     offset++;
@@ -6146,7 +6201,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.11.0 · 04/06/26
+        Version : v2.12.0 · 04/06/26
       </div>
     </div>`;
 }
@@ -7687,6 +7742,7 @@ async function saveNewActivity() {
     heureDebut: '',
     heureFin:  '',
     alerts:    [],
+    id:        'dyn-' + Date.now(),
     _isDup:    true,
     _newActivity: 'visite',
     _created:  new Date().toISOString()
@@ -7699,6 +7755,7 @@ async function saveNewActivity() {
     nights:    nights,
     price:     prix || '',
     visits:    '',
+    id:        'dyn-' + Date.now(),
     _isDup:    true,
     _newActivity: _newActivityType,
     _created:  new Date().toISOString()
@@ -9482,6 +9539,7 @@ async function confirmDuplicate() {
 
   // Créer un nouveau step dynamique inséré juste après l'étape source
   const newStep = Object.assign({}, srcStep, {
+    id:     'dyn-' + Date.now(),
     city:   title,
     hotel:  srcStep.hotel || '',
     _isDup: true,
@@ -9766,6 +9824,7 @@ function _testNavMenus() { (async () => {
 // ── INITIALISATION ──
 (async function init() {
   await loadExtraSteps();
+  await migrateToStableIds(); // migration une seule fois : index → IDs stables
   renderSidebar();
   renderTimeline();
   await loadAllFiches();
@@ -11922,7 +11981,12 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.11.0</div><div style="font-size:10px;color:var(--slate-light);">04/06/26</div></div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.12.0</div><div style="font-size:10px;color:var(--slate-light);">04/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">IDs stables sur les étapes · les fiches ne se décalent plus lors de l'ajout de nouvelles étapes · migration automatique au démarrage</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.11.0</div><div style="font-size:10px;color:var(--slate-light);">04/06/26</div></div>
         <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fiche Activité distincte · header teal · programme, à emporter, finances · Marqueur H sur les étapes hôtel · Bouton 🗺 Maps sur l'adresse postale · Sécurité : rôle admin en base (profiles) · Token JWT sur les appels backup · RLS table backups · Email non pré-rempli au login</div>
       </div>
 
