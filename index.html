@@ -136,14 +136,51 @@
   .timeline::before{content:'';position:absolute;left:11px;top:16px;bottom:16px;width:1.5px;background:linear-gradient(to bottom,var(--amber),var(--teal) 50%,var(--amber-light));opacity:.3;}
   .entry{position:relative;margin-bottom:8px;}
   .entry.hidden{display:none;}
-  .marker{position:absolute;left:-32px;top:12px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1;border:1.5px solid var(--sand);box-shadow:0 1px 4px rgba(0,0,0,.15);}
-  .marker.hotel  {background:var(--amber);color:white;}
-  .marker.visit  {background:var(--teal);color:white;}
-  .marker.drive  {background:var(--slate-pale);color:var(--slate);}
-  .marker.flight {background:#1A2E44;color:#90BCFF;}
-  .marker.carpick{background:var(--amber);color:white;}
+  .marker{position:absolute;left:-32px;top:12px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;line-height:1;border:1.5px solid var(--sand);box-shadow:0 1px 4px rgba(0,0,0,.15);}
+  .marker.hotel    {background:var(--amber);color:white;}
+  .marker.visit    {background:var(--teal);color:white;}
+  .marker.drive    {background:var(--slate-pale);color:var(--slate);}
+  .marker.flight   {background:#1A2E44;color:#90BCFF;}
+  .marker.carpick  {background:var(--amber);color:white;}
   .marker.carreturn{background:var(--teal);color:white;}
-  .marker.end    {background:var(--red);color:white;}
+  .marker.end      {background:var(--red);color:white;}
+  .marker.activity {background:var(--teal);color:white;}
+
+  /* ACTIVITY CARD */
+  .activity-card{background:white;border-radius:12px;border:.5px solid var(--sand-dark);border-left:3px solid var(--teal);padding:1rem 1.25rem;transition:box-shadow .2s,transform .2s;}
+  .activity-card:hover{box-shadow:0 4px 20px rgba(26,22,16,.08);transform:translateY(-1px);}
+  .act-step-pill{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--teal-pale);color:var(--teal);white-space:nowrap;}
+  .act-step-pill.more{background:var(--sand-dark);color:var(--slate-light);}
+
+  /* ACTIVITY MODAL — mini-timeline étapes */
+  .act-step-row{display:flex;gap:0;position:relative;}
+  .act-step-icon{display:flex;flex-direction:column;align-items:center;width:34px;flex-shrink:0;padding-top:6px;}
+  .act-step-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:.5px solid var(--sand-dark);}
+  .act-step-line{width:1px;flex:1;min-height:8px;background:var(--sand-dark);margin-top:3px;}
+  .act-step-content{flex:1;padding:2px 0 10px 10px;min-width:0;}
+  .act-step-name{font-size:13px;font-weight:500;color:var(--ink);line-height:1.3;}
+  .act-step-meta{display:flex;gap:6px;margin-top:2px;flex-wrap:wrap;align-items:center;}
+  .act-step-badge{font-size:10px;color:var(--slate-light);display:flex;align-items:center;gap:2px;}
+  .act-step-expanded{margin-top:6px;padding:8px 10px;background:var(--sand);border-radius:8px;border:.5px solid var(--sand-dark);display:flex;flex-direction:column;gap:6px;}
+  .act-step-desc{font-size:12px;color:var(--ink-light);line-height:1.5;}
+  .act-step-alert{display:flex;align-items:flex-start;gap:6px;padding:5px 8px;border-radius:6px;font-size:11px;line-height:1.4;border-left:2px solid;}
+  .act-step-alert.warn{background:var(--orange-pale);border-left-color:#D4820A;color:var(--orange);}
+  .act-step-alert.info{background:var(--teal-pale);border-left-color:var(--teal);color:var(--teal);}
+  .act-maps-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;border:.5px solid #4285F4;background:#EBF3FF;color:#1A56C4;text-decoration:none;font-size:11px;font-weight:500;width:fit-content;}
+  .act-step-actions{display:flex;gap:2px;flex-shrink:0;}
+  .act-act-btn{width:22px;height:22px;border-radius:5px;border:.5px solid var(--sand-dark);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--slate-light);font-size:11px;}
+  .act-act-btn:disabled{opacity:.25;cursor:default;}
+  .act-act-btn:not(:disabled):hover{background:var(--sand);color:var(--ink-light);}
+  .act-act-btn.del:not(:disabled):hover{color:var(--red);border-color:var(--red-border);}
+  .act-edit-form{background:var(--sand);border:.5px solid var(--sand-dark);border-radius:8px;padding:.75rem;display:flex;flex-direction:column;gap:.5rem;}
+  .act-flbl{font-size:10px;color:var(--slate-light);display:block;margin-bottom:2px;}
+  .act-finp{width:100%;font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 8px;border:.5px solid var(--sand-dark);border-radius:7px;background:white;color:var(--ink);outline:none;}
+  .act-finp:focus{border-color:var(--teal);}
+  textarea.act-finp{resize:vertical;min-height:48px;line-height:1.5;}
+  .act-add-btn{width:100%;margin-top:6px;padding:8px;border-radius:8px;border:1.5px dashed var(--sand-dark);background:transparent;color:var(--slate-light);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .act-add-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-pale);}
+  .act-resa-box{background:var(--slate-pale);border-radius:8px;padding:.65rem .85rem;border:.5px solid var(--sand-dark);margin-top:6px;display:flex;flex-direction:column;gap:.4rem;}
+  .act-resa-title{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:2px;}
 
   /* DAY SEPARATOR */
   .day-separator{position:relative;display:flex;align-items:center;margin:10px 0 10px -36px;padding-left:0;}
@@ -730,7 +767,7 @@
     </script>
     <div class="auth-field">
       <label>Email</label>
-      <input type="email" id="auth-email" placeholder="votre@email.com" autocomplete="email" >
+      <input type="email" id="auth-email" placeholder="votre@email.com" autocomplete="email" value="bernarderic29@gmail.com">
     </div>
     <div class="auth-field">
       <label>Mot de passe</label>
@@ -743,7 +780,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.11.3 · 28/05/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.11.0 · 04/06/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -894,6 +931,7 @@
       <div class="multi-select-dropdown" id="type-filter-dropdown">
         <label class="msd-option"><input type="checkbox" value="hotel" onchange="applyTypeFilter()"> 🏨 Hôtels</label>
         <label class="msd-option"><input type="checkbox" value="visit" onchange="applyTypeFilter()"> 🗺 Visites</label>
+        <label class="msd-option"><input type="checkbox" value="activity" onchange="applyTypeFilter()"> 📅 Activités</label>
         <label class="msd-option"><input type="checkbox" value="drive" onchange="applyTypeFilter()"> 🚗 Trajets</label>
         <label class="msd-option"><input type="checkbox" value="ptdej" onchange="applyTypeFilter()"> 🍳 Petit-déj</label>
         <div class="msd-sep"></div>
@@ -1198,7 +1236,7 @@
             
           </div>
           
-        </div></div><div class="entry" id="step-3"><div class="marker visit"></div>
+        </div></div><div class="entry" id="step-3"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1221,7 +1259,7 @@
             <span style="font-size:10px;opacity:.5;margin-left:4px;">📋</span>
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+1</div><span class="day-separator-label">mer. 29 juil.</span><div class="day-separator-line"></div></div><div class="entry" id="step-5"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+1</div><span class="day-separator-label">mer. 29 juil.</span><div class="day-separator-line"></div></div><div class="entry" id="step-5"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1236,7 +1274,7 @@
       <span class="pill-icon">🔴</span>
       <div><span class="pill-label">Date limite possiblement dépassée</span><span class="pill-detail">Annulation avant le 20 juillet — à vérifier d'urgence</span></div>
     </div></div>
-        </div></div><div class="day-separator"><div class="day-separator-node">J+4</div><span class="day-separator-label">sam. 1 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-6"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+4</div><span class="day-separator-label">sam. 1 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-6"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1262,7 +1300,7 @@
             
           </div>
           
-        </div></div><div class="entry" id="step-8"><div class="marker visit"></div>
+        </div></div><div class="entry" id="step-8"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1274,7 +1312,7 @@
           <div class="card-hotel">🗺 Visite</div>
           <div class="card-tags"><span class="tag tag-visit">🗺 Randonnée</span></div><div class="card-extra-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px;"><span class="tag" style="background:var(--amber-pale);color:var(--amber)">📝 Note</span></div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+5</div><span class="day-separator-label">dim. 2 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-9"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+5</div><span class="day-separator-label">dim. 2 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-9"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1297,7 +1335,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+7</div><span class="day-separator-label">mar. 4 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-11"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+7</div><span class="day-separator-label">mar. 4 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-11"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1320,7 +1358,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+8</div><span class="day-separator-label">mer. 5 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-13"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+8</div><span class="day-separator-label">mer. 5 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-13"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1343,7 +1381,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+10</div><span class="day-separator-label">ven. 7 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-15"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+10</div><span class="day-separator-label">ven. 7 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-15"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1366,7 +1404,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+11</div><span class="day-separator-label">sam. 8 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-17"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+11</div><span class="day-separator-label">sam. 8 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-17"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1389,7 +1427,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+12</div><span class="day-separator-label">dim. 9 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-19"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+12</div><span class="day-separator-label">dim. 9 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-19"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1412,7 +1450,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+13</div><span class="day-separator-label">lun. 10 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-21"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+13</div><span class="day-separator-label">lun. 10 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-21"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1438,7 +1476,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+14</div><span class="day-separator-label">mar. 11 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-23"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+14</div><span class="day-separator-label">mar. 11 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-23"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1464,7 +1502,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+16</div><span class="day-separator-label">jeu. 13 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-25"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+16</div><span class="day-separator-label">jeu. 13 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-25"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1490,7 +1528,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+17</div><span class="day-separator-label">ven. 14 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-27"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+17</div><span class="day-separator-label">ven. 14 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-27"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1516,7 +1554,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+19</div><span class="day-separator-label">dim. 16 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-29"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+19</div><span class="day-separator-label">dim. 16 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-29"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1542,7 +1580,7 @@
             <span style="font-size:10px;opacity:.5;margin-left:4px;">📋</span>
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+20</div><span class="day-separator-label">lun. 17 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-31"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+20</div><span class="day-separator-label">lun. 17 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-31"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1565,7 +1603,7 @@
             
           </div>
           
-        </div></div><div class="day-separator"><div class="day-separator-node">J+21</div><span class="day-separator-label">mar. 18 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-33"><div class="marker visit"></div>
+        </div></div><div class="day-separator"><div class="day-separator-node">J+21</div><span class="day-separator-label">mar. 18 août</span><div class="day-separator-line"></div></div><div class="entry" id="step-33"><div class="marker visit">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -1820,6 +1858,12 @@ let steps = [
   { type:'hotel', dates:'29 juil. – 1er août', dateDebut:'2026-07-29', dateFin:'2026-08-01', nights:3, city:'Yellowstone / Grand Teton, Wyoming', hotel:'Best Western Weston Inn ★', price:723, ptdej:true, annul:'avant le 20 juillet',
     visits:'Old Faithful, Grand Prismatic Spring, Grand Canyon de Yellowstone, Lamar Valley (bisons, ours, loups), Mammoth Hot Springs, Hayden Valley',
     alerts:[{ kind:'urgent', label:'Date limite possiblement dépassée', detail:'Annulation avant le 20 juillet — à vérifier d\'urgence' }] },
+
+  // ── ACTIVITÉS YELLOWSTONE ──
+  { type:'activity', dates:'30 juil.', dateDebut:'2026-07-30', title:'Journée Old Faithful & Grand Prismatic', heureDebut:'08:00', heureFin:'19:00',
+    alerts:[] },
+  { type:'activity', dates:'31 juil.', dateDebut:'2026-07-31', title:'Journée Lamar Valley & Rodéo', heureDebut:'06:30', heureFin:'21:00',
+    alerts:[{ kind:'info', label:'Départ Lamar Valley 17h30', detail:'Impératif pour arriver au rodéo à 19h00' }] },
 
   // ── J5 : GD TETON → ÉTAPE NUIT (CHOIX À FAIRE) ──
   { type:'hotel', dates:'1er août', dateDebut:'2026-08-01', dateFin:'2026-08-02', nights:1, city:'Montpelier OU Rock Springs, Wyoming', hotel:'⚠️ CHOIX À FAIRE : Montpelier (opt. 1) / Four Points by Sheraton Rock Springs (opt. 2)', price:164, ptdej:true, annul:'avant le 29 juillet',
@@ -2281,15 +2325,138 @@ function _renderModalContent(idx) {
     : isCarPickup ? '🚗 Prise en charge du véhicule'
     : isCarReturn ? '🔑 Restitution du véhicule'
     : isDrive   ? (saved._customTitle || `${step.from} → ${step.to}`)
+    : isActivityStep(step) ? (saved._customTitle || step.title || step.city || 'Activité')
     : (saved._customTitle || step.city);
   document.getElementById('modal-subtitle').textContent =
     isFlight    ? `Lufthansa · Réf. ZKUZPE · Billet LH/ETKT 220 6059505613-14`
     : isCarPickup ? `Budget · Jackson Hole Airport · 28 juillet 2026 · 18h00`
     : isCarReturn ? `Budget · San Francisco Airport · 20 août 2026 · 18h00`
     : isDrive   ? `Trajet · ${step.duration || '–'} · ${step.km ? step.km + ' km' : '–'}`
+    : isActivityStep(step) ? `${step.dates}${step.heureDebut ? ' · ' + step.heureDebut + (step.heureFin ? ' → ' + step.heureFin : '') : ''}`
     : `${saved.hotelName || step.hotel} · ${step.dates}`;
 
   const body = document.getElementById('modal-body');
+
+  // Couleur du header selon le type d'étape
+  const modalHeader = document.querySelector('.modal-header');
+  if (modalHeader) {
+    modalHeader.style.background = isActivityStep(step) ? 'var(--teal)'
+      : (isDrive || isCarPickup || isCarReturn) ? 'var(--slate)'
+      : isFlight ? '#0E1A2B'
+      : 'var(--amber)';
+  }
+
+  if (isActivityStep(step)) {
+    // Initialiser l'état local des étapes
+    _actEtapes = JSON.parse(JSON.stringify(saved.etapes || []));
+    _actNextId = _actEtapes.length ? Math.max(..._actEtapes.map(e => e.id || 0)) + 1 : 1;
+    _actExpanded = null;
+    _actEditing  = null;
+    body.innerHTML = `
+      <div class="modal-section">
+        <div class="modal-section-title">Programme</div>
+        <div id="act-steps-list"></div>
+        <button class="act-add-btn" id="act-add-btn" onclick="_actStartAdd()">
+          <span style="font-size:16px;line-height:1;">+</span> Ajouter une étape
+        </button>
+        <div id="act-add-form"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">À emporter</div>
+        <div class="field field-grid single">
+          <textarea id="f-aEmporter" class="act-finp" style="min-height:56px;font-size:13px;">${saved.aEmporter || ''}</textarea>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">💰 Finances</div>
+        ${(()=>{
+          const payments = (saved.payments || []).filter(p => !p._deleted);
+          const regle = payments.reduce((s, p) => s + parseFloat(p.montant || 0), 0);
+          let html = '';
+          if (payments.length) {
+            html += '<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;">';
+            payments.forEach(p => {
+              const dateStr = p.date ? _fmtPayDate(p.date) : '–';
+              const payId   = p.id || (p.montant + '_' + p.date);
+              html += `<div style="display:flex;align-items:flex-start;gap:8px;background:white;border:.5px solid var(--sand-dark);border-left:3px solid var(--green);border-radius:8px;padding:7px 10px;font-size:12px;">
+                <div style="flex:1;min-width:0;">
+                  <div><span style="font-weight:600;margin-right:8px;">${parseFloat(p.montant).toFixed(2)} €</span><strong>${p.payepar||'–'}</strong> · ${dateStr}${p.note?' · <em>'+p.note+'</em>':''}</div>
+                </div>
+                <button onclick="openDelPayModal('${payId}')" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:13px;padding:2px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">🗑</button>
+              </div>`;
+            });
+            html += `</div><div style="font-size:12px;color:var(--green);font-weight:500;margin-bottom:8px;">Total : ${regle.toFixed(2)} €</div>`;
+          } else {
+            html += '<div style="font-size:12px;color:var(--slate-light);padding:.4rem 0;margin-bottom:8px;">Aucune dépense enregistrée.</div>';
+          }
+          html += `<button onclick="openPaymentModal(${idx})" style="width:100%;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:9px;border-radius:8px;border:1.5px dashed var(--green);background:var(--green-pale);color:var(--green);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='var(--green)';this.style.color='white'" onmouseout="this.style.background='var(--green-pale)';this.style.color='var(--green)'">
+            💳 ${payments.length ? '+ Ajouter un règlement' : 'Enregistrer un règlement'}
+          </button>`;
+          _paymentTargetIdx = idx;
+          return html;
+        })()}
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Remarques</div>
+        <div class="field"><textarea id="f-note" placeholder="Notes libres…">${saved.note || ''}</textarea></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>🔗 Liens utiles</span>
+          <button onclick="_addHotelLink(${idx})" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;">+ Ajouter</button>
+        </div>
+        <div id="hotel-links-${idx}" style="display:flex;flex-direction:column;gap:6px;">
+          ${(saved.links||[]).map((l,li) => `
+            <div style="display:flex;align-items:center;gap:6px;background:white;border:.5px solid var(--sand-dark);border-radius:8px;padding:6px 10px;">
+              <span style="font-size:14px;">${l.icon||'🔗'}</span>
+              <a href="${l.url}" target="_blank" style="flex:1;font-size:12px;color:var(--teal);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.label||l.url}</a>
+              <button onclick="_removeHotelLink(${idx},${li})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:12px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
+            </div>`).join('')}
+          ${!(saved.links||[]).length ? '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucun lien ajouté.</div>' : ''}
+        </div>
+      </div>
+      <!-- 📷 Images -->
+      <div class="modal-section">
+        <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>📷 Images</span>
+          <label style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;">
+            + Ajouter<input type="file" accept="image/*" multiple style="display:none;" onchange="_addHotelImages(${idx},this)">
+          </label>
+        </div>
+        <div id="hotel-images-${idx}" style="display:flex;flex-wrap:wrap;gap:8px;">
+          ${(saved.images||[]).length ? (saved.images).map((img,ii) => `
+            <div style="position:relative;display:inline-block;">
+              <img src="${img.data}" title="${img.caption||''}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:.5px solid var(--sand-dark);display:block;">
+              <button onclick="_removeHotelImage(${idx},${ii})" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+            </div>`).join('')
+          : '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucune image. Ajoutez des photos du site, du paysage…</div>'}
+        </div>
+      </div>
+      <!-- 📑 Documents PDF -->
+      ${_renderDocsSection(idx, saved)}
+      <!-- 📍 Points d'intérêt -->
+      <div class="modal-section">
+        <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>📍 Points d'intérêt</span>
+          <button onclick="_addHotelPOI(${idx})" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid var(--amber);background:var(--amber-pale);color:var(--amber);cursor:pointer;">+ Ajouter</button>
+        </div>
+        <div id="hotel-pois-${idx}" style="display:flex;flex-direction:column;gap:6px;">
+          ${(saved.pois||[]).length ? (saved.pois).map((p,pi) => `
+            <div style="display:flex;align-items:flex-start;gap:8px;background:white;border:.5px solid var(--sand-dark);border-radius:8px;padding:7px 10px;">
+              <span style="font-size:18px;flex-shrink:0;">${p.icon||'📍'}</span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:600;color:var(--ink);">${p.name}</div>
+                ${p.desc ? `<div style="font-size:11px;color:var(--slate-light);margin-top:2px;">${p.desc}</div>` : ''}
+                ${p.url ? `<a href="${p.url}" target="_blank" style="font-size:11px;color:var(--teal);text-decoration:none;display:inline-flex;align-items:center;gap:3px;margin-top:3px;">🌐 Voir sur la carte</a>` : ''}
+              </div>
+              <button onclick="_removeHotelPOI(${idx},${pi})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:13px;padding:2px 4px;border-radius:4px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
+            </div>`).join('')
+          : '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucun point d\'intérêt.</div>'}
+        </div>
+      </div>`;
+    _actRender();
+    return;
+  }
 
   if (isFlight) {
     const segHTML = step.segments.map((s, i) => `
@@ -2627,7 +2794,7 @@ function _renderModalContent(idx) {
       <div class="modal-section">
         <div class="modal-section-title">Adresses</div>
         <div class="field-grid single">
-          <div class="field"><label>Adresse de l'hôtel</label><div style="display:flex;gap:8px;align-items:center;"><input type="text" id="f-adrarr" placeholder="Numéro, rue, ville, état…" value="${saved.adrarr||''}" style="flex:1;">${saved.adrarr ? '<a href="https://maps.google.com/?q=' + encodeURIComponent(saved.adrarr) + '" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:7px 12px;border-radius:8px;border:1px solid #4285F4;background:#4285F4;color:white;text-decoration:none;font-size:11px;font-weight:500;white-space:nowrap;flex-shrink:0;">🗺️ Maps</a>' : ''}</div></div>
+          <div class="field"><label>Adresse de l'hôtel</label><input type="text" id="f-adrarr" placeholder="Numéro, rue, ville, état…" value="${saved.adrarr||''}"></div>
           <div class="field"><label>Adresse de départ (étape précédente)</label><input type="text" id="f-adrdep" placeholder="Adresse de départ…" value="${saved.adrdep||''}"></div>
           <div class="field">
             <label>📍 Coordonnées GPS</label>
@@ -3277,6 +3444,417 @@ async function _removeHotelPOI(idx, pi) {
 }
 
 // ── TITRE MODIFIABLE dans la modale ──
+// ── ACTIVITÉ — gestion des étapes ──
+// Helper : un step est de type activité si type='activity' OU ancienne visite FAB
+function isActivityStep(s) { return s && (s.type === 'activity' || s._newActivity === 'visite'); }
+
+let _actEtapes   = [];
+let _actNextId   = 1;
+let _actExpanded = null;
+let _actEditing  = null; // step id or 'new'
+
+const _ACT_TYPES = {
+  visite:    { icon:'🔭', color:'var(--teal)',         bg:'var(--teal-pale)',    label:'Visite'     },
+  trajet:    { icon:'🚗', color:'var(--slate)',        bg:'var(--slate-pale)',   label:'Trajet'     },
+  repas:     { icon:'☕', color:'var(--orange)',       bg:'var(--orange-pale)',  label:'Repas'      },
+  spectacle: { icon:'🎟', color:'var(--red)',          bg:'var(--red-pale)',     label:'Spectacle'  },
+  pause:     { icon:'🧺', color:'var(--amber)',        bg:'var(--amber-pale)',   label:'Pause'      },
+  rando:     { icon:'🥾', color:'var(--green)',        bg:'var(--green-pale)',   label:'Randonnée'  },
+};
+
+function _actRender() {
+  const list   = document.getElementById('act-steps-list');
+  const addBtn = document.getElementById('act-add-btn');
+  const addFrm = document.getElementById('act-add-form');
+  if (!list) return;
+
+  list.innerHTML = _actEtapes.map((s, i) => {
+    const t = _ACT_TYPES[s.type] || _ACT_TYPES.visite;
+    const isLast = i === _actEtapes.length - 1;
+    const isExp  = _actExpanded === s.id;
+    const isEd   = _actEditing  === s.id;
+
+    const iconHtml = `<div class="act-step-icon">
+      <div class="act-step-dot" style="background:${t.bg};">${t.icon}</div>
+      ${!isLast ? '<div class="act-step-line"></div>' : ''}
+    </div>`;
+
+    if (isEd) return `<div class="act-step-row">${iconHtml}<div style="flex:1;padding:2px 0 10px 10px;min-width:0;">${_actBuildForm(s, false)}</div></div>`;
+
+    const alertSpan = s.alerte
+      ? `<span style="font-size:10px;padding:1px 5px;border-radius:8px;background:${s.alerte.type==='warn'?'var(--orange-pale)':'var(--teal-pale)'};color:${s.alerte.type==='warn'?'var(--orange)':'var(--teal)'};">${s.alerte.type==='warn'?'⚠':'ℹ'}</span>` : '';
+    const mapsSpan = s.maps ? `<span style="font-size:10px;padding:1px 5px;border-radius:8px;background:var(--slate-pale);color:var(--slate);">Maps</span>` : '';
+    const resaSpan = s.resa && s.resa.num ? `<span style="font-size:10px;padding:1px 5px;border-radius:8px;background:var(--amber-pale);color:var(--amber);">🎟 Résa</span>` : '';
+
+    const expandedHtml = isExp ? `<div class="act-step-expanded">
+      ${s.desc ? `<div class="act-step-desc">${s.desc}</div>` : ''}
+      ${s.alerte ? `<div class="act-step-alert ${s.alerte.type}">${s.alerte.texte}</div>` : ''}
+      ${s.maps ? `<a href="${s.maps}" target="_blank" class="act-maps-btn">🗺 Ouvrir dans Maps</a>` : ''}
+      ${s.resa && s.resa.num ? `<div class="act-resa-box"><div class="act-resa-title">Réservation</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;">
+          <div><span style="color:var(--slate-light);font-size:10px;">N° réservation</span><br>${s.resa.num}</div>
+          <div><span style="color:var(--slate-light);font-size:10px;">Prix / pers.</span><br>${s.resa.prix || '–'}</div>
+          ${s.resa.url ? `<div style="grid-column:1/-1;"><a href="${s.resa.url}" target="_blank" style="font-size:11px;color:var(--teal);">${s.resa.url}</a></div>` : ''}
+        </div></div>` : ''}
+      <!-- 🔗 Liens utiles -->
+      <div style="border-top:.5px solid var(--sand-dark);margin-top:6px;padding-top:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);font-weight:500;">🔗 Liens utiles</span>
+          <button onclick="_actAddLink(${s.id})" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:2px 8px;border-radius:8px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;">+ Ajouter</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          ${(s.links||[]).length ? (s.links).map((l,li) => `
+            <div style="display:flex;align-items:center;gap:6px;background:white;border:.5px solid var(--sand-dark);border-radius:7px;padding:5px 8px;">
+              <span style="font-size:13px;flex-shrink:0;">${l.icon||'🔗'}</span>
+              <a href="${l.url}" target="_blank" style="flex:1;font-size:11px;color:var(--teal);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.label||l.url}</a>
+              <button onclick="_actRemoveLink(${s.id},${li})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:11px;padding:1px 3px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
+            </div>`).join('') : '<div style="font-size:11px;color:var(--slate-light);">Aucun lien.</div>'}
+        </div>
+      </div>
+      <!-- 📷 Images -->
+      <div style="border-top:.5px solid var(--sand-dark);margin-top:6px;padding-top:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);font-weight:500;">📷 Images</span>
+          <label style="font-family:'DM Sans',sans-serif;font-size:10px;padding:2px 8px;border-radius:8px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;">
+            + Ajouter<input type="file" accept="image/*" multiple style="display:none;" onchange="_actAddImages(${s.id},this)">
+          </label>
+        </div>
+        ${(s.images||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;">${(s.images).map((img,ii) => `
+          <div style="position:relative;display:inline-block;">
+            <img src="${img.data}" title="${img.caption||''}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:.5px solid var(--sand-dark);display:block;">
+            <button onclick="_actRemoveImage(${s.id},${ii})" style="position:absolute;top:-4px;right:-4px;width:15px;height:15px;border-radius:50%;background:var(--red);border:none;color:white;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+          </div>`).join('')}</div>`
+        : '<div style="font-size:11px;color:var(--slate-light);">Aucune image. Ajoutez des photos du site, du paysage…</div>'}
+      </div>
+      <!-- 📑 Documents PDF -->
+      <div style="border-top:.5px solid var(--sand-dark);margin-top:6px;padding-top:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);font-weight:500;">📑 Documents PDF</span>
+          <label style="font-family:'DM Sans',sans-serif;font-size:10px;padding:2px 8px;border-radius:8px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;">
+            + Ajouter<input type="file" accept=".pdf,image/jpeg,image/png" multiple style="display:none;" onchange="_actAddDoc(${s.id},this)">
+          </label>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          ${(s.docs||[]).length ? (s.docs).map((doc,di) => {
+            const sizeStr = !doc.size ? '' : doc.size < 1024*1024 ? (doc.size/1024).toFixed(0)+' Ko' : (doc.size/(1024*1024)).toFixed(1)+' Mo';
+            const dateStr = doc.addedAt ? new Date(doc.addedAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : '';
+            const icon = doc.type==='application/pdf'||doc.name?.endsWith('.pdf') ? '📄' : '🖼';
+            return `<div style="display:flex;align-items:center;gap:7px;background:white;border:.5px solid var(--sand-dark);border-radius:7px;padding:6px 8px;">
+              <span style="font-size:16px;flex-shrink:0;">${icon}</span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:11px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${doc.caption||doc.name}</div>
+                <div style="font-size:10px;color:var(--slate-light);">${sizeStr}${sizeStr&&dateStr?' · ':''}${dateStr}</div>
+              </div>
+              <button onclick="_openDocViewer('${doc.url}','${(doc.name||'').replace(/'/g,"\\'")}','${doc.type}')" style="font-size:10px;padding:2px 7px;border-radius:5px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;">Ouvrir</button>
+              <button onclick="_actDeleteDoc(${s.id},${di})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:12px;padding:1px 3px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
+            </div>`;}).join('')
+          : '<div style="font-size:11px;color:var(--slate-light);">Aucun document. Ajoutez vos confirmations, billets…</div>'}
+        </div>
+      </div>
+      <!-- 📍 Points d'intérêt -->
+      <div style="border-top:.5px solid var(--sand-dark);margin-top:6px;padding-top:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-light);font-weight:500;">📍 Points d'intérêt</span>
+          <button onclick="_actAddPOI(${s.id})" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:2px 8px;border-radius:8px;border:.5px solid var(--amber);background:var(--amber-pale);color:var(--amber);cursor:pointer;">+ Ajouter</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          ${(s.pois||[]).length ? (s.pois).map((p,pi) => `
+            <div style="background:white;border:.5px solid var(--sand-dark);border-radius:7px;padding:6px 8px;display:flex;align-items:flex-start;gap:7px;">
+              <span style="font-size:16px;flex-shrink:0;margin-top:1px;">${p.icon||'📍'}</span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:11px;font-weight:600;color:var(--ink);">${p.name}</div>
+                ${p.desc ? `<div style="font-size:10px;color:var(--slate-light);margin-top:1px;">${p.desc}</div>` : ''}
+                ${p.url ? `<a href="${p.url}" target="_blank" style="font-size:10px;color:var(--teal);text-decoration:none;display:inline-flex;align-items:center;gap:3px;margin-top:2px;">🌐 Voir sur la carte</a>` : ''}
+              </div>
+              <button onclick="_actRemovePOI(${s.id},${pi})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:11px;padding:1px 3px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
+            </div>`).join('')
+          : '<div style="font-size:11px;color:var(--slate-light);">Aucun point d\'intérêt.</div>'}
+        </div>
+      </div>
+    </div>` : '';
+
+    return `<div class="act-step-row">
+      ${iconHtml}
+      <div class="act-step-content">
+        <div style="display:flex;align-items:flex-start;gap:5px;">
+          <div style="flex:1;cursor:pointer;min-width:0;" onclick="_actToggle(${s.id})">
+            <div class="act-step-name">${s.nom}</div>
+            <div class="act-step-meta">
+              <span class="act-step-badge">🕐 ${s.heure || '–'}</span>
+              <span class="act-step-badge">⏳ ${s.duree || '–'}</span>
+              ${alertSpan}${mapsSpan}${resaSpan}
+            </div>
+          </div>
+          <div class="act-step-actions">
+            <button class="act-act-btn" onclick="_actMove(${i},-1)" ${i===0?'disabled':''} title="Monter">▲</button>
+            <button class="act-act-btn" onclick="_actMove(${i},1)" ${i===_actEtapes.length-1?'disabled':''} title="Descendre">▼</button>
+            <button class="act-act-btn" onclick="_actEdit(${s.id})" title="Modifier">✏</button>
+            <button class="act-act-btn del" onclick="_actDel(${s.id})" title="Supprimer">🗑</button>
+          </div>
+        </div>
+        ${expandedHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  if (addBtn && addFrm) {
+    if (_actEditing === 'new') {
+      addFrm.innerHTML = _actBuildForm(null, true);
+      addBtn.style.display = 'none';
+    } else {
+      addFrm.innerHTML = '';
+      addBtn.style.display = 'flex';
+    }
+  }
+}
+
+function _actBuildForm(s, isNew) {
+  const p = isNew ? 'anew' : 'aed';
+  const v = s || { type:'visite', nom:'', heure:'', duree:'', desc:'', maps:'', alerte:null, resa:null };
+  const typeOpts = Object.entries(_ACT_TYPES).map(([k,t]) =>
+    `<option value="${k}" ${v.type===k?'selected':''}>${t.label}</option>`).join('');
+  const hasResa  = !isNew && s && s.resa && s.resa.num;
+  return `<div class="act-edit-form">
+    <div style="font-size:11px;font-weight:500;color:var(--slate-light);">${isNew ? 'Nouvelle étape' : 'Modifier l\'étape'}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div><label class="act-flbl">Type</label><select id="${p}-type" class="act-finp">${typeOpts}</select></div>
+      <div><label class="act-flbl">Heure</label><input type="time" id="${p}-heure" class="act-finp" value="${v.heure||''}"></div>
+    </div>
+    <div><label class="act-flbl">Nom de l'étape</label>
+      <input type="text" id="${p}-nom" class="act-finp" style="font-size:13px;padding:6px 9px;" value="${v.nom||''}" placeholder="Ex. Mammoth Hot Springs…"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div><label class="act-flbl">Durée</label><input type="text" id="${p}-duree" class="act-finp" value="${v.duree||''}" placeholder="1h30"></div>
+      <div><label class="act-flbl">Lien Maps (optionnel)</label><input type="url" id="${p}-maps" class="act-finp" value="${v.maps||''}" placeholder="https://maps.google.com/…"></div>
+    </div>
+    <div><label class="act-flbl">Description courte</label>
+      <textarea id="${p}-desc" class="act-finp">${v.desc||''}</textarea></div>
+    <div><label class="act-flbl">Alerte (optionnel)</label>
+      <div style="display:flex;gap:6px;">
+        <select id="${p}-atype" class="act-finp" style="width:110px;flex-shrink:0;">
+          <option value="">Aucune</option>
+          <option value="warn" ${v.alerte?.type==='warn'?'selected':''}>⚠ Attention</option>
+          <option value="info" ${v.alerte?.type==='info'?'selected':''}>ℹ Info</option>
+        </select>
+        <input type="text" id="${p}-atexte" class="act-finp" style="flex:1;" value="${v.alerte?.texte||''}" placeholder="Texte de l'alerte…">
+      </div>
+    </div>
+    <div>
+      <label class="act-flbl" style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+        <input type="checkbox" id="${p}-hasResa" ${hasResa?'checked':''} onchange="_actToggleResaForm('${p}')"> Cette étape a une réservation
+      </label>
+      <div id="${p}-resa-fields" style="display:${hasResa?'grid':'none'};grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;">
+        <div><label class="act-flbl">N° réservation</label><input type="text" id="${p}-resa-num" class="act-finp" value="${v.resa?.num||''}"></div>
+        <div><label class="act-flbl">Prix / personne</label><input type="text" id="${p}-resa-prix" class="act-finp" value="${v.resa?.prix||''}" placeholder="60 $"></div>
+        <div style="grid-column:1/-1;"><label class="act-flbl">Lien réservation</label><input type="url" id="${p}-resa-url" class="act-finp" value="${v.resa?.url||''}" placeholder="https://…"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:4px;">
+      <button onclick="${isNew?'_actCancelAdd()':'_actCancelEdit()'}" style="font-size:12px;padding:5px 12px;border-radius:20px;border:.5px solid var(--sand-dark);background:transparent;color:var(--slate-light);cursor:pointer;font-family:'DM Sans',sans-serif;">Annuler</button>
+      <button onclick="${isNew?'_actSaveNew()':'_actSaveEdit('+s?.id+')'}" style="font-size:12px;padding:5px 14px;border-radius:20px;border:none;background:var(--teal);color:white;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">✓ ${isNew?'Ajouter':'Enregistrer'}</button>
+    </div>
+  </div>`;
+}
+
+function _actToggleResaForm(p) {
+  const cb = document.getElementById(p + '-hasResa');
+  const el = document.getElementById(p + '-resa-fields');
+  if (el) el.style.display = cb.checked ? 'grid' : 'none';
+}
+
+function _actReadForm(p) {
+  const nom = (document.getElementById(p+'-nom')?.value || '').trim();
+  if (!nom) { const el = document.getElementById(p+'-nom'); if (el) el.style.borderColor='var(--red)'; return null; }
+  const atype  = document.getElementById(p+'-atype')?.value  || '';
+  const atexte = (document.getElementById(p+'-atexte')?.value || '').trim();
+  const hasRes = document.getElementById(p+'-hasResa')?.checked;
+  const resaNum = (document.getElementById(p+'-resa-num')?.value || '').trim();
+  return {
+    type:  document.getElementById(p+'-type')?.value  || 'visite',
+    nom,
+    heure: document.getElementById(p+'-heure')?.value || '',
+    duree: document.getElementById(p+'-duree')?.value || '',
+    desc:  document.getElementById(p+'-desc')?.value  || '',
+    maps:  document.getElementById(p+'-maps')?.value  || '',
+    alerte: atype && atexte ? { type:atype, texte:atexte } : null,
+    resa:   hasRes && resaNum ? { num:resaNum, prix: document.getElementById(p+'-resa-prix')?.value||'', url: document.getElementById(p+'-resa-url')?.value||'' } : null,
+  };
+}
+
+// ── ACTIVITÉ — sauvegarde media étape ──
+function _actSaveStepMedia() {
+  if (currentModalIdx === null) return;
+  const d = loadFiche(currentModalIdx);
+  d.etapes = JSON.parse(JSON.stringify(_actEtapes));
+  _cache[currentModalIdx] = d;
+  try { localStorage.setItem(storageKey(currentModalIdx), JSON.stringify(d)); } catch(e) {}
+  saveFiche(currentModalIdx, d);
+}
+
+function _actAddLink(stepId) {
+  const url = prompt('URL du lien (ex: https://www.nps.gov)');
+  if (!url?.trim()) return;
+  const label = prompt('Libellé du lien', url.replace(/https?:\/\/(www\.)?/,'').split('/')[0]) || url;
+  const icons = {'maps':'🗺','google':'🗺','booking':'🏨','tripadvisor':'⭐','wikipedia':'📖','wiki':'📖','nps.gov':'🏞','alltrails':'🥾'};
+  const icon  = Object.entries(icons).find(([k]) => url.toLowerCase().includes(k))?.[1] || '🔗';
+  const s = _actEtapes.find(e => e.id === stepId);
+  if (!s) return;
+  s.links = s.links || [];
+  s.links.push({ url: url.trim(), label: label.trim(), icon });
+  _actSaveStepMedia();
+  _actRender();
+}
+
+function _actRemoveLink(stepId, li) {
+  const s = _actEtapes.find(e => e.id === stepId);
+  if (!s) return;
+  s.links = (s.links||[]).filter((_,i) => i !== li);
+  _actSaveStepMedia();
+  _actRender();
+}
+
+function _actAddImages(stepId, input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  const s = _actEtapes.find(e => e.id === stepId);
+  if (!s) return;
+  s.images = s.images || [];
+  let done = 0;
+  files.forEach(file => {
+    if (file.size > 3*1024*1024) { alert(file.name + ' trop grand (max 3 Mo)'); done++; if(done===files.length){_actSaveStepMedia();_actRender();} return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      s.images.push({ data: ev.target.result, name: file.name, caption: file.name.replace(/\.[^/.]+$/,'') });
+      done++;
+      if (done === files.length) { _actSaveStepMedia(); _actRender(); }
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function _actRemoveImage(stepId, ii) {
+  if (!confirm('Supprimer cette image ?')) return;
+  const s = _actEtapes.find(e => e.id === stepId);
+  if (!s) return;
+  s.images = (s.images||[]).filter((_,i) => i !== ii);
+  _actSaveStepMedia();
+  _actRender();
+}
+
+async function _actAddDoc(stepId, input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  const s = _actEtapes.find(e => e.id === stepId);
+  if (!s) return;
+  s.docs = s.docs || [];
+  const MAX = 20*1024*1024;
+  const ALLOWED = ['application/pdf','image/jpeg','image/png','image/jpg'];
+  let done = 0;
+  for (const file of files) {
+    if (!ALLOWED.includes(file.type)) {
+      alert(file.name + ' : PDF, JPG, PNG uniquement');
+      done++; if (done===files.length){_actSaveStepMedia();_actRender();} continue;
+    }
+    if (file.size > MAX) {
+      alert(file.name + ' trop grand (max 20 Mo)');
+      done++; if (done===files.length){_actSaveStepMedia();_actRender();} continue;
+    }
+    const path = `activity-${currentModalIdx}/step-${stepId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    try {
+      const res = await fetch(`${SUPA_URL}/storage/v1/object/roadtrip-docs/${path}`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': file.type, 'x-upsert': 'true' },
+        body: file
+      });
+      if (!res.ok) throw new Error('Upload HTTP ' + res.status);
+      const url = `${SUPA_URL}/storage/v1/object/public/roadtrip-docs/${path}`;
+      s.docs.push({ url, path, name: file.name, type: file.type, size: file.size, caption: file.name.replace(/\.[^/.]+$/,''), addedAt: new Date().toISOString() });
+    } catch(e) { alert('Erreur upload ' + file.name + ' : ' + e.message); }
+    done++;
+    if (done === files.length) { _actSaveStepMedia(); _actRender(); }
+  }
+  input.value = '';
+}
+
+async function _actDeleteDoc(stepId, di) {
+  if (!confirm('Supprimer ce document ?')) return;
+  const s = _actEtapes.find(e => e.id === stepId);
+  if (!s) return;
+  const doc = (s.docs||[])[di];
+  if (doc?.path && SUPA_READY) {
+    try {
+      await fetch(`${SUPA_URL}/storage/v1/object/roadtrip-docs/${doc.path}`, {
+        method: 'DELETE', headers: { 'Authorization': 'Bearer ' + SUPA_KEY }
+      });
+    } catch(e) { console.warn('Erreur suppression Storage:', e); }
+  }
+  s.docs = (s.docs||[]).filter((_,i) => i !== di);
+  _actSaveStepMedia();
+  _actRender();
+}
+
+function _actAddPOI(stepId) {
+  const name = prompt("Nom du point d'intérêt (ex: Old Faithful)");
+  if (!name?.trim()) return;
+  const desc = prompt('Description courte (optionnel)') || '';
+  const url  = prompt('Lien Google Maps (optionnel)') || '';
+  const icon = prompt('Emoji icône (📍 🏛 🍽 🏖 🎭 🏔 🌋 🦌)', '📍') || '📍';
+  const s = _actEtapes.find(e => e.id === stepId);
+  if (!s) return;
+  s.pois = s.pois || [];
+  s.pois.push({ name: name.trim(), desc: desc.trim(), url: url.trim(), icon: icon.trim() });
+  _actSaveStepMedia();
+  _actRender();
+}
+
+function _actRemovePOI(stepId, pi) {
+  if (!confirm("Supprimer ce point d'intérêt ?")) return;
+  const s = _actEtapes.find(e => e.id === stepId);
+  if (!s) return;
+  s.pois = (s.pois||[]).filter((_,i) => i !== pi);
+  _actSaveStepMedia();
+  _actRender();
+}
+
+function _actToggle(id)   { _actExpanded = _actExpanded===id ? null : id; _actRender(); }
+function _actEdit(id)     { _actEditing = id; _actExpanded = null; _actRender(); }
+function _actCancelEdit() { _actEditing = null; _actRender(); }
+function _actStartAdd()   { _actEditing = 'new'; _actRender(); }
+function _actCancelAdd()  { _actEditing = null; _actRender(); }
+
+function _actSaveEdit(id) {
+  const data = _actReadForm('aed'); if (!data) return;
+  const i = _actEtapes.findIndex(s => s.id === id);
+  _actEtapes[i] = { ..._actEtapes[i], ...data };
+  _actEditing = null; _actExpanded = id;
+  _actSaveStepMedia();
+  _actRender();
+}
+
+function _actSaveNew() {
+  const data = _actReadForm('anew'); if (!data) return;
+  _actEtapes.push({ id: _actNextId++, ...data });
+  _actEditing = null;
+  _actSaveStepMedia();
+  _actRender();
+}
+
+function _actMove(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= _actEtapes.length) return;
+  [_actEtapes[i], _actEtapes[j]] = [_actEtapes[j], _actEtapes[i]];
+  _actSaveStepMedia();
+  _actRender();
+}
+
+function _actDel(id) {
+  _actEtapes = _actEtapes.filter(s => s.id !== id);
+  if (_actExpanded === id) _actExpanded = null;
+  if (_actEditing  === id) _actEditing  = null;
+  _actSaveStepMedia();
+  _actRender();
+}
+
 async function _saveModalTitle(newTitle) {
   if (currentModalIdx === null || !newTitle.trim()) return;
   const step = steps[currentModalIdx];
@@ -3544,6 +4122,9 @@ async function navigateModal(dir) {
 
 function closeModal() {
   document.getElementById('modal-overlay').style.cssText = 'display:none;position:fixed;inset:0;top:44px;background:var(--sand);z-index:80;overflow-y:auto;';
+  // Réinitialiser la couleur du header pour la prochaine ouverture
+  const modalHeader = document.querySelector('.modal-header');
+  if (modalHeader) modalHeader.style.background = '';
   currentModalIdx = null;
   _leavePresence(); // Quitter le canal de présence
   if (driveMapInstance) { driveMapInstance.remove(); driveMapInstance = null; }
@@ -3593,6 +4174,24 @@ function updateCardInTimeline(idx, data) {
     const has = Object.values(data).some(v => v && v.toString().trim() !== '');
     btn.classList.toggle('has-data', has);
     btn.innerHTML = '📋 Fiche';
+  }
+
+  // Pour les activités : mettre à jour les pills d'étapes sur la carte
+  if (isActivityStep(step)) {
+    const card  = entry.querySelector('.activity-card');
+    if (!card) return;
+    const etapes = data.etapes || [];
+    const visiblePills = etapes.slice(0, 4);
+    const extraCount   = etapes.length > 4 ? etapes.length - 4 : 0;
+    const pillsHtml = visiblePills.length
+      ? visiblePills.map(e => `<span class="act-step-pill">${e.nom.length > 22 ? e.nom.slice(0,22) + '…' : e.nom}</span>`).join('')
+        + (extraCount ? `<span class="act-step-pill more">+${extraCount}</span>` : '')
+      : '<span style="font-size:11px;color:var(--slate-light);font-style:italic;">Programme à renseigner</span>';
+    const tagsEl = card.querySelector('.card-tags');
+    if (tagsEl) tagsEl.innerHTML = pillsHtml;
+    const metaEl = card.querySelector('[style*="color:var(--teal)"]');
+    if (metaEl) metaEl.textContent = `${step.heureDebut} → ${step.heureFin} · ${etapes.length} étape${etapes.length !== 1 ? 's' : ''}`;
+    return;
   }
 
   // Pour les hôtels : afficher les infos saisies directement sur la carte
@@ -3836,6 +4435,21 @@ async function saveModal() {
   // Partir des données existantes pour ne pas écraser payments, deletedPayments, etc.
   const data = Object.assign({}, loadFiche(currentModalIdx));
 
+  // Activité — sauvegarder les étapes et le champ à emporter
+  if (steps[currentModalIdx] && isActivityStep(steps[currentModalIdx])) {
+    data.etapes    = JSON.parse(JSON.stringify(_actEtapes));
+    data.aEmporter = document.getElementById('f-aEmporter')?.value || '';
+    data.note      = document.getElementById('f-note')?.value       || '';
+    const confirmEl = document.getElementById('save-confirm');
+    confirmEl.textContent = '⏳ Enregistrement…';
+    confirmEl.classList.add('show');
+    await saveFiche(currentModalIdx, data);
+    updateCardInTimeline(currentModalIdx, data);
+    confirmEl.textContent = '✓ Sauvegardé';
+    setTimeout(() => { confirmEl.classList.remove('show'); }, 2500);
+    return;
+  }
+
   // Mettre à jour uniquement les champs du formulaire
   const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps','parking-montant','parking-note','hdep-max','horaires-commentaire',
                   'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName'];
@@ -4059,6 +4673,7 @@ function matchesFilter(step, idx) {
     let typeMatch = false;
     if (activeTypes.has('hotel') && step.type === 'hotel') typeMatch = true;
     if (activeTypes.has('visit') && step.type === 'hotel' && step.visits) typeMatch = true;
+    if (activeTypes.has('activity') && isActivityStep(step)) typeMatch = true;
     if (activeTypes.has('drive') && (step.type === 'drive' || step.type === 'car-pickup' || step.type === 'car-return' || step.type === 'flight')) typeMatch = true;
     if (activeTypes.has('ptdej') && step.type === 'hotel' && step.ptdej) typeMatch = true;
     return typeMatch;
@@ -4295,6 +4910,31 @@ function renderTimeline() {
           ${step.price ? `<div class="card-tags"><span class="tag tag-price">${step.price} €</span></div>` : ''}
           ${pillsHTML(step.alerts, idx)}
         </div>`;
+    } else if (isActivityStep(step)) {
+      const saved   = loadFiche(idx);
+      const title   = saved._customTitle || step.title || step.city || 'Activité';
+      const etapes  = saved.etapes || [];
+      const hasResa = etapes.some(e => e.resa && e.resa.num);
+      const visiblePills = etapes.slice(0, 4);
+      const extraCount   = etapes.length > 4 ? etapes.length - 4 : 0;
+      const pillsHtml = visiblePills.length
+        ? visiblePills.map(e => `<span class="act-step-pill">${e.nom.length > 22 ? e.nom.slice(0,22) + '…' : e.nom}</span>`).join('')
+          + (extraCount ? `<span class="act-step-pill more">+${extraCount}</span>` : '')
+        : '<span style="font-size:11px;color:var(--slate-light);font-style:italic;">Programme à renseigner</span>';
+      entry.innerHTML = `<div class="marker activity">🗺</div>
+        <div class="activity-card" onclick="openModal(${idx})" style="cursor:pointer;">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-city">${title}</div>
+            </div>
+            <div class="card-date">${step.dates}</div>
+            ${ficheBtn(idx)}
+          </div>
+          <div style="font-size:11px;color:var(--teal);font-weight:500;margin-bottom:6px;">${step.heureDebut} → ${step.heureFin} · ${etapes.length} étape${etapes.length !== 1 ? 's' : ''}</div>
+          <div class="card-tags" style="gap:4px;">${pillsHtml}</div>
+          ${hasResa ? '<div class="card-tags" style="margin-top:5px;"><span class="tag" style="background:var(--slate-pale);color:var(--slate);">🎟 Réservation(s)</span></div>' : ''}
+          ${pillsHTML(step.alerts, idx)}
+        </div>`;
     } else {
       const mc = step.visits ? 'visit' : 'hotel';
       let tags = '';
@@ -4303,7 +4943,7 @@ function renderTimeline() {
       if (step.ptdej) tags += `<span class="tag tag-ptdej">🍳 Petit-déj</span>`;
       if (step.annul) tags += `<span class="tag tag-annul">Annulation ${step.annul}</span>`;
       if (step.visits) tags += `<span class="tag tag-visit">🗺 ${step.visits.length>55?step.visits.slice(0,55)+'…':step.visits}</span>`;
-      entry.innerHTML = `<div class="marker ${mc}"></div>
+      entry.innerHTML = `<div class="marker ${mc}">H</div>
         <div class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -5506,7 +6146,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.11.3 · 28/05/26
+        Version : v2.11.0 · 04/06/26
       </div>
     </div>`;
 }
@@ -7036,16 +7676,29 @@ async function saveNewActivity() {
   }
 
   // Créer le nouveau step dynamique
-  const typeMap = { etape:'hotel', visite:'hotel', depense:'depense', note:'hotel' };
-  const newStep = {
+  const typeMap = { etape:'hotel', visite:'activity', depense:'depense', note:'hotel' };
+  const isVisite = _newActivityType === 'visite';
+  const newStep = isVisite ? {
+    type:      'activity',
+    title:     city,
+    city,
+    dates:     date ? new Date(date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '',
+    dateDebut: date,
+    heureDebut: '',
+    heureFin:  '',
+    alerts:    [],
+    _isDup:    true,
+    _newActivity: 'visite',
+    _created:  new Date().toISOString()
+  } : {
     type:      typeMap[_newActivityType] || 'hotel',
     city,
-    hotel:     hotel || (_newActivityType === 'visite' ? '🗺 Visite' : _newActivityType === 'depense' ? '💰 Dépense' : '📝 Note'),
+    hotel:     hotel || (_newActivityType === 'depense' ? '💰 Dépense' : '📝 Note'),
     dates:     date ? new Date(date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '',
     dateDebut: date,
     nights:    nights,
     price:     prix || '',
-    visits:    _newActivityType === 'visite' ? city : '',
+    visits:    '',
     _isDup:    true,
     _newActivity: _newActivityType,
     _created:  new Date().toISOString()
@@ -9250,7 +9903,7 @@ window.addEventListener('DOMContentLoaded', function runChecks() {
   const warnings = [];
   const infos    = [];
 
-  const VALID_TYPES = ['hotel','drive','car-pickup','car-return','flight','end'];
+  const VALID_TYPES = ['hotel','drive','car-pickup','car-return','flight','end','activity','depense'];
   const REQUIRED_HOTEL_FIELDS = ['dates','city','hotel','price'];
   const REQUIRED_DRIVE_FIELDS = ['from','to'];
   const REQUIRED_FLIGHT_FIELDS = ['direction','dates','segments','ref'];
@@ -10401,8 +11054,29 @@ async function handleLogin() {
   if (!email || !password) { errEl.textContent = 'Veuillez remplir tous les champs.'; errEl.classList.add('show'); return; }
 
   if (!_supaClient) {
-    errEl.textContent = 'Erreur : connexion à Supabase non initialisée. Rechargez la page.';
-    errEl.classList.add('show');
+    btn.disabled = true;
+    if (loadEl) loadEl.classList.add('show');
+    try {
+      const res = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (loadEl) loadEl.classList.remove('show');
+      btn.disabled = false;
+      if (data.error || data.error_code) {
+        errEl.textContent = 'Email ou mot de passe incorrect.';
+        errEl.classList.add('show');
+      } else {
+        showApp({ email, id: data.user?.id });
+      }
+    } catch(e) {
+      if (loadEl) loadEl.classList.remove('show');
+      btn.disabled = false;
+      errEl.textContent = 'Erreur réseau : ' + e.message;
+      errEl.classList.add('show');
+    }
     return;
   }
 
@@ -10625,10 +11299,9 @@ function closeAdminOnBg(e) { /* plus utilisé */ }
 async function loadAdminStats() {
   if (!SUPA_READY) return;
   try {
-    const authH = await getAuthHeaders();
     const [fichesRes, backupsRes] = await Promise.all([
       fetch(`${SUPA_URL}/rest/v1/fiches?select=id,updated_at`, { headers: SUPA_HEADERS }),
-      fetch(`${SUPA_URL}/rest/v1/backups?select=id,created_at`, { headers: authH })
+      fetch(`${SUPA_URL}/rest/v1/backups?select=id,created_at`, { headers: SUPA_HEADERS })
     ]);
     const fiches  = fichesRes.ok  ? await fichesRes.json()  : [];
     const backups = backupsRes.ok ? await backupsRes.json() : [];
@@ -10644,32 +11317,6 @@ async function loadAdminStats() {
   } catch(e) { _log.warn('Erreur stats admin : ' + (e.message||e)); }
 }
 
-// Retourne les headers avec le JWT de la session en cours (nécessaire pour la RLS backups)
-async function getAuthHeaders() {
-  const { data } = await _supaClient.auth.getSession();
-  const token = data?.session?.access_token;
-  if (!token) throw new Error("Session expirée — reconnectez-vous");
-  return {
-    "Content-Type": "application/json",
-    "apikey": SUPA_KEY,
-    "Authorization": "Bearer " + token,
-    "Prefer": "return=representation"
-  };
-}
-
-// Retourne les headers avec le JWT de la session en cours (nécessaire pour la RLS backups)
-async function getAuthHeaders() {
-  const { data } = await _supaClient.auth.getSession();
-  const token = data?.session?.access_token;
-  if (!token) throw new Error("Session expirée — reconnectez-vous");
-  return {
-    "Content-Type": "application/json",
-    "apikey": SUPA_KEY,
-    "Authorization": "Bearer " + token,
-    "Prefer": "return=representation"
-  };
-}
-
 async function createBackup(auto = false) {
   const statusEl = document.getElementById('backup-status');
   if (statusEl && !auto) { statusEl.className='admin-status info show'; statusEl.textContent='⏳ Sauvegarde en cours…'; }
@@ -10678,8 +11325,7 @@ async function createBackup(auto = false) {
     const res = await fetch(`${SUPA_URL}/rest/v1/fiches?select=*`, { headers: SUPA_HEADERS });
     const fiches = res.ok ? await res.json() : [];
     const backup = { id:'backup_'+Date.now(), label:auto?'Auto':'Manuelle', fiches_count:fiches.length, data:fiches, created_at:new Date().toISOString() };
-    const authH = await getAuthHeaders();
-    const saveRes = await fetch(`${SUPA_URL}/rest/v1/backups`, { method:'POST', headers:authH, body:JSON.stringify(backup) });
+    const saveRes = await fetch(`${SUPA_URL}/rest/v1/backups`, { method:'POST', headers:SUPA_HEADERS, body:JSON.stringify(backup) });
     if (!saveRes.ok) throw new Error('HTTP ' + saveRes.status);
     if (statusEl && !auto) {
       statusEl.className='admin-status ok show';
@@ -10696,8 +11342,7 @@ async function loadBackupList() {
   const list = document.getElementById('backup-list');
   if (!list || !SUPA_READY) return;
   try {
-    const authH = await getAuthHeaders();
-    const res = await fetch(`${SUPA_URL}/rest/v1/backups?select=id,label,fiches_count,created_at&order=created_at.desc&limit=20`, { headers: authH });
+    const res = await fetch(`${SUPA_URL}/rest/v1/backups?select=id,label,fiches_count,created_at&order=created_at.desc&limit=20`, { headers: SUPA_HEADERS });
     if (!res.ok) throw new Error('HTTP '+res.status);
     const backups = await res.json();
     if (!backups.length) { list.innerHTML='<div style="font-size:12px;color:var(--slate-light);padding:.5rem;text-align:center">Aucune sauvegarde</div>'; return; }
@@ -10723,8 +11368,7 @@ async function loadBackupList() {
 async function downloadBackup(id) {
   if (!SUPA_READY) return;
   try {
-    const authH = await getAuthHeaders();
-    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=*`, { headers: authH });
+    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=*`, { headers: SUPA_HEADERS });
     const rows = await res.json();
     if (!rows.length) return;
     const a = document.createElement('a');
@@ -10743,8 +11387,7 @@ async function restoreBackup(id, label) {
     await createBackup(true);
 
     statusEl.textContent='⏳ Récupération de la sauvegarde…';
-    const authH = await getAuthHeaders();
-    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=data`, { headers: authH });
+    const res = await fetch(`${SUPA_URL}/rest/v1/backups?id=eq.${id}&select=data`, { headers: SUPA_HEADERS });
     const rows = await res.json();
     if (!rows.length || !rows[0].data) throw new Error('Sauvegarde introuvable');
     const fichesToRestore = rows[0].data;
@@ -11262,13 +11905,8 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.11.3</div><div style="font-size:10px;color:var(--slate-light);">28/05/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fiche hôtel · Bouton 🗺 Maps sur l'adresse postale · Fix login · Sécurité renforcée · RLS backups · Rôle admin en base · Token JWT · Suppression email codé en dur</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.11.0</div><div style="font-size:10px;color:var(--slate-light);">28/05/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Sécurité renforcée · RLS table backups (admin uniquement) · Vérification rôle admin en base de données · Token JWT sur appels backup · Suppression email admin codé en dur</div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.11.0</div><div style="font-size:10px;color:var(--slate-light);">04/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fiche Activité distincte · header teal · programme, à emporter, finances · carte timeline bordure teal · Marqueur H sur les étapes hôtel · Sécurité : rôle admin vérifié en base de données (table profiles)</div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
