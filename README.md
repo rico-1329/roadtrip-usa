@@ -185,10 +185,10 @@ git push origin main
 
 | Nom | Email |
 |-----|-------|
-| Éric | bernarderic29@gmail.com |
-| Pascale | pascale.cervoni@hotmail.fr |
-| Carole | carole.carlino@free.fr |
-| Léa | (compte Carole) |
+| Éric | bernarderic |
+| Pascale | pascale |
+| Carole | carole |
+| Léa | lea |
 
 ---
 
