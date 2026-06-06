@@ -828,7 +828,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.16.0 · 06/06/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.17.0 · 06/06/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -2529,39 +2529,38 @@ function _renderModalContent(idx) {
   const isFlight    = step.type === 'flight';
 
   // Bandeau photo : injecté en tête du body (scrolle avec le contenu)
+  // Les images sont stockées dans window._bannerImgs pour éviter les base64 dans les onclick
+  window._bannerImgs = [];
   function _buildPhotoBanner(sv, st) {
     const _isH = !isFlight && !isCarPickup && !isCarReturn && !isDrive && !isActivityStep(st);
     const _isA = isActivityStep(st);
     const _isD = isDrive;
+    function _thumbHTML(img, i, h) {
+      window._bannerImgs.push(img);
+      const idx_i = window._bannerImgs.length - 1;
+      return '<div style="flex:1;min-width:0;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;" onclick="_openBannerImg(' + idx_i + ')">'
+        + '<img src="' + img.data + '" title="' + (img.caption||'').replace(/"/g,'&quot;') + '" style="max-width:100%;max-height:' + h + 'px;object-fit:contain;display:block;"></div>';
+    }
     if (_isH && sv.images && sv.images.length) {
-      const pi = sv.primaryImageIdx || 0;
-      const im = sv.images[pi] || sv.images[0];
-      return '<div style="background:#3a2a0a;display:flex;justify-content:center;align-items:center;max-height:130px;overflow:hidden;cursor:pointer;margin:-1.5rem -1.5rem 1rem -1.5rem;" onclick="window.open(\'' + im.data + '\',\'_blank\')">'
-        + '<img src="' + im.data + '" title="' + (im.caption||'') + '" style="width:100%;max-height:130px;object-fit:contain;display:block;"></div>';
+      const im = sv.images[sv.primaryImageIdx || 0] || sv.images[0];
+      window._bannerImgs.push(im);
+      const bi = window._bannerImgs.length - 1;
+      return '<div style="background:#3a2a0a;display:flex;justify-content:center;align-items:center;max-height:130px;overflow:hidden;cursor:pointer;margin:-1.5rem -1.5rem 1rem -1.5rem;" onclick="_openBannerImg(' + bi + ')">'
+        + '<img src="' + im.data + '" title="' + (im.caption||'').replace(/"/g,'&quot;') + '" style="width:100%;max-height:130px;object-fit:contain;display:block;"></div>';
     }
-    if (_isD && sv.images && sv.images.length && (sv.headerImages||[]).length) {
+    const bg = _isD ? '#1a2a3a' : '#1a4a3a';
+    if ((_isD || _isA) && sv.images && sv.images.length && (sv.headerImages||[]).length) {
       const sels = (sv.headerImages||[]).map(i => sv.images[i]).filter(Boolean);
       if (!sels.length) return '';
       const h = sels.length <= 2 ? 140 : 110;
-      const bg = '#1a2a3a';
-      if (sels.length === 1)
-        return '<div style="background:' + bg + ';display:flex;justify-content:center;align-items:center;height:' + h + 'px;overflow:hidden;cursor:pointer;margin:-1.5rem -1.5rem 1rem -1.5rem;" onclick="window.open(\'' + sels[0].data + '\',\'_blank\')">'
-          + '<img src="' + sels[0].data + '" title="' + (sels[0].caption||'') + '" style="max-width:100%;max-height:' + h + 'px;object-fit:contain;display:block;"></div>';
+      if (sels.length === 1) {
+        window._bannerImgs.push(sels[0]);
+        const bi = window._bannerImgs.length - 1;
+        return '<div style="background:' + bg + ';display:flex;justify-content:center;align-items:center;height:' + h + 'px;overflow:hidden;cursor:pointer;margin:-1.5rem -1.5rem 1rem -1.5rem;" onclick="_openBannerImg(' + bi + ')">'
+          + '<img src="' + sels[0].data + '" title="' + (sels[0].caption||'').replace(/"/g,'&quot;') + '" style="max-width:100%;max-height:' + h + 'px;object-fit:contain;display:block;"></div>';
+      }
       return '<div style="display:flex;height:' + h + 'px;background:' + bg + ';gap:2px;margin:-1.5rem -1.5rem 1rem -1.5rem;">'
-        + sels.map(img => '<div style="flex:1;min-width:0;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;" onclick="window.open(\'' + img.data + '\',\'_blank\')">'
-          + '<img src="' + img.data + '" title="' + (img.caption||'') + '" style="max-width:100%;max-height:' + h + 'px;object-fit:contain;display:block;"></div>').join('') + '</div>';
-    }
-    if (_isA && sv.images && sv.images.length && (sv.headerImages||[]).length) {
-      const sels = (sv.headerImages||[]).map(i => sv.images[i]).filter(Boolean);
-      if (!sels.length) return '';
-      const h = sels.length <= 2 ? 140 : 110;
-      const bg = '#1a4a3a';
-      if (sels.length === 1)
-        return '<div style="background:' + bg + ';display:flex;justify-content:center;align-items:center;height:' + h + 'px;overflow:hidden;cursor:pointer;margin:-1.5rem -1.5rem 1rem -1.5rem;" onclick="window.open(\'' + sels[0].data + '\',\'_blank\')">'
-          + '<img src="' + sels[0].data + '" title="' + (sels[0].caption||'') + '" style="max-width:100%;max-height:' + h + 'px;object-fit:contain;display:block;"></div>';
-      return '<div style="display:flex;height:' + h + 'px;background:' + bg + ';gap:2px;margin:-1.5rem -1.5rem 1rem -1.5rem;">'
-        + sels.map(img => '<div style="flex:1;min-width:0;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;" onclick="window.open(\'' + img.data + '\',\'_blank\')">'
-          + '<img src="' + img.data + '" title="' + (img.caption||'') + '" style="max-width:100%;max-height:' + h + 'px;object-fit:contain;display:block;"></div>').join('') + '</div>';
+        + sels.map((img, i) => _thumbHTML(img, i, h)).join('') + '</div>';
     }
     return '';
   }
@@ -2932,13 +2931,21 @@ function _renderModalContent(idx) {
         ${_inlineFinancesHTML('car_main', 306, idx)}
       </div>`;
   } else if (isDrive) {
-    const gmUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(step.from+', USA')}&destination=${encodeURIComponent(step.to+', USA')}&travelmode=driving`;
+    // Les adresses éditables priment sur les valeurs par défaut du code
+    const _dep = saved.adrdep || step.from || '';
+    const _arr = saved.adrarr || step.to   || '';
+    const gmUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(_dep)}&destination=${encodeURIComponent(_arr)}&travelmode=driving`;
+    const cFrom = findCoords(_dep) || findCoords(step.from);
+    const cTo   = findCoords(_arr) || findCoords(step.to);
+    const appleUrl = cFrom && cTo
+      ? `https://maps.apple.com/?saddr=${cFrom[0]},${cFrom[1]}&daddr=${cTo[0]},${cTo[1]}&dirflg=d`
+      : `https://maps.apple.com/?saddr=${encodeURIComponent(_dep)}&daddr=${encodeURIComponent(_arr)}&dirflg=d`;
     body.innerHTML = `${_photoBanner}
 
       <div class="map-route-bar">
         <div class="map-route-point dep">
           <div class="map-route-label">Départ</div>
-          <div class="map-route-name">${step.from}</div>
+          <div class="map-route-name" id="drive-dep-display">${_dep}</div>
           <div class="map-route-time" id="map-hdep-display">${saved.hdep ? '🕐 ' + saved.hdep : '–'}</div>
         </div>
         <div class="map-route-middle">
@@ -2948,7 +2955,7 @@ function _renderModalContent(idx) {
         </div>
         <div class="map-route-point">
           <div class="map-route-label">Arrivée</div>
-          <div class="map-route-name">${step.to}</div>
+          <div class="map-route-name" id="drive-arr-display">${_arr}</div>
           <div class="map-route-time" id="map-harr-display">${saved.harr ? '🕐 ' + saved.harr : '–'}</div>
         </div>
       </div>
@@ -2956,15 +2963,8 @@ function _renderModalContent(idx) {
         <div id="drive-map"></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:0;">
-        <a class="map-open-btn" href="${gmUrl}" target="_blank">🗺 Ouvrir l'itinéraire dans Google Maps</a>
-        ${(()=>{
-          const cFrom = findCoords(step.from);
-          const cTo   = findCoords(step.to);
-          const appleUrl = cFrom && cTo
-            ? `https://maps.apple.com/?saddr=${cFrom[0]},${cFrom[1]}&daddr=${cTo[0]},${cTo[1]}&dirflg=d`
-            : `https://maps.apple.com/?saddr=${encodeURIComponent(step.from+', USA')}&daddr=${encodeURIComponent(step.to+', USA')}&dirflg=d`;
-          return `<a class="map-open-btn" href="${appleUrl}" target="_blank" style="background:#000;color:white;border-color:#000;">🍎 Ouvrir l'itinéraire dans Plans</a>`;
-        })()}
+        <a class="map-open-btn" id="drive-gm-btn" href="${gmUrl}" target="_blank">🗺 Ouvrir l'itinéraire dans Google Maps</a>
+        <a class="map-open-btn" id="drive-apple-btn" href="${appleUrl}" target="_blank" style="background:#000;color:white;border-color:#000;">🍎 Ouvrir l'itinéraire dans Plans</a>
         <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--orange-pale);border-left:3px solid var(--amber);border-radius:8px;">
           <span style="font-size:15px;flex-shrink:0;">🗺️</span>
           <div>
@@ -2975,16 +2975,16 @@ function _renderModalContent(idx) {
       </div>
       <div class="modal-section" style="margin-top:1rem;">
         <div class="modal-section-title">Horaires</div>
-        <div class="field-grid">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div class="field"><label>Heure de départ</label><input type="time" id="f-hdep" value="${saved.hdep||''}" oninput="document.getElementById('map-hdep-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
-          <div class="field"><label>Heure d'arrivée prévue</label><input type="time" id="f-harr" value="${saved.harr||''}" oninput="document.getElementById('map-harr-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
+          <div class="field"><label>Heure d'arrivée</label><input type="time" id="f-harr" value="${saved.harr||''}" oninput="document.getElementById('map-harr-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
         </div>
       </div>
       <div class="modal-section">
-        <div class="modal-section-title">Adresses précises</div>
+        <div class="modal-section-title">Adresses</div>
         <div class="field-grid single">
-          <div class="field"><label>Adresse de départ</label><input type="text" id="f-adrdep" placeholder="Adresse complète…" value="${saved.adrdep||''}"></div>
-          <div class="field"><label>Adresse d'arrivée</label><input type="text" id="f-adrarr" placeholder="Adresse complète…" value="${saved.adrarr||''}"></div>
+          <div class="field"><label>📍 Départ</label><input type="text" id="f-adrdep" placeholder="Adresse, ville, état…" value="${saved.adrdep||''}" oninput="_updateDriveAddresses(this.value, null)"></div>
+          <div class="field"><label>📍 Arrivée</label><input type="text" id="f-adrarr" placeholder="Adresse, ville, état…" value="${saved.adrarr||''}" oninput="_updateDriveAddresses(null, this.value)"></div>
         </div>
       </div>
       <div class="modal-section">
@@ -4049,6 +4049,35 @@ function _actClearAll(idx) {
   try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(e) {}
   saveFiche(idx, d);
   _actRender();
+}
+
+
+
+function _updateDriveAddresses(dep, arr) {
+  const depVal = dep !== null ? dep : document.getElementById('f-adrdep')?.value || '';
+  const arrVal = arr !== null ? arr : document.getElementById('f-adrarr')?.value || '';
+  if (dep !== null) {
+    const el = document.getElementById('drive-dep-display');
+    if (el) el.textContent = depVal;
+  }
+  if (arr !== null) {
+    const el = document.getElementById('drive-arr-display');
+    if (el) el.textContent = arrVal;
+  }
+  // Mettre à jour les liens maps
+  const gmBtn = document.getElementById('drive-gm-btn');
+  if (gmBtn && depVal && arrVal) {
+    gmBtn.href = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(depVal) + '&destination=' + encodeURIComponent(arrVal) + '&travelmode=driving';
+  }
+  const appleBtn = document.getElementById('drive-apple-btn');
+  if (appleBtn && depVal && arrVal) {
+    appleBtn.href = 'https://maps.apple.com/?saddr=' + encodeURIComponent(depVal) + '&daddr=' + encodeURIComponent(arrVal) + '&dirflg=d';
+  }
+}
+
+function _openBannerImg(i) {
+  const img = window._bannerImgs && window._bannerImgs[i];
+  if (img && img.data) { window.open(img.data, '_blank'); }
 }
 
 function _actResetToDefault(idx) {
@@ -6524,7 +6553,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols · ${steps.filter(s=>s.type==='activity').length} activités<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.16.0 · 06/06/26
+        Version : v2.17.0 · 06/06/26
       </div>
     </div>
 ${_renderActionLog()}`;
@@ -12364,8 +12393,13 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.16.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Bandeau photo dans les fiches Hôtel, Activité et Trajet · multi-sélection 📌 · strip adaptatif 1/2/3+ photos · liens utiles dans les fiches Trajet · accès images hôtel corrigé · journal d'actions dans les Logs</div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.17.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fiches trajet : adresses Départ/Arrivée éditables liées aux cartes Google & Apple · photos + liens utiles · boutons navigation fixes · scroll reset · bandeau photo scrollable</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.16.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Bandeau photo dans les fiches Hôtel, Activité et Trajet · multi-sélection 📌 · strip adaptatif · liens utiles · journal d'actions dans les Logs
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
