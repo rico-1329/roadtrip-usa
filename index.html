@@ -160,7 +160,7 @@
   .act-step-content{flex:1;padding:2px 0 10px 10px;min-width:0;}
   .act-step-name{font-size:13px;font-weight:500;color:var(--ink);line-height:1.3;}
   .act-step-meta{display:flex;gap:6px;margin-top:2px;flex-wrap:wrap;align-items:center;}
-  .act-step-badge{font-size:10px;color:var(--slate);display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;border:.5px solid var(--sand-dark);background:white;white-space:nowrap;}
+  .act-step-badge{font-size:10px;color:var(--slate-light);display:flex;align-items:center;gap:2px;}
   .act-step-expanded{margin-top:6px;padding:8px 10px;background:var(--sand);border-radius:8px;border:.5px solid var(--sand-dark);display:flex;flex-direction:column;gap:6px;}
   .act-step-desc{font-size:12px;color:var(--ink-light);line-height:1.5;}
   .act-step-alert{display:flex;align-items:flex-start;gap:6px;padding:5px 8px;border-radius:6px;font-size:11px;line-height:1.4;border-left:2px solid;}
@@ -828,7 +828,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.16.4 · 06/06/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.16.0 · 06/06/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -1862,6 +1862,7 @@
       </div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
+    <div id="modal-header-thumb"></div>
     <div class="modal-body" id="modal-body"></div>
     <div class="modal-actions" style="flex-direction:column;gap:0;padding:0;">
       <!-- Ligne navigation -->
@@ -1905,7 +1906,7 @@ let steps = [
     alerts:[{ kind:'urgent', label:'Annulation imminente', detail:'Date limite : 25 juillet' }] },
 
   // ── J2-4 : YELLOWSTONE / GRAND TETON ──
-  { id:'d-jac-yst', type:'drive', from:'Jackson, Wyoming', to:'Yellowstone / Grand Teton', km:100, duration:'1h30' },
+  { id:'d-jac-yst', type:'drive', from:'Jackson', to:'Yellowstone / Grand Teton', km:100, duration:'1h30' },
   { id:'h-20260729', type:'hotel', dates:'29 juil. – 1er août', dateDebut:'2026-07-29', dateFin:'2026-08-01', nights:3, city:'Yellowstone / Grand Teton, Wyoming', hotel:'Best Western Weston Inn ★', price:723, ptdej:true, annul:'avant le 20 juillet',
     visits:'Old Faithful, Grand Prismatic Spring, Grand Canyon de Yellowstone, Lamar Valley (bisons, ours, loups), Mammoth Hot Springs, Hayden Valley',
     alerts:[{ kind:'urgent', label:'Date limite possiblement dépassée', detail:'Annulation avant le 20 juillet — à vérifier d\'urgence' }] },
@@ -1915,42 +1916,52 @@ let steps = [
   { id:'act-yst-j1', type:'activity', dates:'29 juil.', dateDebut:'2026-07-29', title:'Jour 1 · Old Faithful & Grand Prismatic', heureDebut:'08:00', heureFin:'19:30',
     alerts:[],
     defaultEtapes:[
-  {id:1,type:'trajet',nom:'Jackson Town Square → Colter Bay Village',heure:'08:00',duree:'~1h15',km:90,desc:'Depuis Jackson Town Square, prenez la US-191 N / US-89 N / US-26 N (Broadway Ave) vers le nord. La route traverse la vallée de Jackson Hole sur une vingtaine de kilomètres avant d\'entrer dans le Grand Teton National Park au niveau de la Moose Entrance (péage inclus dans votre pass $35). Continuez sur la US-89 N / US-191 N en longeant la chaîne des Teton sur votre gauche. Passez Moran Junction, puis tournez à gauche pour rejoindre Colter Bay Village par la route secondaire fléchée. Station-service BP sur place — faites le plein, c\'est la dernière avant Yellowstone.',maps:'',alerte:{type:'warn',texte:'⛽ Station BP sur place — faire le plein, c\'est la dernière avant Yellowstone'}},
-  {id:2,type:'trajet',nom:'Colter Bay Village → Lewis Falls',heure:'09:30',duree:'~50 min',km:55,desc:'Revenez sur la US-89 N / US-191 N direction nord. La route longe le lac Jackson sur quelques kilomètres puis pénètre dans une zone plus sauvage et boisée. À Flagg Ranch, vous quittez officiellement le Grand Teton National Park et entrez dans le corridor John D. Rockefeller Jr. Memorial Parkway. Continuez tout droit sur la US-89 N / US-191 N jusqu\'à la South Entrance de Yellowstone (présentation de votre pass). Environ 8 km après l\'entrée, vous longez le lac Lewis sur votre droite. Le parking de Lewis Falls apparaît sur la gauche de la route, bien signalé. Courte descente à pied (~200 m) pour atteindre les chutes.',maps:'',alerte:null},
-  {id:3,type:'visite',nom:'Lewis Falls → West Thumb Geyser Basin',heure:'',duree:'~20 min',km:20,desc:'Reprenez la US-89 N / US-191 N vers le nord. La route longe d\'abord la rivière Lewis puis le terrain s\'ouvre sur des prairies. Vous franchirez la Continental Divide à environ 2 450 m d\'altitude (panneau indicateur sur la route). Descendez vers le lac Yellowstone et tournez à droite sur le Grand Loop Road (US-89 N) en direction de West Thumb. Le parking du West Thumb Geyser Basin est sur la droite, bien indiqué, avec un grand visitor center.',maps:'',alerte:null},
-  {id:4,type:'trajet',nom:'West Thumb Geyser Basin → Old Faithful',heure:'',duree:'~45 min',km:45,desc:'Depuis West Thumb, prenez le Grand Loop Road vers l\'ouest (direction Craig Pass / Old Faithful). La route monte progressivement à travers une forêt de pins lodge. Vous passerez le point culminant de Craig Pass à 2 477 m (le plus haut col de la Grand Loop Road) avec le lac Isa juste à côté — curiosité géographique : ses eaux se déversent à la fois dans l\'Atlantique et le Pacifique. Redescendez ensuite dans la vallée de la Firehole River. Suivez les panneaux Old Faithful — le parking est immense, plusieurs zones. Garez-vous et rendez-vous directement au visitor center pour consulter l\'heure de la prochaine éruption.',maps:'',alerte:null},
-  {id:5,type:'rando',nom:'Old Faithful → Grand Prismatic Spring + Overlook',heure:'',duree:'~10 min',km:10,desc:'Reprenez le Grand Loop Road vers le nord (direction Madison / Norris). Après environ 3 km vous passez devant l\'entrée du Midway Geyser Basin — ne vous arrêtez pas ici, continuez encore ~800 m. Le parking du Fairy Falls Trailhead est sur la gauche de la route, bien signalé. C\'est de là que part le sentier pour le Grand Prismatic Overlook (1,6 km aller-retour, environ 30–40 min de marche). Attention : en juillet ce parking est souvent plein dès 9h, mais à 15h vous aurez de meilleures chances. Grand Prismatic Spring : 30 à 45 min pour faire les passerelles.',maps:'',alerte:{type:'info',texte:'⏰ Idéalement entre 10h et 13h · Parking Fairy Falls souvent plein dès 9h en juillet — préférer 15h'}},
-  {id:6,type:'visite',nom:'Grand Prismatic Overlook → Fountain Paint Pot',heure:'',duree:'~5 min',km:4,desc:'Reprenez le Grand Loop Road vers le nord, direction Madison. Après environ 3 km sur la gauche, vous verrez le parking du Fountain Paint Pot bien indiqué. Le boardwalk fait ~800 m de boucle, tout plat, comptez 45 min.',maps:'',alerte:null},
-  {id:7,type:'trajet',nom:'Fountain Paint Pot → West Yellowstone',heure:'',duree:'~25 min',km:23,desc:'Continuez sur le Grand Loop Road vers le nord jusqu\'à Madison Junction. À Madison Junction, tournez à gauche sur la US-20 / Madison-West Entrance Road direction ouest. Cette route longe la Firehole River et la Madison River dans un cadre magnifique — gardez l\'œil ouvert pour les bisons et wapitis très fréquents en soirée dans cette vallée. Après ~22 km vous franchissez la West Entrance de Yellowstone et entrez directement dans la ville de West Yellowstone. Votre hôtel se trouve à quelques minutes du poste d\'entrée.',maps:'',alerte:{type:'info',texte:'🦬 Bisons et wapitis très fréquents en soirée dans la vallée de Madison — ralentir'}}
+  {id:1,type:'trajet',nom:'Jackson → Colter Bay Village',heure:'08:00',duree:'~1h15',desc:'US-191 N / US-89 N. Traversée de Jackson Hole, entrée Grand Teton NP (Moose Entrance — pass $35). Longer les Tetons sur la gauche. Passer Moran Junction puis tourner à gauche vers Colter Bay.',maps:'',alerte:{type:'warn',texte:'⛽ Station BP sur place — dernier plein avant Yellowstone'}},
+  {id:2,type:'trajet',nom:'Colter Bay → Lewis Falls',heure:'09:30',duree:'~50 min',desc:'US-89 N, longer le lac Jackson. Quitter Grand Teton NP à Flagg Ranch. South Entrance Yellowstone (présenter le pass). ~8 km après l\'entrée, parking Lewis Falls sur la gauche.',maps:'',alerte:null},
+  {id:3,type:'visite',nom:'Lewis Falls',heure:'',duree:'~20 min',desc:'Courte descente à pied (~200 m) pour atteindre les chutes.',maps:'',alerte:null},
+  {id:4,type:'visite',nom:'West Thumb Geyser Basin',heure:'',duree:'~30 min',desc:'Franchir la Continental Divide (~2 450 m). Geysers spectaculaires au bord du lac Yellowstone.',maps:'',alerte:null},
+  {id:5,type:'trajet',nom:'West Thumb → Old Faithful',heure:'',duree:'~45 min',desc:'Grand Loop Road vers l\'ouest, Craig Pass 2 477 m — lac Isa (eaux vers Atlantique et Pacifique).',maps:'',alerte:null},
+  {id:6,type:'visite',nom:'Old Faithful',heure:'',duree:'~1h',desc:'Consulter l\'heure de la prochaine éruption au visitor center dès l\'arrivée. Éruptions toutes les 60 à 110 min.',maps:'',alerte:{type:'info',texte:'Consulter le panneau d\'affichage à l\'arrivée — éruptions toutes les 60 à 110 min'}},
+  {id:7,type:'visite',nom:'Grand Prismatic Spring + Overlook',heure:'',duree:'~1h30',desc:'Parking Fairy Falls Trailhead. Overlook : 1,6 km A/R, 30–40 min. Passerelles Grand Prismatic : 30–45 min.',maps:'',alerte:{type:'info',texte:'⏰ Idéalement entre 10h et 13h · Parking souvent plein dès 9h'}},
+  {id:8,type:'visite',nom:'Fountain Paint Pot Trail',heure:'',duree:'~45 min',desc:'Boardwalk ~800 m en boucle, tout plat.',maps:'',alerte:null},
+  {id:9,type:'trajet',nom:'→ West Yellowstone',heure:'',duree:'~25 min',desc:'Grand Loop Road Nord → Madison Junction → US-20 Ouest.',maps:'',alerte:{type:'info',texte:'🦬 Bisons et wapitis très fréquents en soirée dans la vallée de Madison'}}
 ] },
+  { id:'act-20260730', type:'activity', dates:'30 juil.', dateDebut:'2026-07-30', title:'Jour 2 · Norris, Canyon & Hayden Valley', heureDebut:'07:00', heureFin:'20:30',
+    alerts:[],
+   },
   { id:'act-yst-j2', type:'activity', dates:'30 juil.', dateDebut:'2026-07-30', title:'Jour 2 · Norris, Canyon & Hayden Valley', heureDebut:'07:00', heureFin:'20:30',
     alerts:[],
     defaultEtapes:[
-  {id:1,type:'trajet',nom:'West Yellowstone → Norris Geyser Basin',heure:'07:00',duree:'~40 min',km:36,desc:'Depuis votre hôtel à West Yellowstone, prenez la US-20 Est direction Madison Junction (~14 km). À Madison Junction, tournez à droite sur le Grand Loop Road Nord direction Norris (~22 km). La route longe la Gibbon River sur une bonne partie du trajet, traverse la Gibbon Falls (visible depuis la route) et remonte doucement vers le plateau de Norris. Parking bien indiqué à l\'arrivée, grand et gratuit.',maps:'',alerte:null},
-  {id:2,type:'visite',nom:'Norris Geyser Basin',heure:'07:40',duree:'~1h30',desc:'Commencez par Porcelain Basin (1,2 km, terrain ouvert et minéral, vapeur omniprésente, couleurs blanches et ocre). Puis enchaînez avec Back Basin (2,5 km dans les bois) où se trouve le Steamboat Geyser — le plus grand geyser actif du monde, pouvant atteindre 90 m de hauteur lors de ses grandes éruptions. Visitor center, toilettes et boutique sur place. Route : depuis Norris, prenez le Grand Loop Road Est direction Canyon Junction (~20 km, ~25 min). Route forestière agréable qui traverse des prairies ouvertes avec de belles vues.',maps:'',alerte:{type:'info',texte:'Départ tôt recommandé pour éviter la foule'}},
-  {id:3,type:'visite',nom:'Canyon Village Visitor Center',heure:'',duree:'~20 min',desc:'Arrêt rapide en arrivant à Canyon Junction. Le visitor center est sur la droite, bien signalé. Récupérez la carte détaillée des points de vue du canyon (North Rim Drive et South Rim Drive), passez aux toilettes et prenez un café si besoin. Ouvert dès 8h en juillet.',maps:'',alerte:null},
-  {id:4,type:'visite',nom:'Artist Point — South Rim',heure:'',duree:'~45 min',desc:'Depuis Canyon Village, prenez la South Rim Drive vers l\'est (~3 km). Parking dédié Artist Point sur la gauche, bien signalé. Chemin pavé de ~500 m depuis le parking jusqu\'au belvédère. C\'est le point de vue le plus célèbre et le plus photographié de Yellowstone : vue plongeante sur les Lower Falls (94 m de haut, deux fois plus hautes que les chutes du Niagara) et les parois jaune-ocre du canyon qui s\'étendent sur plusieurs kilomètres. Arrivée vers 11h — lumière idéale avant le zénith.',maps:'',alerte:{type:'info',texte:'Lumière idéale avant le zénith — arriver vers 11h'}},
-  {id:5,type:'visite',nom:'Inspiration Point — North Rim',heure:'',duree:'~30 min',desc:'Revenez sur la South Rim Drive vers Canyon Village (~3 km), puis traversez Canyon Junction et prenez la North Rim Drive vers l\'est (~3 km). Parking dédié Inspiration Point. Quelques marches depuis le parking pour atteindre le belvédère en surplomb. La vue est radicalement différente d\'Artist Point : vous voyez le canyon en enfilade depuis la hauteur, avec les deux cascades (Upper et Lower Falls) dans le même cadre. Incontournable pour compléter la vision du canyon.',maps:'',alerte:null},
-  {id:6,type:'repas',nom:'Déjeuner à Canyon Village',heure:'',duree:'~45 min',desc:'Revenez à Canyon Village (~3 km depuis Inspiration Point). Le Canyon Lodge Dining Room propose des plats chauds complets (burgers, pâtes, plats du jour). La Cafeteria est plus rapide si vous voulez gagner du temps. C\'est la meilleure — et quasi seule — option de restauration dans cette partie du parc.',maps:'',alerte:null},
-  {id:7,type:'visite',nom:'Brink of the Lower Falls',heure:'',duree:'~40 min',desc:'Depuis Canyon Village, reprenez la South Rim Drive (~2 km). Le parking Uncle Tom\'s Trail est sur la droite. Le sentier fait 800 m aller-retour avec une descente de près de 100 marches métalliques en zigzag taillées dans la roche. Vous arrivez au bord même des Lower Falls, à quelques mètres du précipice — la puissance du débit et la bruine sont impressionnantes. Prévoyez absolument une veste légère : l\'humidité des chutes refroidit fortement l\'air même en plein été.',maps:'',alerte:{type:'warn',texte:'🧥 Veste légère indispensable — bruine des chutes refroidit fortement l\'air'}},
-  {id:8,type:'pause',nom:'Pause libre — Zone Canyon',heure:'15:00',duree:'~1h30',desc:'Temps libre dans la zone Canyon. Quelques options selon votre énergie : flânerie sur la North Rim Trail (sentier longeant le bord du canyon), repos au visitor center, ou exploration de la boutique. Ce temps tampon est aussi utile en cas d\'embouteillages aux parkings en milieu de journée.',maps:'',alerte:null},
-  {id:9,type:'visite',nom:'Mud Volcano Area',heure:'',duree:'~45 min',desc:'Depuis Canyon Village, prenez le Grand Loop Road Sud direction Fishing Bridge (~15 km, ~15 min). Le parking de Mud Volcano est sur la gauche de la route, bien signalé. Boardwalk de 1,2 km entièrement plat avec une boucle montante et descendante. Les trois incontournables : Dragon\'s Mouth Spring (une grotte d\'où sort de la vapeur avec un grondement sourd impressionnant), Mud Volcano (boue noire bouillonnante en surface) et Black Dragon\'s Cauldron (mare sombre et bouillonnante). Ambiance post-apocalyptique unique dans le parc.',maps:'',alerte:{type:'info',texte:'Ambiance post-apocalyptique — grondements et vapeur impressionnants'}},
-  {id:10,type:'visite',nom:'Hayden Valley — Lumière dorée',heure:'17:30',duree:'~1h45',desc:'Depuis Mud Volcano, reprenez le Grand Loop Road Sud direction Fishing Bridge — mais roulez extrêmement lentement car vous êtes déjà en plein cœur de Hayden Valley. La vallée s\'étend sur environ 10 km le long de la Yellowstone River, entre Mud Volcano au nord et Fishing Bridge au sud. De nombreux pull-offs jalonnent la route des deux côtés — arrêtez-vous dès que vous voyez des voitures garées, c\'est souvent signe d\'une observation en cours. En juillet à cette heure : bisons (troupeaux de parfois plusieurs centaines d\'individus), grizzlys (souvent visibles en lisière de forêt à l\'est), coyotes (chassent dans les herbes hautes), pygargues à tête blanche, pélicans blancs. Jumelles absolument indispensables. La lumière rasante de fin de journée dore la prairie et rend les photos magnifiques.',maps:'',alerte:{type:'info',texte:'🦬 Jumelles indispensables · Lumière rasante idéale pour les photos'}},
-  {id:11,type:'trajet',nom:'Retour West Yellowstone',heure:'19:15',duree:'~1h15',km:57,desc:'Depuis le sud de Hayden Valley, faites demi-tour vers le nord et reprenez le Grand Loop Road Nord jusqu\'à Canyon Junction (~15 km). À Canyon Junction, prenez le Grand Loop Road Ouest direction Madison Junction (~28 km) — cette portion longe la Gibbon River dans une belle lumière de fin de soirée. À Madison Junction, prenez la US-20 Ouest (~14 km) jusqu\'à West Yellowstone. Arrivée vers 20h30.',maps:'',alerte:null}
+  {id:1,type:'trajet',nom:'West Yellowstone → Norris Geyser Basin',heure:'07:00',duree:'~40 min',desc:'US-20 Est → Madison Junction → Grand Loop Road Nord (~22 km). Gibbon River et Gibbon Falls.',maps:'',alerte:null},
+  {id:2,type:'visite',nom:'Norris Geyser Basin',heure:'07:40',duree:'~1h30',desc:'Porcelain Basin (1,2 km, terrain ouvert) puis Back Basin (2,5 km) avec le Steamboat Geyser — plus grand geyser actif du monde (jusqu\'à 90 m).',maps:'',alerte:{type:'info',texte:'Départ tôt recommandé pour éviter la foule'}},
+  {id:3,type:'trajet',nom:'Norris → Canyon Village',heure:'',duree:'~25 min',desc:'Grand Loop Road Est direction Canyon Junction (~20 km).',maps:'',alerte:null},
+  {id:4,type:'visite',nom:'Canyon Village Visitor Center',heure:'',duree:'~20 min',desc:'Récupérer la carte North Rim / South Rim Drive. Toilettes, café.',maps:'',alerte:null},
+  {id:5,type:'visite',nom:'Artist Point — South Rim',heure:'',duree:'~45 min',desc:'Vue plongeante sur les Lower Falls (94 m, 2× les chutes du Niagara) et parois jaune-ocre.',maps:'',alerte:{type:'info',texte:'Lumière idéale avant le zénith — arriver vers 11h'}},
+  {id:6,type:'visite',nom:'Inspiration Point — North Rim',heure:'',duree:'~30 min',desc:'Vue en enfilade du canyon avec Upper et Lower Falls dans le même cadre.',maps:'',alerte:null},
+  {id:7,type:'repas',nom:'Déjeuner Canyon Village',heure:'',duree:'~45 min',desc:'Canyon Lodge Dining Room ou Cafeteria. Seule option dans cette partie du parc.',maps:'',alerte:null},
+  {id:8,type:'visite',nom:'Brink of the Lower Falls',heure:'',duree:'~40 min',desc:'~100 marches métalliques en zigzag. Vue au bord même des chutes — bruine impressionnante.',maps:'',alerte:{type:'warn',texte:'🧥 Veste légère indispensable — bruine des chutes refroidit fortement l\'air'}},
+  {id:9,type:'pause',nom:'Temps libre — Zone Canyon',heure:'15:00',duree:'~1h30',desc:'North Rim Trail, visitor center ou boutique.',maps:'',alerte:null},
+  {id:10,type:'visite',nom:'Mud Volcano Area',heure:'',duree:'~45 min',desc:'Boardwalk 1,2 km : Dragon\'s Mouth Spring, Mud Volcano, Black Dragon\'s Cauldron.',maps:'',alerte:{type:'info',texte:'Ambiance post-apocalyptique — grondements et vapeur impressionnants'}},
+  {id:11,type:'visite',nom:'Hayden Valley — Lumière dorée',heure:'17:30',duree:'~1h45',desc:'Vallée de 10 km. S\'arrêter à chaque pull-off avec des voitures garées. Bisons, grizzlys, coyotes, pygargues.',maps:'',alerte:{type:'info',texte:'🦬 Jumelles indispensables · Lumière rasante idéale pour les photos'}},
+  {id:12,type:'trajet',nom:'Retour West Yellowstone',heure:'19:15',duree:'~1h15',desc:'Canyon Junction → Grand Loop Road Ouest → Madison Junction → US-20 Ouest. Arrivée ~20h30.',maps:'',alerte:null}
 ] },
+  { id:'act-20260731', type:'activity', dates:'31 juil.', dateDebut:'2026-07-31', title:'Jour 3 · Mammoth Hot Springs & Lamar Valley', heureDebut:'06:30', heureFin:'21:00',
+    alerts:[{ kind:'info', label:'Départ Lamar Valley 17h30', detail:'Impératif pour arriver au rodéo à temps' }],
+   },
   { id:'act-yst-j3', type:'activity', dates:'31 juil.', dateDebut:'2026-07-31', title:'Jour 3 · Mammoth Hot Springs & Lamar Valley', heureDebut:'06:30', heureFin:'21:00',
     alerts:[{ kind:'info', label:'Départ Lamar Valley 17h30', detail:'Impératif pour arriver au rodéo' }],
     defaultEtapes:[
-  {id:1,type:'trajet',nom:'Étape 1 - West Yellowstone → Mammoth Hot Springs',heure:'06:30',duree:'~1h45',km:110,desc:'Depuis votre hôtel à West Yellowstone, prenez la US-20 Est direction Madison Junction (~14 km). À Madison Junction, tournez à droite sur le Grand Loop Road Nord direction Norris (~22 km). À Norris Junction, continuez tout droit sur le Grand Loop Road Nord direction Mammoth (~22 km). La route longe la Gibbon River, traverse des prairies ouvertes avec vue sur les Gallatin Mountains, passe devant les Roaring Mountain (colline fumante visible depuis la route) et monte progressivement vers le plateau de Mammoth. Parking principal bien indiqué à l\'arrivée.',maps:'',alerte:null},
-  {id:2,type:'visite',nom:'Étape 2 - Mammoth Hot Springs — Terrasses',heure:'',duree:'~1h30',desc:'Phénomène géologique unique au monde : des terrasses de travertin (calcaire blanc-crème) formées par les sources chaudes qui débordent en cascades minéralisées. Commencez par les Lower Terraces (accès à pied depuis le parking principal, boardwalk de ~1,5 km) : Palette Springs aux couleurs pastel étonnantes, Minerva Terrace avec ses bassins étagés en gradins, Liberty Cap (cône de travertin de 12 m de haut, visible depuis la route). Ensuite montez aux Upper Terraces en voiture via la route à sens unique de 2 km : Canary Spring souvent la plus active et colorée, vue panoramique sur l\'ensemble du site et la vallée de Mammoth en contrebas. Arrivez tôt — la lumière du matin fait ressortir les teintes orangées et jaunes des bactéries thermophiles.',maps:'',alerte:{type:'info',texte:'Arriver tôt — la lumière du matin magnifie les teintes orangées et jaunes des bactéries thermophiles'}},
-  {id:3,type:'repas',nom:'Étape 3 - Mammoth Village — Petit-déjeuner tardif + plein d\'essence',heure:'',duree:'~20 min',desc:'Le Terrace Grill (rapide, café, viennoiseries, sandwichs) ou le Mammoth Hotel Dining Room (plus complet avec œufs, pancakes) sont à 200 m des terrasses. Faites impérativement le plein d\'essence à la station de Mammoth avant de partir — c\'est la dernière station avant Lamar Valley et vous aurez plus de 150 km à parcourir avant d\'en revoir une. Gardez l\'œil ouvert dans le village : des élans se promènent régulièrement entre les bâtiments le matin. Route : depuis Mammoth, prenez le Grand Loop Road Est direction Tower-Roosevelt (~30 km, ~35 min). La route descend spectaculairement dans la vallée de la Yellowstone River, longe des falaises basaltiques noires et traverse des prairies ouvertes avec de belles vues sur les sommets environnants.',maps:'',alerte:{type:'warn',texte:'⛽ PLEIN OBLIGATOIRE — dernière station avant Lamar Valley · plus de 150 km sans station'}},
-  {id:4,type:'visite',nom:'Étape 4 - Tower Fall',heure:'',duree:'~30 min',desc:'Parking dédié sur la droite de la route à Tower Junction, bien signalé. Sentier de 500 m depuis le parking jusqu\'au belvédère — chemin légèrement descendant, facile. La chute plonge de 40 m entre des colonnes de phonolite (roche volcanique noire) dans un décor spectaculaire. Vue sur la Yellowstone River en contrebas. Site souvent peu fréquenté le matin — profitez-en. Route : depuis Tower Junction, ne prenez pas le Grand Loop Road Sud (qui mène à Canyon Village) mais continuez tout droit sur la Northeast Entrance Road (US-212 Est) direction Lamar Valley (~15 km, ~20 min). La route remonte la vallée du Yellowstone River dans un paysage de plus en plus sauvage et ouvert.',maps:'',alerte:null},
-  {id:5,type:'visite',nom:'Étape 5 - Lamar Valley — Matinée faune',heure:'',duree:'~3h15',desc:'La "Serengeti de l\'Amérique du Nord" — le meilleur endroit au monde pour observer des loups sauvages. La vallée s\'étend sur 25 km le long de la Lamar River jusqu\'à l\'entrée nord-est du parc. Roulez très lentement sur toute la longueur de la vallée. Cherchez les voitures garées sur les pull-offs et les gens avec des longues-vues pointées — c\'est toujours le signe d\'une observation en cours. Les rangers naturalistes postés avec leurs spotting scopes sont une ressource précieuse, n\'hésitez pas à les solliciter pour savoir où regarder. Ce que vous pouvez voir en juillet : loups (meutes de Lamar Canyon et Junction Butte, particulièrement actives le matin), bisons en troupeaux massifs traversant parfois la rivière, grizzlys sur les pentes est de la vallée souvent avec des oursons en juillet, ours noirs en lisière de forêt, pronghorns dans les prairies ouvertes, aigles dorés et pygargues à tête blanche survolant la vallée. Jumelles absolument indispensables.',maps:'',alerte:{type:'info',texte:'🐺 Meilleur endroit au monde pour observer les loups · Jumelles absolument indispensables'}},
-  {id:6,type:'repas',nom:'Étape 6 - Pebble Creek — Pique-nique',heure:'',duree:'~45 min',desc:'Depuis l\'extrémité est de Lamar Valley, continuez sur la Northeast Entrance Road vers l\'est (~15 km). L\'aire de pique-nique de Pebble Creek est sur la gauche de la route, bien signalée. Cadre alpin magnifique au bord du ruisseau avec les sommets des Absaroka Mountains en arrière-plan. Option randonnée facile : Pebble Creek Trail (2 km aller-retour le long du ruisseau, dénivelé minime). Zone fréquentée par les ours noirs — gardez les aliments dans le coffre et restez vigilants.',maps:'',alerte:{type:'warn',texte:'🐻 Zone fréquentée par les ours noirs — aliments dans le coffre, restez vigilants'}},
-  {id:7,type:'visite',nom:'Étape 7 - Lamar Valley — Lumière dorée',heure:'',duree:'~2h',desc:'Revenez sur vos pas vers l\'ouest sur la Northeast Entrance Road. Deuxième passage dans Lamar Valley en fin de journée — souvent encore meilleur que le matin. La faune se remet en mouvement pour la chasse et l\'alimentation du soir. Les loups sont particulièrement actifs au crépuscule. La lumière rasante illumine la prairie d\'une teinte dorée absolument magnifique.',maps:'',alerte:{type:'warn',texte:'⚠️ Quitter Lamar Valley à 17h30 impérativement pour arriver au rodéo à temps'}},
-  {id:8,type:'trajet',nom:'Étape 8 - Retour West Yellowstone via Canyon Village',heure:'17:30',duree:'~1h15',km:120,desc:'Depuis Lamar Valley, continuez vers l\'ouest sur la Northeast Entrance Road jusqu\'à Tower Junction (~25 km). À Tower Junction, prenez le Grand Loop Road Sud direction Canyon Junction (~30 km) — Google Maps prend ce chemin car c\'est le plus rapide. À Canyon Junction, prenez le Grand Loop Road Ouest direction Madison Junction (~28 km). À Madison Junction, prenez la US-20 Ouest (~14 km) jusqu\'à West Yellowstone. Arrivée vers 18h45.',maps:'',alerte:null},
-  {id:9,type:'repas',nom:'Étape 9 - Dîner rapide à West Yellowstone',heure:'18:45',duree:'~15 min',desc:'Running Bear Pancake House (cuisine familiale rapide, juste en centre-ville) ou sandwich à emporter. Vous avez 15 min — c\'est serré mais faisable car le rodéo est à 5 min à pied de la plupart des hôtels du centre.',maps:'',alerte:null},
-  {id:10,type:'spectacle',nom:'Étape 10 - Wild West Yellowstone Rodeo',heure:'20:00',duree:'~2h',desc:'175 Oldroyd Road, West Yellowstone — à 5 min à pied ou en voiture du centre. Tickets $52-$70 par personne, réservation recommandée sur eventticketscenter.com. Au programme : bronco busting, bull riding, barrel racing, calf roping — un vrai rodéo western familial et authentique. Fin vers 21h00 — conclusion parfaite pour votre dernière soirée à Yellowstone avant les Grand Teton le lendemain !',maps:'',alerte:{type:'info',texte:'🎟 $52–$70 / pers. · Réservation sur eventticketscenter.com · Fin vers 21h00'}}
+  {id:1,type:'trajet',nom:'West Yellowstone → Mammoth Hot Springs',heure:'06:30',duree:'~1h45',desc:'US-20 Est → Madison Junction → Norris → Grand Loop Road Nord. Roaring Mountain visible depuis la route.',maps:'',alerte:null},
+  {id:2,type:'visite',nom:'Mammoth Hot Springs Terrasses',heure:'08:15',duree:'~1h30',desc:'Lower Terraces (boardwalk ~1,5 km) : Palette Springs, Minerva Terrace, Liberty Cap. Upper Terraces en voiture (sens unique 2 km) : Canary Spring.',maps:'',alerte:{type:'info',texte:'Arriver tôt — la lumière du matin magnifie les teintes orangées'}},
+  {id:3,type:'repas',nom:'Petit-déjeuner Mammoth Village',heure:'',duree:'~20 min',desc:'Terrace Grill (rapide) ou Mammoth Hotel Dining Room. Élans souvent dans le village le matin !',maps:'',alerte:{type:'warn',texte:'⛽ PLEIN OBLIGATOIRE ici — dernière station avant Lamar Valley · plus de 150 km sans station'}},
+  {id:4,type:'trajet',nom:'Mammoth → Tower Fall',heure:'',duree:'~35 min',desc:'Grand Loop Road Est (~30 km). Descente spectaculaire, falaises basaltiques noires.',maps:'',alerte:null},
+  {id:5,type:'visite',nom:'Tower Fall',heure:'',duree:'~30 min',desc:'Sentier 500 m. Chute de 40 m entre colonnes de phonolite volcanique. Site peu fréquenté le matin.',maps:'',alerte:null},
+  {id:6,type:'visite',nom:'Lamar Valley — Faune du matin',heure:'',duree:'~3h15',desc:'Northeast Entrance Road Est (~15 km). Rouler très lentement. S\'arrêter à chaque pull-off. Rangers avec spotting scopes.',maps:'',alerte:{type:'info',texte:'🐺 Meilleur endroit du monde pour observer les loups · Jumelles indispensables'}},
+  {id:7,type:'repas',nom:'Pique-nique Pebble Creek',heure:'',duree:'~45 min',desc:'~15 km à l\'est de Lamar Valley. Cadre alpin au bord du ruisseau.',maps:'',alerte:{type:'warn',texte:'🐻 Zone ours noirs — aliments dans le coffre, rester vigilants'}},
+  {id:8,type:'visite',nom:'Lamar Valley — Lumière dorée',heure:'',duree:'~2h',desc:'Retour vers l\'ouest. Faune active pour la chasse du soir. Loups très actifs au crépuscule.',maps:'',alerte:{type:'warn',texte:'⚠️ Quitter Lamar Valley impérativement à 17h30 pour le rodéo'}},
+  {id:9,type:'trajet',nom:'Retour West Yellowstone via Canyon',heure:'17:30',duree:'~1h15',desc:'Tower Junction → Grand Loop Road Sud → Canyon Junction → Grand Loop Road Ouest → US-20 Ouest. Arrivée ~18h45.',maps:'',alerte:null},
+  {id:10,type:'repas',nom:'Dîner rapide — West Yellowstone',heure:'18:45',duree:'~15 min',desc:'Running Bear Pancake House ou sandwich à emporter.',maps:'',alerte:null},
+  {id:11,type:'spectacle',nom:'Wild West Yellowstone Rodéo',heure:'20:00',duree:'~2h',desc:'175 Oldroyd Road. Bronco busting, bull riding, barrel racing, calf roping. Fin ~21h.',maps:'',alerte:{type:'info',texte:'🎟 $52–$70/pers · Réservation sur eventticketscenter.com'}}
 ] },
   // ── J5 : GD TETON → ÉTAPE NUIT (CHOIX À FAIRE) ──
   { id:'h-20260801', type:'hotel', dates:'1er août', dateDebut:'2026-08-01', dateFin:'2026-08-02', nights:1, city:'Montpelier OU Rock Springs, Wyoming', hotel:'⚠️ CHOIX À FAIRE : Montpelier (opt. 1) / Four Points by Sheraton Rock Springs (opt. 2)', price:164, ptdej:true, annul:'avant le 29 juillet',
@@ -2293,6 +2304,54 @@ async function migrateToStableIds() {
 // Charge toutes les fiches depuis Supabase au démarrage
 // ── STEPS DYNAMIQUES (fiches dupliquées) ── persistance en Supabase/localStorage
 const EXTRA_STEPS_KEY = 'roadtrip_extra_steps';
+const DELETED_STEPS_KEY = 'roadtrip_deleted_steps';
+const ACTION_LOG_KEY    = 'roadtrip_action_log';
+
+// ── DELETED STEPS ──────────────────────────────────────────────
+function _getDeletedIds() {
+  try { return new Set(JSON.parse(localStorage.getItem(DELETED_STEPS_KEY) || '[]')); }
+  catch(e) { return new Set(); }
+}
+async function _markStepDeleted(stepId) {
+  const ids = _getDeletedIds(); ids.add(stepId);
+  const arr = [...ids];
+  try { localStorage.setItem(DELETED_STEPS_KEY, JSON.stringify(arr)); } catch(e) {}
+  if (SUPA_READY) {
+    try {
+      await fetch(`${SUPA_URL}/rest/v1/fiches`, {
+        method:'POST', headers:SUPA_HEADERS,
+        body: JSON.stringify({ id: DELETED_STEPS_KEY, data:{ ids: arr }, updated_at: new Date().toISOString() })
+      });
+    } catch(e) {}
+  }
+}
+async function _loadDeletedIds() {
+  if (SUPA_READY) {
+    try {
+      const res = await fetch(`${SUPA_URL}/rest/v1/fiches?id=eq.${DELETED_STEPS_KEY}&select=data`, { headers: SUPA_HEADERS });
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows.length && rows[0].data?.ids) {
+          try { localStorage.setItem(DELETED_STEPS_KEY, JSON.stringify(rows[0].data.ids)); } catch(e) {}
+          return new Set(rows[0].data.ids);
+        }
+      }
+    } catch(e) {}
+  }
+  return _getDeletedIds();
+}
+
+// ── ACTION LOG ─────────────────────────────────────────────────
+function _getActionLog() {
+  try { return JSON.parse(localStorage.getItem(ACTION_LOG_KEY) || '[]'); } catch(e) { return []; }
+}
+function _addActionLog(icon, action, detail) {
+  const user = _getCurrentUser() || 'Inconnu';
+  const log = _getActionLog();
+  log.unshift({ ts: new Date().toISOString(), icon, action, detail, user });
+  if (log.length > 100) log.length = 100;
+  try { localStorage.setItem(ACTION_LOG_KEY, JSON.stringify(log)); } catch(e) {}
+}
 
 async function saveExtraSteps() {
   const extra = steps
@@ -2331,6 +2390,15 @@ async function loadExtraSteps() {
       const local = localStorage.getItem(EXTRA_STEPS_KEY);
       if (local) extra = JSON.parse(local);
     } catch(e) {}
+  }
+
+  // Charger et filtrer les IDs supprimés
+  const deletedIds = await _loadDeletedIds();
+  if (deletedIds.size) {
+    const before = steps.length;
+    for (let i = steps.length - 1; i >= 0; i--) {
+      if (steps[i].id && deletedIds.has(steps[i].id)) steps.splice(i, 1);
+    }
   }
 
   if (!extra.length) return;
@@ -2472,7 +2540,57 @@ function _renderModalContent(idx) {
     : isCarReturn ? `Budget · San Francisco Airport · 20 août 2026 · 18h00`
     : isDrive   ? `Trajet · ${step.duration || '–'} · ${step.km ? step.km + ' km' : '–'}`
     : isActivityStep(step) ? `${step.dates}${step.heureDebut ? ' · ' + step.heureDebut + (step.heureFin ? ' → ' + step.heureFin : '') : ''}`
-    : `${saved.hotelName || step.hotel} · ${step.dates}`;
+    : saved.hotelName
+      ? `${saved.hotelName} · ${step.dates}`
+      : saved._customTitle
+        ? `${step.city} · ${step.dates}`
+        : `${step.hotel} · ${step.dates}`;
+
+  // Bandeau photo dans le header (hôtels + activités)
+  const _headerThumb = document.getElementById('modal-header-thumb');
+  if (_headerThumb) {
+    const _isHotel = !isFlight && !isCarPickup && !isCarReturn && !isDrive && !isActivityStep(step);
+    const _isAct   = isActivityStep(step);
+    const _isDrv   = isDrive;
+
+    if (_isHotel && saved.images && saved.images.length) {
+      // Hôtel : une photo principale (📌 single)
+      const _primIdx = saved.primaryImageIdx || 0;
+      const _img = saved.images[_primIdx] || saved.images[0];
+      _headerThumb.innerHTML = `<div style="background:#3a2a0a;display:flex;justify-content:center;align-items:center;max-height:200px;overflow:hidden;cursor:pointer;" onclick="window.open('${_img.data}','_blank')"><img src="${_img.data}" title="${_img.caption||''}" style="width:100%;max-height:200px;object-fit:contain;display:block;"></div>`;
+
+    } else if (_isDrv && saved.images && saved.images.length && (saved.headerImages||[]).length) {
+      // Trajet : strip des photos sélectionnées (📌 multi)
+      const _selIdxsDrv = saved.headerImages;
+      const _selImgsDrv = _selIdxsDrv.map(i => saved.images[i]).filter(Boolean);
+      if (_selImgsDrv.length === 1) {
+        _headerThumb.innerHTML = `<div style="background:#1a2a3a;display:flex;justify-content:center;align-items:center;height:220px;overflow:hidden;cursor:pointer;" onclick="window.open('${_selImgsDrv[0].data}','_blank')"><img src="${_selImgsDrv[0].data}" title="${_selImgsDrv[0].caption||''}" style="max-width:100%;max-height:220px;object-fit:contain;display:block;"></div>`;
+      } else {
+        const _imgHDrv = _selImgsDrv.length <= 2 ? 220 : 160;
+        _headerThumb.innerHTML = `<div style="display:flex;height:${_imgHDrv}px;background:#1a2a3a;gap:2px;">${
+          _selImgsDrv.map(img => `<div style="flex:1;min-width:0;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;" onclick="window.open('${img.data}','_blank')"><img src="${img.data}" title="${img.caption||''}" style="max-width:100%;max-height:${_imgHDrv}px;object-fit:contain;display:block;"></div>`).join('')
+        }</div>`;
+      }
+
+    } else if (_isAct && saved.images && saved.images.length && (saved.headerImages||[]).length) {
+      // Activité : strip des photos sélectionnées (📌)
+      const _selIdxs = saved.headerImages;
+      const _selImgs = _selIdxs.map(i => saved.images[i]).filter(Boolean);
+      if (_selImgs.length === 1) {
+        // 1 photo : pleine largeur
+        _headerThumb.innerHTML = `<div style="background:#1a4a3a;display:flex;justify-content:center;align-items:center;height:220px;overflow:hidden;cursor:pointer;" onclick="window.open('${_selImgs[0].data}','_blank')"><img src="${_selImgs[0].data}" title="${_selImgs[0].caption||''}" style="max-width:100%;max-height:220px;object-fit:contain;display:block;"></div>`;
+      } else {
+        // Plusieurs photos : strip horizontal de hauteur fixe
+        const w = Math.round(100 / _selImgs.length);
+        const _imgH = _selImgs.length <= 2 ? 220 : 160;
+        _headerThumb.innerHTML = `<div style="display:flex;height:${_imgH}px;background:#1a4a3a;gap:2px;">${
+          _selImgs.map(img => `<div style="flex:1;min-width:0;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;" onclick="window.open('${img.data}','_blank')"><img src="${img.data}" title="${img.caption||''}" style="max-width:100%;max-height:${_imgH}px;object-fit:contain;display:block;"></div>`).join('')
+        }</div>`;
+      }
+    } else {
+      _headerThumb.innerHTML = '';
+    }
+  }
 
   const body = document.getElementById('modal-body');
 
@@ -2569,13 +2687,24 @@ function _renderModalContent(idx) {
             + Ajouter<input type="file" accept="image/*" multiple style="display:none;" onchange="_addHotelImages(${idx},this)">
           </label>
         </div>
+        ${(saved.images||[]).length > 0 ? '<div style="font-size:10px;color:var(--slate-light);margin-bottom:6px;">📌 Cliquez sur le pin pour afficher la photo dans le bandeau</div>' : ''}
         <div id="hotel-images-${idx}" style="display:flex;flex-wrap:wrap;gap:8px;">
-          ${(saved.images||[]).length ? (saved.images).map((img,ii) => `
-            <div style="position:relative;display:inline-block;">
-              <img src="${img.data}" title="${img.caption||''}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:.5px solid var(--sand-dark);display:block;cursor:pointer;" onclick="window.open('${img.data}','_blank')">
+          ${(saved.images||[]).map((img,ii) => {
+            const headerImgs = new Set(saved.headerImages||[]);
+            const isPinned = headerImgs.has(ii);
+            return `<div style="position:relative;display:inline-block;margin-bottom:6px;">
+              <img src="${img.data}" title="${img.caption||''}"
+                style="width:90px;height:70px;object-fit:cover;border-radius:8px;cursor:pointer;border:${isPinned?'2px solid var(--teal)':'1px solid var(--sand-dark)'};"
+                onclick="window.open('${img.data}','_blank')">
+              ${img.caption ? `<div style="font-size:9px;color:var(--slate-light);text-align:center;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${img.caption}</div>` : ''}
               <button onclick="_removeHotelImage(${idx},${ii})" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
-            </div>`).join('')
-          : '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucune image. Ajoutez des photos du site, du paysage…</div>'}
+              <button onclick="_toggleActivityHeaderImg(${idx},${ii})" title="${isPinned?'Retirer du bandeau':'Afficher dans le bandeau'}"
+                style="position:absolute;bottom:-5px;left:-5px;width:18px;height:18px;border-radius:50%;background:${isPinned?'var(--teal)':'rgba(255,255,255,.9)'};border:1px solid ${isPinned?'var(--teal)':'var(--sand-dark)'};font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;">
+                ${isPinned?'★':'📌'}
+              </button>
+            </div>`;
+          }).join('')}
+          ${!(saved.images||[]).length ? '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucune image. Ajoutez des photos du site, du paysage…</div>' : ''}
         </div>
       </div>
       <!-- 📑 Documents PDF -->
@@ -2806,17 +2935,13 @@ function _renderModalContent(idx) {
         ${_inlineFinancesHTML('car_main', 306, idx)}
       </div>`;
   } else if (isDrive) {
-    const gmOrigin  = saved.gmFrom || step.from;
-    const gmDest    = saved.gmTo   || step.to;
-    const gmWps     = (saved.gmWaypoints || []).filter(w => w.trim());
-    const gmWpParam = gmWps.length ? `&waypoints=${encodeURIComponent(gmWps.join('|'))}` : '';
-    const gmUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(gmOrigin+', USA')}&destination=${encodeURIComponent(gmDest+', USA')}${gmWpParam}&travelmode=driving`;
+    const gmUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(step.from+', USA')}&destination=${encodeURIComponent(step.to+', USA')}&travelmode=driving`;
     body.innerHTML = `
       <div class="map-route-bar">
         <div class="map-route-point dep">
-          <div class="map-route-label">🟢 Départ</div>
-          <input type="text" id="f-gmFrom" value="${gmOrigin}" placeholder="${step.from}" style="font-size:13px;font-weight:500;color:var(--ink);background:transparent;border:none;border-bottom:1px solid var(--sand-dark);padding:2px 0;width:100%;font-family:'DM Sans',sans-serif;outline:none;" onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='var(--sand-dark)'">
-          <input type="time" id="f-hdep" value="${saved.hdep||''}" style="font-size:12px;color:var(--amber);background:transparent;border:none;border-bottom:1px dashed var(--sand-dark);padding:2px 0;margin-top:4px;width:100%;font-family:'DM Sans',sans-serif;outline:none;" onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='var(--sand-dark)'">
+          <div class="map-route-label">Départ</div>
+          <div class="map-route-name">${step.from}</div>
+          <div class="map-route-time" id="map-hdep-display">${saved.hdep ? '🕐 ' + saved.hdep : '–'}</div>
         </div>
         <div class="map-route-middle">
           <span class="map-route-arrow">→</span>
@@ -2824,21 +2949,10 @@ function _renderModalContent(idx) {
           <div class="map-route-meta">${step.km ? '📍 ' + step.km + ' km' : ''}</div>
         </div>
         <div class="map-route-point">
-          <div class="map-route-label">🔴 Arrivée</div>
-          <input type="text" id="f-gmTo" value="${gmDest}" placeholder="${step.to}" style="font-size:13px;font-weight:500;color:var(--ink);background:transparent;border:none;border-bottom:1px solid var(--sand-dark);padding:2px 0;width:100%;font-family:'DM Sans',sans-serif;outline:none;" onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='var(--sand-dark)'">
-          <input type="time" id="f-harr" value="${saved.harr||''}" style="font-size:12px;color:var(--amber);background:transparent;border:none;border-bottom:1px dashed var(--sand-dark);padding:2px 0;margin-top:4px;width:100%;font-family:'DM Sans',sans-serif;outline:none;" onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='var(--sand-dark)'">
+          <div class="map-route-label">Arrivée</div>
+          <div class="map-route-name">${step.to}</div>
+          <div class="map-route-time" id="map-harr-display">${saved.harr ? '🕐 ' + saved.harr : '–'}</div>
         </div>
-      </div>
-      <div id="drive-waypoints-list" style="display:flex;flex-direction:column;gap:4px;margin:-6px 0 8px;">
-        ${(saved.gmWaypoints||[]).map((wp,i) => `
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:10px;color:var(--slate-light);white-space:nowrap;min-width:52px;text-align:right;">📍 Étape ${i+1}</span>
-            <input type="text" class="drive-waypoint-input" value="${wp}" placeholder="Ville, État…" style="flex:1;padding:5px 9px;border-radius:8px;border:.5px solid var(--sand-dark);font-size:12px;font-family:'DM Sans',sans-serif;background:white;">
-            <button onclick="this.parentElement.remove();_renumberDriveWaypoints()" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:13px;padding:3px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
-          </div>`).join('')}
-      </div>
-      <div style="margin-bottom:12px;">
-        <button onclick="_addDriveWaypoint()" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:3px 12px;border-radius:20px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;">+ Étape intermédiaire</button>
       </div>
       <div class="map-container">
         <div id="drive-map"></div>
@@ -2846,11 +2960,11 @@ function _renderModalContent(idx) {
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:0;">
         <a class="map-open-btn" href="${gmUrl}" target="_blank">🗺 Ouvrir l'itinéraire dans Google Maps</a>
         ${(()=>{
-          const cFrom = findCoords(gmOrigin);
-          const cTo   = findCoords(gmDest);
+          const cFrom = findCoords(step.from);
+          const cTo   = findCoords(step.to);
           const appleUrl = cFrom && cTo
             ? `https://maps.apple.com/?saddr=${cFrom[0]},${cFrom[1]}&daddr=${cTo[0]},${cTo[1]}&dirflg=d`
-            : `https://maps.apple.com/?saddr=${encodeURIComponent(gmOrigin+', USA')}&daddr=${encodeURIComponent(gmDest+', USA')}&dirflg=d`;
+            : `https://maps.apple.com/?saddr=${encodeURIComponent(step.from+', USA')}&daddr=${encodeURIComponent(step.to+', USA')}&dirflg=d`;
           return `<a class="map-open-btn" href="${appleUrl}" target="_blank" style="background:#000;color:white;border-color:#000;">🍎 Ouvrir l'itinéraire dans Plans</a>`;
         })()}
         <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--orange-pale);border-left:3px solid var(--amber);border-radius:8px;">
@@ -2862,8 +2976,65 @@ function _renderModalContent(idx) {
         </div>
       </div>
       <div class="modal-section" style="margin-top:1rem;">
+        <div class="modal-section-title">Horaires</div>
+        <div class="field-grid">
+          <div class="field"><label>Heure de départ</label><input type="time" id="f-hdep" value="${saved.hdep||''}" oninput="document.getElementById('map-hdep-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
+          <div class="field"><label>Heure d'arrivée prévue</label><input type="time" id="f-harr" value="${saved.harr||''}" oninput="document.getElementById('map-harr-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Adresses précises</div>
+        <div class="field-grid single">
+          <div class="field"><label>Adresse de départ</label><input type="text" id="f-adrdep" placeholder="Adresse complète…" value="${saved.adrdep||''}"></div>
+          <div class="field"><label>Adresse d'arrivée</label><input type="text" id="f-adrarr" placeholder="Adresse complète…" value="${saved.adrarr||''}"></div>
+        </div>
+      </div>
+      <div class="modal-section">
         <div class="modal-section-title">Remarques</div>
         <div class="field"><textarea id="f-note" placeholder="Notes sur ce trajet…">${saved.note||''}</textarea></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>📸 Photos du trajet</span>
+          <label style="cursor:pointer;font-size:11px;padding:4px 12px;border-radius:10px;border:1px solid var(--amber);background:var(--amber-pale);color:var(--amber);font-weight:500;font-family:'DM Sans',sans-serif;">
+            + Ajouter
+            <input type="file" accept="image/*" multiple style="display:none;" onchange="_addHotelImages(${idx},this)">
+          </label>
+        </div>
+        ${(saved.images||[]).length > 0 ? '<div style="font-size:10px;color:var(--slate-light);margin-bottom:6px;">📌 Cliquez sur le pin pour afficher la photo dans le bandeau</div>' : ''}
+        <div id="hotel-images-${idx}" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+          ${(saved.images||[]).map((img,ii) => {
+            const headerImgs = new Set(saved.headerImages||[]);
+            const isPinned = headerImgs.has(ii);
+            return `<div style="position:relative;display:inline-block;margin-bottom:6px;">
+              <img src="${img.data}" title="${img.caption||''}"
+                style="width:90px;height:70px;object-fit:cover;border-radius:8px;cursor:pointer;border:${isPinned?'2px solid var(--slate)':'1px solid var(--sand-dark)'};"
+                onclick="window.open('${img.data}','_blank')">
+              ${img.caption ? `<div style="font-size:9px;color:var(--slate-light);text-align:center;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${img.caption}</div>` : ''}
+              <button onclick="_removeHotelImage(${idx},${ii})" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+              <button onclick="_toggleActivityHeaderImg(${idx},${ii})" title="${isPinned?'Retirer du bandeau':'Afficher dans le bandeau'}"
+                style="position:absolute;bottom:-5px;left:-5px;width:18px;height:18px;border-radius:50%;background:${isPinned?'var(--slate)':'rgba(255,255,255,.9)'};border:1px solid ${isPinned?'var(--slate)':'var(--sand-dark)'};font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;">
+                ${isPinned?'★':'📌'}
+              </button>
+            </div>`;
+          }).join('')}
+          ${!(saved.images||[]).length ? '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucune photo. Ajoutez des photos du trajet, paysages…</div>' : ''}
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>🔗 Liens utiles</span>
+          <button onclick="_addHotelLink(${idx})" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;">+ Ajouter</button>
+        </div>
+        <div id="hotel-links-${idx}" style="display:flex;flex-direction:column;gap:6px;">
+          ${(saved.links||[]).map((l,li) => `
+            <div style="display:flex;align-items:center;gap:6px;background:white;border:.5px solid var(--sand-dark);border-radius:8px;padding:6px 10px;">
+              <span style="font-size:14px;">${l.icon||'🔗'}</span>
+              <a href="${l.url}" target="_blank" style="flex:1;font-size:12px;color:var(--teal);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.label||l.url}</a>
+              <button onclick="_removeHotelLink(${idx},${li})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:12px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
+            </div>`).join('')}
+          ${!(saved.links||[]).length ? '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucun lien ajouté.</div>' : ''}
+        </div>
       </div>
       <div class="modal-section">
         <div class="modal-section-title">Finances</div>
@@ -3163,12 +3334,20 @@ function _renderModalContent(idx) {
           </label>
         </div>
         <div id="hotel-images-${idx}" style="display:flex;flex-wrap:wrap;gap:8px;">
-          ${(saved.images||[]).map((img,ii) => `
-            <div style="position:relative;display:inline-block;">
-              <img src="${img.data}" title="${img.caption||''}" style="width:90px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--sand-dark);cursor:pointer;" onclick="window.open('${img.data}','_blank')">
+          ${(saved.images||[]).map((img,ii) => {
+            const isPrimary = (saved.primaryImageIdx||0) === ii;
+            return `<div style="position:relative;display:inline-block;margin-bottom:6px;">
+              <img src="${img.data}" title="${img.caption||''}"
+                style="width:90px;height:70px;object-fit:cover;border-radius:8px;cursor:pointer;border:${isPrimary?'2px solid var(--amber)':'1px solid var(--sand-dark)'};"
+                onclick="window.open('${img.data}','_blank')">
               ${img.caption ? `<div style="font-size:9px;color:var(--slate-light);text-align:center;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${img.caption}</div>` : ''}
               <button onclick="_removeHotelImage(${idx},${ii})" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
-            </div>`).join('')}
+              <button onclick="_setPrimaryHotelImage(${idx},${ii})" title="${isPrimary?'Photo principale (cliquer pour changer)':'Définir comme photo principale'}"
+                style="position:absolute;bottom:-5px;left:-5px;width:18px;height:18px;border-radius:50%;background:${isPrimary?'var(--amber)':'rgba(255,255,255,.9)'};border:1px solid ${isPrimary?'var(--amber)':'var(--sand-dark)'};font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;">
+                ${isPrimary?'★':'📌'}
+              </button>
+            </div>`;
+          }).join('')}
           ${!(saved.images||[]).length ? '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucune image. Ajoutez des photos de l\'hôtel, de la chambre…</div>' : ''}
         </div>
       </div>
@@ -3377,35 +3556,8 @@ function _renderModalContent(idx) {
 
   // Si carte trajet : initialiser la map
   if (steps[idx]?.type === 'drive') {
-    const _sv = loadFiche(idx);
-    setTimeout(() => initDriveMap(_sv.gmFrom || steps[idx].from, _sv.gmTo || steps[idx].to), 50);
+    setTimeout(() => initDriveMap(steps[idx].from, steps[idx].to), 50);
   }
-}
-
-// ── TRAJET — waypoints Google Maps ──
-function _addDriveWaypoint() {
-  const list = document.getElementById('drive-waypoints-list');
-  if (!list) return;
-  const i = list.children.length;
-  const div = document.createElement('div');
-  div.style.cssText = 'display:flex;gap:6px;align-items:flex-end;';
-  div.innerHTML = `
-    <div class="field" style="flex:1;margin:0;">
-      <label style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate-light);font-weight:500;">📍 Étape ${i+1}</label>
-      <input type="text" class="drive-waypoint-input" placeholder="Ville, État…" style="width:100%;padding:7px 9px;border-radius:8px;border:.5px solid var(--sand-dark);font-size:13px;font-family:'DM Sans',sans-serif;">
-    </div>
-    <button onclick="this.parentElement.remove();_renumberDriveWaypoints()" style="margin-bottom:1px;background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:14px;padding:6px 4px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>`;
-  list.appendChild(div);
-  div.querySelector('input').focus();
-}
-
-function _renumberDriveWaypoints() {
-  const list = document.getElementById('drive-waypoints-list');
-  if (!list) return;
-  Array.from(list.children).forEach((div, i) => {
-    const lbl = div.querySelector('label');
-    if (lbl) lbl.textContent = `📍 Étape ${i+1}`;
-  });
 }
 
 // ── FICHE HÔTEL — LIENS, IMAGES, POI ──
@@ -3584,6 +3736,28 @@ function _renderDocsSection(idx, saved) {
   </div>`;
 }
 
+
+
+async function _toggleActivityHeaderImg(idx, ii) {
+  const d = loadFiche(idx);
+  const set = new Set(d.headerImages || []);
+  if (set.has(ii)) set.delete(ii); else set.add(ii);
+  d.headerImages = [...set].sort((a,b) => a-b);
+  _cache[idx] = d;
+  try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(e) {}
+  await saveFiche(idx, d);
+  _renderModalContent(idx);
+}
+
+async function _setPrimaryHotelImage(idx, ii) {
+  const d = loadFiche(idx);
+  d.primaryImageIdx = ii;
+  _cache[idx] = d;
+  try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(e) {}
+  await saveFiche(idx, d);
+  _renderModalContent(idx);
+}
+
 async function _removeHotelImage(idx, ii) {
   if (!confirm('Supprimer cette image ?')) return;
   const d = loadFiche(idx);
@@ -3695,7 +3869,7 @@ function _actRender() {
         </div>
         ${(s.images||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;">${(s.images).map((img,ii) => `
           <div style="position:relative;display:inline-block;">
-            <img src="${img.data}" title="${img.caption||''}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:.5px solid var(--sand-dark);display:block;cursor:pointer;" onclick="window.open('${img.data}','_blank')">
+            <img src="${img.data}" title="${img.caption||''}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:.5px solid var(--sand-dark);display:block;">
             <button onclick="_actRemoveImage(${s.id},${ii})" style="position:absolute;top:-4px;right:-4px;width:15px;height:15px;border-radius:50%;background:var(--red);border:none;color:white;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
           </div>`).join('')}</div>`
         : '<div style="font-size:11px;color:var(--slate-light);">Aucune image. Ajoutez des photos du site, du paysage…</div>'}
@@ -3754,9 +3928,8 @@ function _actRender() {
           <div style="flex:1;cursor:pointer;min-width:0;" onclick="_actToggle(${s.id})">
             <div class="act-step-name">${s.nom}</div>
             <div class="act-step-meta">
-              ${s.km ? `<span class="act-step-badge">📍 ~${s.km} km</span>` : ''}
-              <span class="act-step-badge">⏱ ${s.duree || '–'}</span>
-              ${s.heure ? `<span class="act-step-badge">🕐 ${s.heure}</span>` : ''}
+              <span class="act-step-badge">🕐 ${s.heure || '–'}</span>
+              <span class="act-step-badge">⏳ ${s.duree || '–'}</span>
               ${alertSpan}${mapsSpan}${resaSpan}
             </div>
           </div>
@@ -3797,9 +3970,8 @@ function _actBuildForm(s, isNew) {
     </div>
     <div><label class="act-flbl">Nom de l'étape</label>
       <input type="text" id="${p}-nom" class="act-finp" style="font-size:13px;padding:6px 9px;" value="${v.nom||''}" placeholder="Ex. Mammoth Hot Springs…"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
       <div><label class="act-flbl">Durée</label><input type="text" id="${p}-duree" class="act-finp" value="${v.duree||''}" placeholder="1h30"></div>
-      <div><label class="act-flbl">Distance (km)</label><input type="number" id="${p}-km" class="act-finp" value="${v.km||''}" placeholder="45" min="0"></div>
       <div><label class="act-flbl">Lien Maps (optionnel)</label><input type="url" id="${p}-maps" class="act-finp" value="${v.maps||''}" placeholder="https://maps.google.com/…"></div>
     </div>
     <div><label class="act-flbl">Description courte</label>
@@ -3849,7 +4021,6 @@ function _actReadForm(p) {
     nom,
     heure: document.getElementById(p+'-heure')?.value || '',
     duree: document.getElementById(p+'-duree')?.value || '',
-    km:    parseInt(document.getElementById(p+'-km')?.value || '0', 10) || null,
     desc:  document.getElementById(p+'-desc')?.value  || '',
     maps:  document.getElementById(p+'-maps')?.value  || '',
     alerte: atype && atexte ? { type:atype, texte:atexte } : null,
@@ -4660,20 +4831,11 @@ async function saveModal() {
 
   // Mettre à jour uniquement les champs du formulaire
   const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps','parking-montant','parking-note','hdep-max','horaires-commentaire',
-                  'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName','gmFrom','gmTo'];
+                  'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName'];
   fields.forEach(f => {
     const el = document.getElementById('f-' + f);
     if (el) data[f] = el.value;
   });
-
-  // Waypoints Google Maps (trajets)
-  if (steps[currentModalIdx]?.type === 'drive') {
-    const wps = [];
-    document.querySelectorAll('.drive-waypoint-input').forEach(el => {
-      if (el.value.trim()) wps.push(el.value.trim());
-    });
-    data.gmWaypoints = wps;
-  }
 
   // Nom d'hôtel personnalisé → mettre à jour .card-hotel sur la carte
   const hotelNameEl = document.getElementById('f-hotelname');
@@ -6362,12 +6524,36 @@ function _logsRefresh() {
       <div style="font-size:11px;font-weight:600;color:var(--slate-light);margin-bottom:.5rem;">CONFIGURATION</div>
       <div style="font-size:12px;color:var(--ink);line-height:1.8;">
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
-        Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
+        Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols · ${steps.filter(s=>s.type==='activity').length} activités<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.16.4 · 06/06/26
+        Version : v2.16.0 · 06/06/26
       </div>
-    </div>`;
+    </div>
+${_renderActionLog()}`;
 }
+
+
+function _renderActionLog() {
+  const log = _getActionLog();
+  if (!log.length) return '<div style="margin-top:.75rem;padding:.75rem 1rem;background:white;border-radius:10px;border:.5px solid var(--sand-dark);"><div style="font-size:12px;font-weight:600;color:var(--slate-light);">\u{1F4CB} JOURNAL D\'ACTIONS <span style=\"font-weight:400;\">(aucune)</span></div></div>';
+  const rows = log.map(e => {
+    const dt = new Date(e.ts).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const userBadge = e.user && e.user !== 'Inconnu' && e.user !== '–'
+      ? '<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:var(--teal-pale);color:var(--teal);margin-right:4px;">' + e.user.split('@')[0] + '</span>'
+      : '';
+    return '<div style="font-size:11px;padding:4px 8px;border-radius:6px;background:#f9f9f9;margin-bottom:3px;display:flex;gap:8px;align-items:flex-start;">'
+      + '<span style="color:var(--slate-light);font-size:10px;white-space:nowrap;flex-shrink:0;">' + dt + '</span>'
+      + '<span>' + userBadge + e.icon + ' <strong>' + e.action + '</strong> — ' + e.detail + '</span>'
+      + '</div>';
+  }).join('');
+  return '<div style="margin-top:.75rem;background:white;border-radius:10px;padding:.75rem 1rem;border:.5px solid var(--sand-dark);">'
+    + '<div style="font-size:12px;font-weight:600;color:var(--slate-light);margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;">'
+    + '\u{1F4CB} JOURNAL D\'ACTIONS (' + log.length + ')'
+    + '<button onclick="_clearActionLog()" style="font-size:10px;padding:2px 8px;border-radius:8px;border:1px solid var(--red);background:white;color:var(--red);cursor:pointer;">Effacer</button>'
+    + '</div>' + rows + '</div>';
+}
+
+function _clearActionLog() { try { localStorage.removeItem(ACTION_LOG_KEY); } catch(e) {} _logsRefresh(); }
 
 // ── CHAT ──
 const CHAT_KEY = 'roadtrip_chat';
@@ -7934,6 +8120,8 @@ async function saveNewActivity() {
   }
   steps.splice(insertAt, 0, newStep);
   await saveExtraSteps();
+  _addActionLog('➕', isVisite ? 'Création activité' : 'Création fiche',
+    `"${city}" · type=${newStep.type} · date=${date || '–'}`);
 
   // Créer la fiche avec la note
   const ficheData = { note, prix: String(prix||''), payments: [] };
@@ -9502,13 +9690,18 @@ async function confirmFicheAction() {
     delete _cache[idx];
     try { localStorage.removeItem(storageKey(idx)); } catch(e) {}
 
-    // 3a. Fiche dupliquée → retirer du tableau steps
-    if (step._isDup) {
+    // 3a. Activité ou fiche dupliquée → retirer définitivement du tableau steps
+    if (step._isDup || step.type === 'activity') {
+      if (step.id) await _markStepDeleted(step.id);
       steps.splice(idx, 1);
-      await saveExtraSteps();
+      if (step._isDup) await saveExtraSteps();
+      _addActionLog('🗑', 'Suppression activité',
+        `"${step.title || step.city || step.id}" · ${step.dates || ''} · idx=${idx}`);
     } else {
-      // 3b. Step fixe → vider les données mais garder le step dans la timeline
+      // 3b. Step fixe (hôtel, trajet…) → vider les données
       await saveFiche(idx, {});
+      _addActionLog('🗑', 'Suppression données fiche',
+        `"${step.hotel || step.city || step.from || step.id}" · type=${step.type} · Motif : ${reason}`);
     }
 
     closeFicheActionModal();
@@ -9520,7 +9713,7 @@ async function confirmFicheAction() {
     // Notification
     const notif = document.createElement('div');
     notif.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--red);color:white;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:opacity .5s;white-space:nowrap;';
-    notif.textContent = step._isDup ? `🗑 Fiche "${step.city}" supprimée` : `🗑 Données effacées · Motif : ${reason}`;
+    notif.textContent = (step._isDup || step.type === 'activity') ? `🗑 Activité "${step.title || step.city}" supprimée` : `🗑 Données effacées · Motif : ${reason}`;
     document.body.appendChild(notif);
     setTimeout(() => { notif.style.opacity = '0'; setTimeout(() => notif.remove(), 500); }, 3500);
   }
@@ -9717,6 +9910,8 @@ async function confirmDuplicate() {
 
   // Persister les steps dynamiques
   await saveExtraSteps();
+  _addActionLog('📋', 'Duplication fiche',
+    `"${srcStep.city || srcStep.from || ''}" → "${title}" · type=${srcStep.type} · idx=${srcIdx}`);
 
   // Données de la nouvelle fiche (copie sans paiements ni validation)
   const srcData = loadFiche(srcIdx);
@@ -12171,23 +12366,8 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.16.3</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fiches trajet : section Itinéraire Google Maps · départ et arrivée éditables indépendamment du titre · étapes intermédiaires (waypoints) avec ajout/suppression dynamique</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.16.2</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fix geocoding Google Maps trajet Jackson → Yellowstone (Jackson, Mississippi → Jackson, Wyoming)</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.16.1</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Clic sur image → ouverture dans un nouvel onglet (fiches hôtel et étapes activité)</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.16.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Itinéraires Yellowstone J1/J2/J3 complets (descriptions verbatim) · badge 📍 km sur les étapes trajet · refonte act-step-badge en outlined pills · correction bug double carte J2/J3 (doublons act-20260730/31 supprimés) · préfixe Étape N- sur J3</div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.16.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Bandeau photo dans les fiches Hôtel, Activité et Trajet · multi-sélection 📌 · strip adaptatif 1/2/3+ photos · liens utiles dans les fiches Trajet · accès images hôtel corrigé · journal d'actions dans les Logs</div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
