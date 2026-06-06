@@ -828,7 +828,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.16.0 · 06/06/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.16.3 · 06/06/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -1905,7 +1905,7 @@ let steps = [
     alerts:[{ kind:'urgent', label:'Annulation imminente', detail:'Date limite : 25 juillet' }] },
 
   // ── J2-4 : YELLOWSTONE / GRAND TETON ──
-  { id:'d-jac-yst', type:'drive', from:'Jackson', to:'Yellowstone / Grand Teton', km:100, duration:'1h30' },
+  { id:'d-jac-yst', type:'drive', from:'Jackson, Wyoming', to:'Yellowstone / Grand Teton', km:100, duration:'1h30' },
   { id:'h-20260729', type:'hotel', dates:'29 juil. – 1er août', dateDebut:'2026-07-29', dateFin:'2026-08-01', nights:3, city:'Yellowstone / Grand Teton, Wyoming', hotel:'Best Western Weston Inn ★', price:723, ptdej:true, annul:'avant le 20 juillet',
     visits:'Old Faithful, Grand Prismatic Spring, Grand Canyon de Yellowstone, Lamar Valley (bisons, ours, loups), Mammoth Hot Springs, Hayden Valley',
     alerts:[{ kind:'urgent', label:'Date limite possiblement dépassée', detail:'Annulation avant le 20 juillet — à vérifier d\'urgence' }] },
@@ -2572,7 +2572,7 @@ function _renderModalContent(idx) {
         <div id="hotel-images-${idx}" style="display:flex;flex-wrap:wrap;gap:8px;">
           ${(saved.images||[]).length ? (saved.images).map((img,ii) => `
             <div style="position:relative;display:inline-block;">
-              <img src="${img.data}" title="${img.caption||''}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:.5px solid var(--sand-dark);display:block;">
+              <img src="${img.data}" title="${img.caption||''}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:.5px solid var(--sand-dark);display:block;cursor:pointer;" onclick="window.open('${img.data}','_blank')">
               <button onclick="_removeHotelImage(${idx},${ii})" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
             </div>`).join('')
           : '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucune image. Ajoutez des photos du site, du paysage…</div>'}
@@ -2806,7 +2806,11 @@ function _renderModalContent(idx) {
         ${_inlineFinancesHTML('car_main', 306, idx)}
       </div>`;
   } else if (isDrive) {
-    const gmUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(step.from+', USA')}&destination=${encodeURIComponent(step.to+', USA')}&travelmode=driving`;
+    const gmOrigin  = saved.gmFrom || step.from;
+    const gmDest    = saved.gmTo   || step.to;
+    const gmWps     = (saved.gmWaypoints || []).filter(w => w.trim());
+    const gmWpParam = gmWps.length ? `&waypoints=${encodeURIComponent(gmWps.join('|'))}` : '';
+    const gmUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(gmOrigin+', USA')}&destination=${encodeURIComponent(gmDest+', USA')}${gmWpParam}&travelmode=driving`;
     body.innerHTML = `
       <div class="map-route-bar">
         <div class="map-route-point dep">
@@ -2831,11 +2835,11 @@ function _renderModalContent(idx) {
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:0;">
         <a class="map-open-btn" href="${gmUrl}" target="_blank">🗺 Ouvrir l'itinéraire dans Google Maps</a>
         ${(()=>{
-          const cFrom = findCoords(step.from);
-          const cTo   = findCoords(step.to);
+          const cFrom = findCoords(gmOrigin);
+          const cTo   = findCoords(gmDest);
           const appleUrl = cFrom && cTo
             ? `https://maps.apple.com/?saddr=${cFrom[0]},${cFrom[1]}&daddr=${cTo[0]},${cTo[1]}&dirflg=d`
-            : `https://maps.apple.com/?saddr=${encodeURIComponent(step.from+', USA')}&daddr=${encodeURIComponent(step.to+', USA')}&dirflg=d`;
+            : `https://maps.apple.com/?saddr=${encodeURIComponent(gmOrigin+', USA')}&daddr=${encodeURIComponent(gmDest+', USA')}&dirflg=d`;
           return `<a class="map-open-btn" href="${appleUrl}" target="_blank" style="background:#000;color:white;border-color:#000;">🍎 Ouvrir l'itinéraire dans Plans</a>`;
         })()}
         <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--orange-pale);border-left:3px solid var(--amber);border-radius:8px;">
@@ -2854,10 +2858,21 @@ function _renderModalContent(idx) {
         </div>
       </div>
       <div class="modal-section">
-        <div class="modal-section-title">Adresses précises</div>
+        <div class="modal-section-title">Itinéraire Google Maps</div>
+        <div style="font-size:11px;color:var(--slate-light);margin-bottom:10px;line-height:1.4;">Précisez les villes et étapes intermédiaires pour le lien Google Maps. Sans effet sur le titre de la fiche.</div>
         <div class="field-grid single">
-          <div class="field"><label>Adresse de départ</label><input type="text" id="f-adrdep" placeholder="Adresse complète…" value="${saved.adrdep||''}"></div>
-          <div class="field"><label>Adresse d'arrivée</label><input type="text" id="f-adrarr" placeholder="Adresse complète…" value="${saved.adrarr||''}"></div>
+          <div class="field"><label>🟢 Départ</label><input type="text" id="f-gmFrom" placeholder="${step.from}" value="${saved.gmFrom||''}"></div>
+        </div>
+        <div id="drive-waypoints-list" style="display:flex;flex-direction:column;gap:6px;margin:6px 0;">
+          ${(saved.gmWaypoints||[]).map((wp,i) => `
+            <div style="display:flex;gap:6px;align-items:flex-end;">
+              <div class="field" style="flex:1;margin:0;"><label style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate-light);font-weight:500;">📍 Étape ${i+1}</label><input type="text" class="drive-waypoint-input" placeholder="Ville, État…" value="${wp}" style="width:100%;padding:7px 9px;border-radius:8px;border:.5px solid var(--sand-dark);font-size:13px;font-family:'DM Sans',sans-serif;"></div>
+              <button onclick="this.parentElement.remove();_renumberDriveWaypoints()" style="margin-bottom:1px;background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:14px;padding:6px 4px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
+            </div>`).join('')}
+        </div>
+        <button onclick="_addDriveWaypoint()" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 12px;border-radius:20px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;margin-bottom:6px;">+ Ajouter une étape</button>
+        <div class="field-grid single">
+          <div class="field"><label>🔴 Arrivée</label><input type="text" id="f-gmTo" placeholder="${step.to}" value="${saved.gmTo||''}"></div>
         </div>
       </div>
       <div class="modal-section">
@@ -3376,8 +3391,35 @@ function _renderModalContent(idx) {
 
   // Si carte trajet : initialiser la map
   if (steps[idx]?.type === 'drive') {
-    setTimeout(() => initDriveMap(steps[idx].from, steps[idx].to), 50);
+    const _sv = loadFiche(idx);
+    setTimeout(() => initDriveMap(_sv.gmFrom || steps[idx].from, _sv.gmTo || steps[idx].to), 50);
   }
+}
+
+// ── TRAJET — waypoints Google Maps ──
+function _addDriveWaypoint() {
+  const list = document.getElementById('drive-waypoints-list');
+  if (!list) return;
+  const i = list.children.length;
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:6px;align-items:flex-end;';
+  div.innerHTML = `
+    <div class="field" style="flex:1;margin:0;">
+      <label style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate-light);font-weight:500;">📍 Étape ${i+1}</label>
+      <input type="text" class="drive-waypoint-input" placeholder="Ville, État…" style="width:100%;padding:7px 9px;border-radius:8px;border:.5px solid var(--sand-dark);font-size:13px;font-family:'DM Sans',sans-serif;">
+    </div>
+    <button onclick="this.parentElement.remove();_renumberDriveWaypoints()" style="margin-bottom:1px;background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:14px;padding:6px 4px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>`;
+  list.appendChild(div);
+  div.querySelector('input').focus();
+}
+
+function _renumberDriveWaypoints() {
+  const list = document.getElementById('drive-waypoints-list');
+  if (!list) return;
+  Array.from(list.children).forEach((div, i) => {
+    const lbl = div.querySelector('label');
+    if (lbl) lbl.textContent = `📍 Étape ${i+1}`;
+  });
 }
 
 // ── FICHE HÔTEL — LIENS, IMAGES, POI ──
@@ -3667,7 +3709,7 @@ function _actRender() {
         </div>
         ${(s.images||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;">${(s.images).map((img,ii) => `
           <div style="position:relative;display:inline-block;">
-            <img src="${img.data}" title="${img.caption||''}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:.5px solid var(--sand-dark);display:block;">
+            <img src="${img.data}" title="${img.caption||''}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:.5px solid var(--sand-dark);display:block;cursor:pointer;" onclick="window.open('${img.data}','_blank')">
             <button onclick="_actRemoveImage(${s.id},${ii})" style="position:absolute;top:-4px;right:-4px;width:15px;height:15px;border-radius:50%;background:var(--red);border:none;color:white;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
           </div>`).join('')}</div>`
         : '<div style="font-size:11px;color:var(--slate-light);">Aucune image. Ajoutez des photos du site, du paysage…</div>'}
@@ -4632,11 +4674,20 @@ async function saveModal() {
 
   // Mettre à jour uniquement les champs du formulaire
   const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps','parking-montant','parking-note','hdep-max','horaires-commentaire',
-                  'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName'];
+                  'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName','gmFrom','gmTo'];
   fields.forEach(f => {
     const el = document.getElementById('f-' + f);
     if (el) data[f] = el.value;
   });
+
+  // Waypoints Google Maps (trajets)
+  if (steps[currentModalIdx]?.type === 'drive') {
+    const wps = [];
+    document.querySelectorAll('.drive-waypoint-input').forEach(el => {
+      if (el.value.trim()) wps.push(el.value.trim());
+    });
+    data.gmWaypoints = wps;
+  }
 
   // Nom d'hôtel personnalisé → mettre à jour .card-hotel sur la carte
   const hotelNameEl = document.getElementById('f-hotelname');
@@ -6327,7 +6378,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.16.0 · 06/06/26
+        Version : v2.16.3 · 06/06/26
       </div>
     </div>`;
 }
@@ -12134,7 +12185,22 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.16.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.16.3</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fiches trajet : section Itinéraire Google Maps · départ et arrivée éditables indépendamment du titre · étapes intermédiaires (waypoints) avec ajout/suppression dynamique</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.16.2</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Fix geocoding Google Maps trajet Jackson → Yellowstone (Jackson, Mississippi → Jackson, Wyoming)</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.16.1</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Clic sur image → ouverture dans un nouvel onglet (fiches hôtel et étapes activité)</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.16.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
         <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Itinéraires Yellowstone J1/J2/J3 complets (descriptions verbatim) · badge 📍 km sur les étapes trajet · refonte act-step-badge en outlined pills · correction bug double carte J2/J3 (doublons act-20260730/31 supprimés) · préfixe Étape N- sur J3</div>
       </div>
 
