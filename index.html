@@ -1862,7 +1862,6 @@
       </div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    <div id="modal-header-thumb"></div>
     <div class="modal-body" id="modal-body"></div>
     <div class="modal-actions" style="flex-direction:column;gap:0;padding:0;">
       <!-- Ligne navigation -->
@@ -2481,6 +2480,7 @@ async function openModal(idx) {
   // Afficher la modale immédiatement avec indicateur de chargement
   const body = document.getElementById('modal-body');
   body.scrollTop = 0; // Reset scroll en haut à chaque fiche
+
   const step = steps[idx];
   const savedPre = loadFiche(idx);
   document.getElementById('modal-title').value = savedPre._customTitle || step.city || step.from || '…';
@@ -2528,6 +2528,45 @@ function _renderModalContent(idx) {
   const isCarReturn = step.type === 'car-return';
   const isFlight    = step.type === 'flight';
 
+  // Bandeau photo : injecté en tête du body (scrolle avec le contenu)
+  function _buildPhotoBanner(sv, st) {
+    const _isH = !isFlight && !isCarPickup && !isCarReturn && !isDrive && !isActivityStep(st);
+    const _isA = isActivityStep(st);
+    const _isD = isDrive;
+    if (_isH && sv.images && sv.images.length) {
+      const pi = sv.primaryImageIdx || 0;
+      const im = sv.images[pi] || sv.images[0];
+      return '<div style="background:#3a2a0a;display:flex;justify-content:center;align-items:center;max-height:130px;overflow:hidden;cursor:pointer;margin:-1.5rem -1.5rem 1rem -1.5rem;" onclick="window.open(\'' + im.data + '\',\'_blank\')">'
+        + '<img src="' + im.data + '" title="' + (im.caption||'') + '" style="width:100%;max-height:130px;object-fit:contain;display:block;"></div>';
+    }
+    if (_isD && sv.images && sv.images.length && (sv.headerImages||[]).length) {
+      const sels = (sv.headerImages||[]).map(i => sv.images[i]).filter(Boolean);
+      if (!sels.length) return '';
+      const h = sels.length <= 2 ? 140 : 110;
+      const bg = '#1a2a3a';
+      if (sels.length === 1)
+        return '<div style="background:' + bg + ';display:flex;justify-content:center;align-items:center;height:' + h + 'px;overflow:hidden;cursor:pointer;margin:-1.5rem -1.5rem 1rem -1.5rem;" onclick="window.open(\'' + sels[0].data + '\',\'_blank\')">'
+          + '<img src="' + sels[0].data + '" title="' + (sels[0].caption||'') + '" style="max-width:100%;max-height:' + h + 'px;object-fit:contain;display:block;"></div>';
+      return '<div style="display:flex;height:' + h + 'px;background:' + bg + ';gap:2px;margin:-1.5rem -1.5rem 1rem -1.5rem;">'
+        + sels.map(img => '<div style="flex:1;min-width:0;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;" onclick="window.open(\'' + img.data + '\',\'_blank\')">'
+          + '<img src="' + img.data + '" title="' + (img.caption||'') + '" style="max-width:100%;max-height:' + h + 'px;object-fit:contain;display:block;"></div>').join('') + '</div>';
+    }
+    if (_isA && sv.images && sv.images.length && (sv.headerImages||[]).length) {
+      const sels = (sv.headerImages||[]).map(i => sv.images[i]).filter(Boolean);
+      if (!sels.length) return '';
+      const h = sels.length <= 2 ? 140 : 110;
+      const bg = '#1a4a3a';
+      if (sels.length === 1)
+        return '<div style="background:' + bg + ';display:flex;justify-content:center;align-items:center;height:' + h + 'px;overflow:hidden;cursor:pointer;margin:-1.5rem -1.5rem 1rem -1.5rem;" onclick="window.open(\'' + sels[0].data + '\',\'_blank\')">'
+          + '<img src="' + sels[0].data + '" title="' + (sels[0].caption||'') + '" style="max-width:100%;max-height:' + h + 'px;object-fit:contain;display:block;"></div>';
+      return '<div style="display:flex;height:' + h + 'px;background:' + bg + ';gap:2px;margin:-1.5rem -1.5rem 1rem -1.5rem;">'
+        + sels.map(img => '<div style="flex:1;min-width:0;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;" onclick="window.open(\'' + img.data + '\',\'_blank\')">'
+          + '<img src="' + img.data + '" title="' + (img.caption||'') + '" style="max-width:100%;max-height:' + h + 'px;object-fit:contain;display:block;"></div>').join('') + '</div>';
+    }
+    return '';
+  }
+  const _photoBanner = _buildPhotoBanner(saved, step);
+
   document.getElementById('modal-title').value =
     isFlight    ? `✈️ Vol ${step.direction === 'aller' ? 'aller — 28 juillet 2026' : 'retour — 20 août 2026'}`
     : isCarPickup ? '🚗 Prise en charge du véhicule'
@@ -2547,51 +2586,7 @@ function _renderModalContent(idx) {
         ? `${step.city} · ${step.dates}`
         : `${step.hotel} · ${step.dates}`;
 
-  // Bandeau photo dans le header (hôtels + activités)
-  const _headerThumb = document.getElementById('modal-header-thumb');
-  if (_headerThumb) {
-    const _isHotel = !isFlight && !isCarPickup && !isCarReturn && !isDrive && !isActivityStep(step);
-    const _isAct   = isActivityStep(step);
-    const _isDrv   = isDrive;
 
-    if (_isHotel && saved.images && saved.images.length) {
-      // Hôtel : une photo principale (📌 single)
-      const _primIdx = saved.primaryImageIdx || 0;
-      const _img = saved.images[_primIdx] || saved.images[0];
-      _headerThumb.innerHTML = `<div style="background:#3a2a0a;display:flex;justify-content:center;align-items:center;max-height:130px;overflow:hidden;cursor:pointer;" onclick="window.open('${_img.data}','_blank')"><img src="${_img.data}" title="${_img.caption||''}" style="width:100%;max-height:130px;object-fit:contain;display:block;"></div>`;
-
-    } else if (_isDrv && saved.images && saved.images.length && (saved.headerImages||[]).length) {
-      // Trajet : strip des photos sélectionnées (📌 multi)
-      const _selIdxsDrv = saved.headerImages;
-      const _selImgsDrv = _selIdxsDrv.map(i => saved.images[i]).filter(Boolean);
-      if (_selImgsDrv.length === 1) {
-        _headerThumb.innerHTML = `<div style="background:#1a2a3a;display:flex;justify-content:center;align-items:center;height:140px;overflow:hidden;cursor:pointer;" onclick="window.open('${_selImgsDrv[0].data}','_blank')"><img src="${_selImgsDrv[0].data}" title="${_selImgsDrv[0].caption||''}" style="max-width:100%;max-height:140px;object-fit:contain;display:block;"></div>`;
-      } else {
-        const _imgHDrv = _selImgsDrv.length <= 2 ? 140 : 110;
-        _headerThumb.innerHTML = `<div style="display:flex;height:${_imgHDrv}px;background:#1a2a3a;gap:2px;">${
-          _selImgsDrv.map(img => `<div style="flex:1;min-width:0;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;" onclick="window.open('${img.data}','_blank')"><img src="${img.data}" title="${img.caption||''}" style="max-width:100%;max-height:${_imgHDrv}px;object-fit:contain;display:block;"></div>`).join('')
-        }</div>`;
-      }
-
-    } else if (_isAct && saved.images && saved.images.length && (saved.headerImages||[]).length) {
-      // Activité : strip des photos sélectionnées (📌)
-      const _selIdxs = saved.headerImages;
-      const _selImgs = _selIdxs.map(i => saved.images[i]).filter(Boolean);
-      if (_selImgs.length === 1) {
-        // 1 photo : pleine largeur
-        _headerThumb.innerHTML = `<div style="background:#1a4a3a;display:flex;justify-content:center;align-items:center;height:140px;overflow:hidden;cursor:pointer;" onclick="window.open('${_selImgs[0].data}','_blank')"><img src="${_selImgs[0].data}" title="${_selImgs[0].caption||''}" style="max-width:100%;max-height:140px;object-fit:contain;display:block;"></div>`;
-      } else {
-        // Plusieurs photos : strip horizontal de hauteur fixe
-        const w = Math.round(100 / _selImgs.length);
-        const _imgH = _selImgs.length <= 2 ? 140 : 110;
-        _headerThumb.innerHTML = `<div style="display:flex;height:${_imgH}px;background:#1a4a3a;gap:2px;">${
-          _selImgs.map(img => `<div style="flex:1;min-width:0;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer;" onclick="window.open('${img.data}','_blank')"><img src="${img.data}" title="${img.caption||''}" style="max-width:100%;max-height:${_imgH}px;object-fit:contain;display:block;"></div>`).join('')
-        }</div>`;
-      }
-    } else {
-      _headerThumb.innerHTML = '';
-    }
-  }
 
   const body = document.getElementById('modal-body');
 
@@ -2614,7 +2609,8 @@ function _renderModalContent(idx) {
       ? '<button onclick="_actResetToDefault(' + idx + ')" style="font-family:\'DM Sans\',sans-serif;font-size:10px;padding:3px 9px;border-radius:10px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;" title="Remplacer les étapes par le programme par défaut">\u21ba R\u00e9initialiser</button>'
       : '';
     const _clearBtn = '<button onclick="_actClearAll(' + idx + ')" style="font-family:\'DM Sans\',sans-serif;font-size:10px;padding:3px 9px;border-radius:10px;border:1px solid var(--red-border);background:var(--red-pale);color:var(--red);cursor:pointer;margin-left:4px;" title="Supprimer toutes les \u00e9tapes">\u2715 Vider</button>';
-    body.innerHTML = `
+    body.innerHTML = `${_photoBanner}
+
       <div class="modal-section">
         <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
           <span>Programme</span>
@@ -2937,7 +2933,8 @@ function _renderModalContent(idx) {
       </div>`;
   } else if (isDrive) {
     const gmUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(step.from+', USA')}&destination=${encodeURIComponent(step.to+', USA')}&travelmode=driving`;
-    body.innerHTML = `
+    body.innerHTML = `${_photoBanner}
+
       <div class="map-route-bar">
         <div class="map-route-point dep">
           <div class="map-route-label">Départ</div>
@@ -3073,7 +3070,7 @@ function _renderModalContent(idx) {
       </div>`;
 
   } else {
-    body.innerHTML = `
+    body.innerHTML = `${_photoBanner}
       <div class="modal-section">
         <div class="modal-section-title">Dates &amp; horaires</div>
         <div class="field-grid">
