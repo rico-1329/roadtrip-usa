@@ -1882,6 +1882,12 @@
   </div>
 </div>
 
+<!-- Lightbox images -->
+<div id="img-lightbox" onclick="_closeLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out;">
+  <img id="img-lightbox-img" src="" style="max-width:95vw;max-height:90vh;object-fit:contain;border-radius:8px;box-shadow:0 0 40px rgba(0,0,0,.5);">
+  <button onclick="_closeLightbox()" style="position:fixed;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:white;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+</div>
+
 <script>
 const ICONS = { urgent:'🔴', missing:'🟡', info:'🔵' };
 
@@ -2691,7 +2697,7 @@ function _renderModalContent(idx) {
             return `<div style="position:relative;display:inline-block;margin-bottom:6px;">
               <img src="${img.data}" title="${img.caption||''}"
                 style="width:90px;height:70px;object-fit:cover;border-radius:8px;cursor:pointer;border:${isPinned?'2px solid var(--teal)':'1px solid var(--sand-dark)'};"
-                onclick="window.open('${img.data}','_blank')">
+                onclick="_openLightbox('${img.data}')">
               ${img.caption ? `<div style="font-size:9px;color:var(--slate-light);text-align:center;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${img.caption}</div>` : ''}
               <button onclick="_removeHotelImage(${idx},${ii})" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
               <button onclick="_toggleActivityHeaderImg(${idx},${ii})" title="${isPinned?'Retirer du bandeau':'Afficher dans le bandeau'}"
@@ -3007,7 +3013,7 @@ function _renderModalContent(idx) {
             return `<div style="position:relative;display:inline-block;margin-bottom:6px;">
               <img src="${img.data}" title="${img.caption||''}"
                 style="width:90px;height:70px;object-fit:cover;border-radius:8px;cursor:pointer;border:${isPinned?'2px solid var(--slate)':'1px solid var(--sand-dark)'};"
-                onclick="window.open('${img.data}','_blank')">
+                onclick="_openLightbox('${img.data}')">
               ${img.caption ? `<div style="font-size:9px;color:var(--slate-light);text-align:center;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${img.caption}</div>` : ''}
               <button onclick="_removeHotelImage(${idx},${ii})" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
               <button onclick="_toggleActivityHeaderImg(${idx},${ii})" title="${isPinned?'Retirer du bandeau':'Afficher dans le bandeau'}"
@@ -3337,7 +3343,7 @@ function _renderModalContent(idx) {
             return `<div style="position:relative;display:inline-block;margin-bottom:6px;">
               <img src="${img.data}" title="${img.caption||''}"
                 style="width:90px;height:70px;object-fit:cover;border-radius:8px;cursor:pointer;border:${isPrimary?'2px solid var(--amber)':'1px solid var(--sand-dark)'};"
-                onclick="window.open('${img.data}','_blank')">
+                onclick="_openLightbox('${img.data}')">
               ${img.caption ? `<div style="font-size:9px;color:var(--slate-light);text-align:center;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${img.caption}</div>` : ''}
               <button onclick="_removeHotelImage(${idx},${ii})" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--red);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
               <button onclick="_setPrimaryHotelImage(${idx},${ii})" title="${isPrimary?'Photo principale (cliquer pour changer)':'Définir comme photo principale'}"
@@ -4075,9 +4081,24 @@ function _updateDriveAddresses(dep, arr) {
   }
 }
 
+
+function _openLightbox(src) {
+  const lb = document.getElementById('img-lightbox');
+  const img = document.getElementById('img-lightbox-img');
+  if (!lb || !img || !src) return;
+  img.src = src;
+  lb.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function _closeLightbox() {
+  const lb = document.getElementById('img-lightbox');
+  if (lb) lb.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 function _openBannerImg(i) {
   const img = window._bannerImgs && window._bannerImgs[i];
-  if (img && img.data) { window.open(img.data, '_blank'); }
+  if (img && img.data) { _openLightbox(img.data); }
 }
 
 function _actResetToDefault(idx) {
