@@ -828,7 +828,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.13.0 · 06/06/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.15.0 · 06/06/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -1910,52 +1910,58 @@ let steps = [
     visits:'Old Faithful, Grand Prismatic Spring, Grand Canyon de Yellowstone, Lamar Valley (bisons, ours, loups), Mammoth Hot Springs, Hayden Valley',
     alerts:[{ kind:'urgent', label:'Date limite possiblement dépassée', detail:'Annulation avant le 20 juillet — à vérifier d\'urgence' }] },
 
+
   // ── ACTIVITÉS YELLOWSTONE ──
-  { id:'act-20260729', type:'activity', dates:'29 juil.', dateDebut:'2026-07-29', title:'Jour 1 · Old Faithful & Grand Prismatic', heureDebut:'08:00', heureFin:'19:30',
+  { id:'act-yst-j1', type:'activity', dates:'29 juil.', dateDebut:'2026-07-29', title:'Jour 1 · Old Faithful & Grand Prismatic', heureDebut:'08:00', heureFin:'19:30',
     alerts:[],
     defaultEtapes:[
   {id:1,type:'trajet',nom:'Jackson → Colter Bay Village',heure:'08:00',duree:'~1h15',desc:'US-191 N / US-89 N. Traversée de Jackson Hole, entrée Grand Teton NP (Moose Entrance — pass $35). Longer les Tetons sur la gauche. Passer Moran Junction puis tourner à gauche vers Colter Bay.',maps:'',alerte:{type:'warn',texte:'⛽ Station BP sur place — dernier plein avant Yellowstone'}},
-  {id:2,type:'trajet',nom:'Colter Bay → Lewis Falls',heure:'09:30',duree:'~50 min',desc:'US-89 N, longer le lac Jackson. Quitter Grand Teton NP à Flagg Ranch. South Entrance Yellowstone (présenter le pass). ~8 km après l\'entrée, parking Lewis Falls sur la gauche. Descente à pied ~200 m.',maps:'',alerte:null},
+  {id:2,type:'trajet',nom:'Colter Bay → Lewis Falls',heure:'09:30',duree:'~50 min',desc:'US-89 N, longer le lac Jackson. Quitter Grand Teton NP à Flagg Ranch. South Entrance Yellowstone (présenter le pass). ~8 km après l\'entrée, parking Lewis Falls sur la gauche.',maps:'',alerte:null},
   {id:3,type:'visite',nom:'Lewis Falls',heure:'',duree:'~20 min',desc:'Courte descente à pied (~200 m) pour atteindre les chutes.',maps:'',alerte:null},
-  {id:4,type:'visite',nom:'West Thumb Geyser Basin',heure:'',duree:'~30 min',desc:'US-89 N Nord, franchir la Continental Divide (~2 450 m). Parking sur la droite avec visitor center. Geysers au bord du lac Yellowstone.',maps:'',alerte:null},
-  {id:5,type:'trajet',nom:'West Thumb → Old Faithful',heure:'',duree:'~45 min',desc:'Grand Loop Road vers l\'ouest, Craig Pass 2 477 m — lac Isa (eaux vers Atlantique et Pacifique). Redescendre dans la vallée de la Firehole River.',maps:'',alerte:null},
-  {id:6,type:'visite',nom:'Old Faithful',heure:'',duree:'~1h',desc:'Parking immense — plusieurs zones. Consulter l\'heure de la prochaine éruption au visitor center dès l\'arrivée. Boardwalk autour du geyser.',maps:'',alerte:{type:'info',texte:'Éruptions toutes les 60 à 110 min — consulter le panneau d\'affichage à l\'arrivée'}},
-  {id:7,type:'visite',nom:'Grand Prismatic Spring + Overlook',heure:'',duree:'~1h30',desc:'Parking Fairy Falls Trailhead sur la gauche, ~800 m au nord de Midway Geyser Basin. Overlook : 1,6 km A/R, 30–40 min. Passerelles Grand Prismatic : 30–45 min.',maps:'',alerte:{type:'info',texte:'⏰ Idéalement entre 10h et 13h · Parking souvent plein dès 9h, meilleures chances vers 15h'}},
-  {id:8,type:'visite',nom:'Fountain Paint Pot Trail',heure:'',duree:'~45 min',desc:'Parking sur la gauche ~3 km au nord de Grand Prismatic. Boardwalk ~800 m en boucle, tout plat.',maps:'',alerte:null},
-  {id:9,type:'trajet',nom:'Fountain Paint Pot → West Yellowstone',heure:'',duree:'~25 min',desc:'Grand Loop Road Nord → Madison Junction → US-20 Ouest. Longer la Firehole River et la Madison River.',maps:'',alerte:{type:'info',texte:'🦬 Bisons et wapitis très fréquents en soirée dans la vallée de Madison'}}
+  {id:4,type:'visite',nom:'West Thumb Geyser Basin',heure:'',duree:'~30 min',desc:'Franchir la Continental Divide (~2 450 m). Geysers spectaculaires au bord du lac Yellowstone.',maps:'',alerte:null},
+  {id:5,type:'trajet',nom:'West Thumb → Old Faithful',heure:'',duree:'~45 min',desc:'Grand Loop Road vers l\'ouest, Craig Pass 2 477 m — lac Isa (eaux vers Atlantique et Pacifique).',maps:'',alerte:null},
+  {id:6,type:'visite',nom:'Old Faithful',heure:'',duree:'~1h',desc:'Consulter l\'heure de la prochaine éruption au visitor center dès l\'arrivée. Éruptions toutes les 60 à 110 min.',maps:'',alerte:{type:'info',texte:'Consulter le panneau d\'affichage à l\'arrivée — éruptions toutes les 60 à 110 min'}},
+  {id:7,type:'visite',nom:'Grand Prismatic Spring + Overlook',heure:'',duree:'~1h30',desc:'Parking Fairy Falls Trailhead. Overlook : 1,6 km A/R, 30–40 min. Passerelles Grand Prismatic : 30–45 min.',maps:'',alerte:{type:'info',texte:'⏰ Idéalement entre 10h et 13h · Parking souvent plein dès 9h'}},
+  {id:8,type:'visite',nom:'Fountain Paint Pot Trail',heure:'',duree:'~45 min',desc:'Boardwalk ~800 m en boucle, tout plat.',maps:'',alerte:null},
+  {id:9,type:'trajet',nom:'→ West Yellowstone',heure:'',duree:'~25 min',desc:'Grand Loop Road Nord → Madison Junction → US-20 Ouest.',maps:'',alerte:{type:'info',texte:'🦬 Bisons et wapitis très fréquents en soirée dans la vallée de Madison'}}
 ] },
   { id:'act-20260730', type:'activity', dates:'30 juil.', dateDebut:'2026-07-30', title:'Jour 2 · Norris, Canyon & Hayden Valley', heureDebut:'07:00', heureFin:'20:30',
     alerts:[],
+   },
+  { id:'act-yst-j2', type:'activity', dates:'30 juil.', dateDebut:'2026-07-30', title:'Jour 2 · Norris, Canyon & Hayden Valley', heureDebut:'07:00', heureFin:'20:30',
+    alerts:[],
     defaultEtapes:[
-  {id:1,type:'trajet',nom:'West Yellowstone → Norris Geyser Basin',heure:'07:00',duree:'~40 min',desc:'US-20 Est → Madison Junction → Grand Loop Road Nord (~22 km). Route le long de la Gibbon River, passe devant Gibbon Falls.',maps:'',alerte:null},
-  {id:2,type:'visite',nom:'Norris Geyser Basin',heure:'07:40',duree:'~1h30',desc:'Deux boucles : Porcelain Basin (1,2 km, terrain ouvert, vapeur omniprésente) puis Back Basin (2,5 km) avec le Steamboat Geyser — le plus grand geyser actif du monde (jusqu\'à 90 m).',maps:'',alerte:{type:'info',texte:'Départ tôt recommandé pour éviter la foule et profiter de la faune'}},
-  {id:3,type:'trajet',nom:'Norris → Canyon Village',heure:'',duree:'~25 min',desc:'Grand Loop Road Est direction Canyon Junction (~20 km). Route forestière traversant des prairies ouvertes.',maps:'',alerte:null},
-  {id:4,type:'visite',nom:'Canyon Village Visitor Center',heure:'',duree:'~20 min',desc:'Récupérer la carte détaillée North Rim / South Rim Drive. Toilettes et café. Ouvert dès 8h.',maps:'',alerte:null},
-  {id:5,type:'visite',nom:'Artist Point — South Rim',heure:'',duree:'~45 min',desc:'South Rim Drive Est (~3 km). Chemin pavé ~500 m. Vue plongeante sur les Lower Falls (94 m, 2× les chutes du Niagara) et les parois jaune-ocre du canyon.',maps:'',alerte:{type:'info',texte:'Lumière idéale avant le zénith — arriver vers 11h'}},
-  {id:6,type:'visite',nom:'Inspiration Point — North Rim',heure:'',duree:'~30 min',desc:'North Rim Drive Est (~3 km). Vue en enfilade du canyon avec Upper et Lower Falls dans le même cadre.',maps:'',alerte:null},
-  {id:7,type:'repas',nom:'Déjeuner à Canyon Village',heure:'',duree:'~45 min',desc:'Canyon Lodge Dining Room (plats chauds) ou Cafeteria (plus rapide). Seule option de restauration dans cette partie du parc.',maps:'',alerte:null},
-  {id:8,type:'visite',nom:'Brink of the Lower Falls',heure:'',duree:'~40 min',desc:'South Rim Drive ~2 km, parking Uncle Tom\'s Trail. ~100 marches métalliques en zigzag. Vue au bord même des chutes — puissance et bruine impressionnantes.',maps:'',alerte:{type:'warn',texte:'🧥 Veste légère indispensable — l\'humidité des chutes refroidit fortement l\'air même en été'}},
-  {id:9,type:'pause',nom:'Temps libre — Zone Canyon',heure:'15:00',duree:'~1h30',desc:'North Rim Trail, repos au visitor center ou boutique. Temps tampon en cas d\'embouteillages aux parkings.',maps:'',alerte:null},
-  {id:10,type:'visite',nom:'Mud Volcano Area',heure:'',duree:'~45 min',desc:'Grand Loop Road Sud ~15 km. Boardwalk 1,2 km : Dragon\'s Mouth Spring, Mud Volcano, Black Dragon\'s Cauldron.',maps:'',alerte:{type:'info',texte:'Ambiance post-apocalyptique — grondements et vapeur impressionnants'}},
-  {id:11,type:'visite',nom:'Hayden Valley — Lumière dorée',heure:'17:30',duree:'~1h45',desc:'Vallée de 10 km le long de la Yellowstone River entre Mud Volcano et Fishing Bridge. Nombreux pull-offs — s\'arrêter dès qu\'il y a des voitures garées. Bisons, grizzlys, coyotes, pygargues.',maps:'',alerte:{type:'info',texte:'🦬 Jumelles absolument indispensables · Lumière rasante idéale pour les photos'}},
+  {id:1,type:'trajet',nom:'West Yellowstone → Norris Geyser Basin',heure:'07:00',duree:'~40 min',desc:'US-20 Est → Madison Junction → Grand Loop Road Nord (~22 km). Gibbon River et Gibbon Falls.',maps:'',alerte:null},
+  {id:2,type:'visite',nom:'Norris Geyser Basin',heure:'07:40',duree:'~1h30',desc:'Porcelain Basin (1,2 km, terrain ouvert) puis Back Basin (2,5 km) avec le Steamboat Geyser — plus grand geyser actif du monde (jusqu\'à 90 m).',maps:'',alerte:{type:'info',texte:'Départ tôt recommandé pour éviter la foule'}},
+  {id:3,type:'trajet',nom:'Norris → Canyon Village',heure:'',duree:'~25 min',desc:'Grand Loop Road Est direction Canyon Junction (~20 km).',maps:'',alerte:null},
+  {id:4,type:'visite',nom:'Canyon Village Visitor Center',heure:'',duree:'~20 min',desc:'Récupérer la carte North Rim / South Rim Drive. Toilettes, café.',maps:'',alerte:null},
+  {id:5,type:'visite',nom:'Artist Point — South Rim',heure:'',duree:'~45 min',desc:'Vue plongeante sur les Lower Falls (94 m, 2× les chutes du Niagara) et parois jaune-ocre.',maps:'',alerte:{type:'info',texte:'Lumière idéale avant le zénith — arriver vers 11h'}},
+  {id:6,type:'visite',nom:'Inspiration Point — North Rim',heure:'',duree:'~30 min',desc:'Vue en enfilade du canyon avec Upper et Lower Falls dans le même cadre.',maps:'',alerte:null},
+  {id:7,type:'repas',nom:'Déjeuner Canyon Village',heure:'',duree:'~45 min',desc:'Canyon Lodge Dining Room ou Cafeteria. Seule option dans cette partie du parc.',maps:'',alerte:null},
+  {id:8,type:'visite',nom:'Brink of the Lower Falls',heure:'',duree:'~40 min',desc:'~100 marches métalliques en zigzag. Vue au bord même des chutes — bruine impressionnante.',maps:'',alerte:{type:'warn',texte:'🧥 Veste légère indispensable — bruine des chutes refroidit fortement l\'air'}},
+  {id:9,type:'pause',nom:'Temps libre — Zone Canyon',heure:'15:00',duree:'~1h30',desc:'North Rim Trail, visitor center ou boutique.',maps:'',alerte:null},
+  {id:10,type:'visite',nom:'Mud Volcano Area',heure:'',duree:'~45 min',desc:'Boardwalk 1,2 km : Dragon\'s Mouth Spring, Mud Volcano, Black Dragon\'s Cauldron.',maps:'',alerte:{type:'info',texte:'Ambiance post-apocalyptique — grondements et vapeur impressionnants'}},
+  {id:11,type:'visite',nom:'Hayden Valley — Lumière dorée',heure:'17:30',duree:'~1h45',desc:'Vallée de 10 km. S\'arrêter à chaque pull-off avec des voitures garées. Bisons, grizzlys, coyotes, pygargues.',maps:'',alerte:{type:'info',texte:'🦬 Jumelles indispensables · Lumière rasante idéale pour les photos'}},
   {id:12,type:'trajet',nom:'Retour West Yellowstone',heure:'19:15',duree:'~1h15',desc:'Canyon Junction → Grand Loop Road Ouest → Madison Junction → US-20 Ouest. Arrivée ~20h30.',maps:'',alerte:null}
 ] },
   { id:'act-20260731', type:'activity', dates:'31 juil.', dateDebut:'2026-07-31', title:'Jour 3 · Mammoth Hot Springs & Lamar Valley', heureDebut:'06:30', heureFin:'21:00',
     alerts:[{ kind:'info', label:'Départ Lamar Valley 17h30', detail:'Impératif pour arriver au rodéo à temps' }],
+   },
+  { id:'act-yst-j3', type:'activity', dates:'31 juil.', dateDebut:'2026-07-31', title:'Jour 3 · Mammoth Hot Springs & Lamar Valley', heureDebut:'06:30', heureFin:'21:00',
+    alerts:[{ kind:'info', label:'Départ Lamar Valley 17h30', detail:'Impératif pour arriver au rodéo' }],
     defaultEtapes:[
-  {id:1,type:'trajet',nom:'West Yellowstone → Mammoth Hot Springs',heure:'06:30',duree:'~1h45',desc:'US-20 Est → Madison Junction → Norris → Grand Loop Road Nord vers Mammoth. Roaring Mountain visible depuis la route.',maps:'',alerte:null},
-  {id:2,type:'visite',nom:'Mammoth Hot Springs Terrasses',heure:'08:15',duree:'~1h30',desc:'Lower Terraces à pied (boardwalk ~1,5 km) : Palette Springs, Minerva Terrace, Liberty Cap. Upper Terraces en voiture (sens unique 2 km) : Canary Spring.',maps:'',alerte:{type:'info',texte:'Arriver tôt — la lumière du matin fait ressortir les teintes orangées des bactéries thermophiles'}},
-  {id:3,type:'repas',nom:'Petit-déjeuner — Mammoth Village',heure:'',duree:'~20 min',desc:'Terrace Grill (rapide) ou Mammoth Hotel Dining Room. Élans souvent dans le village le matin !',maps:'',alerte:{type:'warn',texte:'⛽ PLEIN OBLIGATOIRE ici — dernière station avant Lamar Valley · plus de 150 km sans station'}},
-  {id:4,type:'trajet',nom:'Mammoth → Tower Fall',heure:'',duree:'~35 min',desc:'Grand Loop Road Est vers Tower-Roosevelt (~30 km). Descente spectaculaire dans la vallée de la Yellowstone River, falaises basaltiques noires.',maps:'',alerte:null},
-  {id:5,type:'visite',nom:'Tower Fall',heure:'',duree:'~30 min',desc:'Parking à droite à Tower Junction. Sentier 500 m jusqu\'au belvédère. Chute de 40 m entre des colonnes de phonolite volcanique noire. Site peu fréquenté le matin.',maps:'',alerte:null},
-  {id:6,type:'visite',nom:'Lamar Valley — Faune du matin',heure:'',duree:'~3h15',desc:'Northeast Entrance Road Est (~15 km depuis Tower Junction). Rouler très lentement. S\'arrêter à chaque pull-off avec des voitures garées. Rangers naturalistes avec spotting scopes.',maps:'',alerte:{type:'info',texte:'🐺 Meilleur endroit du monde pour observer les loups · Jumelles absolument indispensables'}},
-  {id:7,type:'repas',nom:'Pique-nique — Pebble Creek',heure:'',duree:'~45 min',desc:'~15 km à l\'est de Lamar Valley. Cadre alpin au bord du ruisseau. Option : Pebble Creek Trail (2 km A/R).',maps:'',alerte:{type:'warn',texte:'🐻 Zone ours noirs — aliments dans le coffre, rester vigilants'}},
-  {id:8,type:'visite',nom:'Lamar Valley — Lumière dorée',heure:'',duree:'~2h',desc:'Retour vers l\'ouest dans Lamar Valley. Souvent meilleur que le matin — faune active pour la chasse du soir. Loups particulièrement actifs au crépuscule.',maps:'',alerte:{type:'warn',texte:'⚠️ Quitter Lamar Valley impérativement à 17h30 pour arriver au rodéo'}},
-  {id:9,type:'trajet',nom:'Retour West Yellowstone via Canyon',heure:'17:30',duree:'~1h15',desc:'Tower Junction → Grand Loop Road Sud → Canyon Junction → Grand Loop Road Ouest → Madison Junction → US-20 Ouest. Arrivée ~18h45.',maps:'',alerte:null},
-  {id:10,type:'repas',nom:'Dîner rapide — West Yellowstone',heure:'18:45',duree:'~15 min',desc:'Running Bear Pancake House ou sandwich à emporter. Le rodéo est à 5 min à pied du centre.',maps:'',alerte:null},
-  {id:11,type:'spectacle',nom:'Wild West Yellowstone Rodéo',heure:'20:00',duree:'~2h',desc:'175 Oldroyd Road, West Yellowstone. Bronco busting, bull riding, barrel racing, calf roping. Fin vers 21h00.',maps:'',alerte:{type:'info',texte:'🎟 $52–$70/pers · Réservation recommandée sur eventticketscenter.com'}}
+  {id:1,type:'trajet',nom:'West Yellowstone → Mammoth Hot Springs',heure:'06:30',duree:'~1h45',desc:'US-20 Est → Madison Junction → Norris → Grand Loop Road Nord. Roaring Mountain visible depuis la route.',maps:'',alerte:null},
+  {id:2,type:'visite',nom:'Mammoth Hot Springs Terrasses',heure:'08:15',duree:'~1h30',desc:'Lower Terraces (boardwalk ~1,5 km) : Palette Springs, Minerva Terrace, Liberty Cap. Upper Terraces en voiture (sens unique 2 km) : Canary Spring.',maps:'',alerte:{type:'info',texte:'Arriver tôt — la lumière du matin magnifie les teintes orangées'}},
+  {id:3,type:'repas',nom:'Petit-déjeuner Mammoth Village',heure:'',duree:'~20 min',desc:'Terrace Grill (rapide) ou Mammoth Hotel Dining Room. Élans souvent dans le village le matin !',maps:'',alerte:{type:'warn',texte:'⛽ PLEIN OBLIGATOIRE ici — dernière station avant Lamar Valley · plus de 150 km sans station'}},
+  {id:4,type:'trajet',nom:'Mammoth → Tower Fall',heure:'',duree:'~35 min',desc:'Grand Loop Road Est (~30 km). Descente spectaculaire, falaises basaltiques noires.',maps:'',alerte:null},
+  {id:5,type:'visite',nom:'Tower Fall',heure:'',duree:'~30 min',desc:'Sentier 500 m. Chute de 40 m entre colonnes de phonolite volcanique. Site peu fréquenté le matin.',maps:'',alerte:null},
+  {id:6,type:'visite',nom:'Lamar Valley — Faune du matin',heure:'',duree:'~3h15',desc:'Northeast Entrance Road Est (~15 km). Rouler très lentement. S\'arrêter à chaque pull-off. Rangers avec spotting scopes.',maps:'',alerte:{type:'info',texte:'🐺 Meilleur endroit du monde pour observer les loups · Jumelles indispensables'}},
+  {id:7,type:'repas',nom:'Pique-nique Pebble Creek',heure:'',duree:'~45 min',desc:'~15 km à l\'est de Lamar Valley. Cadre alpin au bord du ruisseau.',maps:'',alerte:{type:'warn',texte:'🐻 Zone ours noirs — aliments dans le coffre, rester vigilants'}},
+  {id:8,type:'visite',nom:'Lamar Valley — Lumière dorée',heure:'',duree:'~2h',desc:'Retour vers l\'ouest. Faune active pour la chasse du soir. Loups très actifs au crépuscule.',maps:'',alerte:{type:'warn',texte:'⚠️ Quitter Lamar Valley impérativement à 17h30 pour le rodéo'}},
+  {id:9,type:'trajet',nom:'Retour West Yellowstone via Canyon',heure:'17:30',duree:'~1h15',desc:'Tower Junction → Grand Loop Road Sud → Canyon Junction → Grand Loop Road Ouest → US-20 Ouest. Arrivée ~18h45.',maps:'',alerte:null},
+  {id:10,type:'repas',nom:'Dîner rapide — West Yellowstone',heure:'18:45',duree:'~15 min',desc:'Running Bear Pancake House ou sandwich à emporter.',maps:'',alerte:null},
+  {id:11,type:'spectacle',nom:'Wild West Yellowstone Rodéo',heure:'20:00',duree:'~2h',desc:'175 Oldroyd Road. Bronco busting, bull riding, barrel racing, calf roping. Fin ~21h.',maps:'',alerte:{type:'info',texte:'🎟 $52–$70/pers · Réservation sur eventticketscenter.com'}}
 ] },
-
   // ── J5 : GD TETON → ÉTAPE NUIT (CHOIX À FAIRE) ──
   { id:'h-20260801', type:'hotel', dates:'1er août', dateDebut:'2026-08-01', dateFin:'2026-08-02', nights:1, city:'Montpelier OU Rock Springs, Wyoming', hotel:'⚠️ CHOIX À FAIRE : Montpelier (opt. 1) / Four Points by Sheraton Rock Springs (opt. 2)', price:164, ptdej:true, annul:'avant le 29 juillet',
     visits:'Oxbow Bend, Jenny Lake, Schwabacher Landing, Snake River Overlook, Mormon Row',
@@ -2490,14 +2496,6 @@ function _renderModalContent(idx) {
   }
 
   if (isActivityStep(step)) {
-    // Auto-migration : si les étapes existantes ont l'ancien format "ÉTAPE N —", remplacer par defaultEtapes
-    if (saved.etapes && saved.etapes.length && step.defaultEtapes && step.defaultEtapes.length) {
-      const hasOldFormat = saved.etapes.some(e => e.nom && /^[ÉE]TAPE\s+\d+/i.test(e.nom));
-      if (hasOldFormat) {
-        saved = Object.assign({}, saved, { etapes: step.defaultEtapes });
-        saveFiche(idx, saved);
-      }
-    }
     // Initialiser l'état local des étapes
     _actEtapes = JSON.parse(JSON.stringify((saved.etapes && saved.etapes.length) ? saved.etapes : (step.defaultEtapes || [])));
     _actNextId = _actEtapes.length ? Math.max(..._actEtapes.map(e => e.id || 0)) + 1 : 1;
@@ -2506,11 +2504,12 @@ function _renderModalContent(idx) {
     const _resetBtn = step.defaultEtapes && step.defaultEtapes.length
       ? '<button onclick="_actResetToDefault(' + idx + ')" style="font-family:\'DM Sans\',sans-serif;font-size:10px;padding:3px 9px;border-radius:10px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;" title="Remplacer les étapes par le programme par défaut">\u21ba R\u00e9initialiser</button>'
       : '';
+    const _clearBtn = '<button onclick="_actClearAll(' + idx + ')" style="font-family:\'DM Sans\',sans-serif;font-size:10px;padding:3px 9px;border-radius:10px;border:1px solid var(--red-border);background:var(--red-pale);color:var(--red);cursor:pointer;margin-left:4px;" title="Supprimer toutes les \u00e9tapes">\u2715 Vider</button>';
     body.innerHTML = `
       <div class="modal-section">
         <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
           <span>Programme</span>
-          ${_resetBtn}
+          ${_resetBtn}${_clearBtn}
         </div>
         <div id="act-steps-list"></div>
         <button class="act-add-btn" id="act-add-btn" onclick="_actStartAdd()">
@@ -3559,7 +3558,7 @@ function _renderDocsSection(idx, saved) {
             <div style="font-size:12px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${doc.caption || doc.name}</div>
             <div style="font-size:10px;color:var(--slate-light);">${sizeStr(doc.size)}${doc.addedAt ? ' · ' + new Date(doc.addedAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : ''}</div>
           </div>
-          <button onclick="_openDocViewer('${doc.url}','${(doc.name||'').replace(/'/g,"\\'")}','${doc.type}')" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 9px;border-radius:6px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;white-space:nowrap;flex-shrink:0;">Ouvrir</button>
+          <button onclick="_openDocViewer('${doc.url}','${(doc.name||'').replace(/'/g,"\'")}','${doc.type}')" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 9px;border-radius:6px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;white-space:nowrap;flex-shrink:0;">Ouvrir</button>
           <button onclick="_deleteHotelDoc(${idx},${di})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:13px;padding:2px 4px;border-radius:4px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
         </div>`).join('')
       : '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucun document. Ajoutez vos confirmations de réservation, bons de commande…</div>'}
@@ -3702,7 +3701,7 @@ function _actRender() {
                 <div style="font-size:11px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${doc.caption||doc.name}</div>
                 <div style="font-size:10px;color:var(--slate-light);">${sizeStr}${sizeStr&&dateStr?' · ':''}${dateStr}</div>
               </div>
-              <button onclick="_openDocViewer('${doc.url}','${(doc.name||'').replace(/'/g,"\\'")}','${doc.type}')" style="font-size:10px;padding:2px 7px;border-radius:5px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;">Ouvrir</button>
+              <button onclick="_openDocViewer('${doc.url}','${(doc.name||'').replace(/'/g,"\'")}','${doc.type}')" style="font-size:10px;padding:2px 7px;border-radius:5px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;">Ouvrir</button>
               <button onclick="_actDeleteDoc(${s.id},${di})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:12px;padding:1px 3px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
             </div>`;}).join('')
           : '<div style="font-size:11px;color:var(--slate-light);">Aucun document. Ajoutez vos confirmations, billets…</div>'}
@@ -3844,7 +3843,22 @@ function _actSaveStepMedia() {
   d.etapes = JSON.parse(JSON.stringify(_actEtapes));
   _cache[currentModalIdx] = d;
   try { localStorage.setItem(storageKey(currentModalIdx), JSON.stringify(d)); } catch(e) {}
-  saveFiche(currentModalIdx, d);
+  // Pas de saveFiche ici : évite la race condition avec saveModal()
+  // La persistance Supabase est gérée uniquement par saveModal()
+}
+
+
+function _actClearAll(idx) {
+  if (!confirm('Supprimer toutes les étapes de cette activité ?\nCette action est irréversible.')) return;
+  _actEtapes = [];
+  _actNextId = 1;
+  _actExpanded = null; _actEditing = null;
+  const d = loadFiche(idx);
+  d.etapes = [];
+  _cache[idx] = d;
+  try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(e) {}
+  saveFiche(idx, d);
+  _actRender();
 }
 
 function _actResetToDefault(idx) {
@@ -4235,7 +4249,7 @@ function _navigableSteps() {
   // Étapes pouvant avoir une fiche (hotel, drive, car-pickup, car-return, flight, et dups)
   return steps.map((s, i) => i).filter(i => {
     const t = steps[i].type;
-    return t === 'hotel' || t === 'drive' || t === 'car-pickup' || t === 'car-return' || t === 'flight';
+    return t === 'hotel' || t === 'drive' || t === 'car-pickup' || t === 'car-return' || t === 'flight' || t === 'activity' || steps[i]._isDup;
   });
 }
 
@@ -4612,6 +4626,7 @@ async function saveModal() {
     data.etapes    = JSON.parse(JSON.stringify(_actEtapes));
     data.aEmporter = document.getElementById('f-aEmporter')?.value || '';
     data.note      = document.getElementById('f-note')?.value       || '';
+    _loadedAt[currentModalIdx] = new Date().toISOString(); // Éviter faux conflit après auto-save local
     const confirmEl = document.getElementById('save-confirm');
     confirmEl.textContent = '⏳ Enregistrement…';
     confirmEl.classList.add('show');
@@ -5838,7 +5853,7 @@ function _populateRembSuggestions(creditor) {
   const container = document.getElementById('remb-label-suggestions');
   if (!container) return;
   container.innerHTML = [...suggestions].slice(0,8).map(s =>
-    `<button type="button" onclick="document.getElementById('remb-label').value='${s.replace(/'/,"\\'")}';"
+    `<button type="button" onclick="document.getElementById('remb-label').value='${s.replace(/'/,"\'")}';"
       style="font-family:'DM Sans',sans-serif;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;">${s}</button>`
   ).join('');
 }
@@ -6319,7 +6334,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.13.0 · 06/06/26
+        Version : v2.15.0 · 06/06/26
       </div>
     </div>`;
 }
@@ -8102,7 +8117,7 @@ function _showTransferActionModal(action, de, a, montant, label) {
       <div style="display:flex;gap:8px;justify-content:flex-end;padding:.75rem 1.25rem;background:white;border-top:.5px solid var(--sand-dark);">
         <button onclick="document.getElementById('transfer-action-modal').remove()"
           style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 16px;border-radius:8px;border:1px solid var(--sand-dark);background:white;color:var(--ink-light);cursor:pointer;">Annuler</button>
-        <button onclick="_confirmTransferAction('${action}','${de}','${a}',${parseFloat(montant)},'${label.replace(/'/g,"\\'")}')"
+        <button onclick="_confirmTransferAction('${action}','${de}','${a}',${parseFloat(montant)},'${label.replace(/'/g,"\'")}')"
           style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 16px;border-radius:8px;border:none;background:${color};color:white;cursor:pointer;font-weight:500;">${btnLabel}</button>
       </div>
     </div>`;
@@ -8619,7 +8634,7 @@ function _renderVoteBlock(itemKey, label) {
           title="${v.charAt(0).toUpperCase()+v.slice(1)}">${VOTE_ICONS[v]}</button>`).join('')}
       </div>
       <input id="cmt-${itemKey}-${p}" type="text" value="${cur?.commentaire||''}" placeholder="Commentaire…"
-        onblur="if(this.value !== '${(cur?.commentaire||'').replace(/'/g,"\\'")}') _castVote('${itemKey}','${p}','${cur?.vote||'neutre'}',this.value)"
+        onblur="if(this.value !== '${(cur?.commentaire||'').replace(/'/g,"\'")}') _castVote('${itemKey}','${p}','${cur?.vote||'neutre'}',this.value)"
         style="font-family:'DM Sans',sans-serif;font-size:10px;border:1px solid var(--sand-dark);border-radius:5px;padding:3px 6px;color:var(--ink);outline:none;background:white;">` 
       : `<div style="font-size:12px;">${cur ? VOTE_ICONS[cur.vote] + ' ' + (cur.commentaire||'') : '<span style="color:var(--slate-light)">–</span>'}</div>`}
     </div>`;
@@ -12126,8 +12141,13 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.13.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Menu 🖼️ Road Trip en images · galerie plein écran des 4 pages du carnet de voyage · navigation molette, swipe tactile et flèches · points de progression</div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.15.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correction bug sauvegarde fiches activité · navigation ← → active dans les activités · bouton ✕ Vider le programme · ordre chronologique Yellowstone garanti · syntaxe JS corrigée</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.14.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">3 nouvelles fiches activité Yellowstone J1/J2/J3 · itinéraires détaillés · galerie 🖼️ Road Trip en images · navigation molette et swipe</div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
