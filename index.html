@@ -828,7 +828,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.16.3 · 06/06/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.16.4 · 06/06/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -2814,9 +2814,9 @@ function _renderModalContent(idx) {
     body.innerHTML = `
       <div class="map-route-bar">
         <div class="map-route-point dep">
-          <div class="map-route-label">Départ</div>
-          <div class="map-route-name">${step.from}</div>
-          <div class="map-route-time" id="map-hdep-display">${saved.hdep ? '🕐 ' + saved.hdep : '–'}</div>
+          <div class="map-route-label">🟢 Départ</div>
+          <input type="text" id="f-gmFrom" value="${gmOrigin}" placeholder="${step.from}" style="font-size:13px;font-weight:500;color:var(--ink);background:transparent;border:none;border-bottom:1px solid var(--sand-dark);padding:2px 0;width:100%;font-family:'DM Sans',sans-serif;outline:none;" onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='var(--sand-dark)'">
+          <input type="time" id="f-hdep" value="${saved.hdep||''}" style="font-size:12px;color:var(--amber);background:transparent;border:none;border-bottom:1px dashed var(--sand-dark);padding:2px 0;margin-top:4px;width:100%;font-family:'DM Sans',sans-serif;outline:none;" onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='var(--sand-dark)'">
         </div>
         <div class="map-route-middle">
           <span class="map-route-arrow">→</span>
@@ -2824,10 +2824,21 @@ function _renderModalContent(idx) {
           <div class="map-route-meta">${step.km ? '📍 ' + step.km + ' km' : ''}</div>
         </div>
         <div class="map-route-point">
-          <div class="map-route-label">Arrivée</div>
-          <div class="map-route-name">${step.to}</div>
-          <div class="map-route-time" id="map-harr-display">${saved.harr ? '🕐 ' + saved.harr : '–'}</div>
+          <div class="map-route-label">🔴 Arrivée</div>
+          <input type="text" id="f-gmTo" value="${gmDest}" placeholder="${step.to}" style="font-size:13px;font-weight:500;color:var(--ink);background:transparent;border:none;border-bottom:1px solid var(--sand-dark);padding:2px 0;width:100%;font-family:'DM Sans',sans-serif;outline:none;" onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='var(--sand-dark)'">
+          <input type="time" id="f-harr" value="${saved.harr||''}" style="font-size:12px;color:var(--amber);background:transparent;border:none;border-bottom:1px dashed var(--sand-dark);padding:2px 0;margin-top:4px;width:100%;font-family:'DM Sans',sans-serif;outline:none;" onfocus="this.style.borderBottomColor='var(--teal)'" onblur="this.style.borderBottomColor='var(--sand-dark)'">
         </div>
+      </div>
+      <div id="drive-waypoints-list" style="display:flex;flex-direction:column;gap:4px;margin:-6px 0 8px;">
+        ${(saved.gmWaypoints||[]).map((wp,i) => `
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:10px;color:var(--slate-light);white-space:nowrap;min-width:52px;text-align:right;">📍 Étape ${i+1}</span>
+            <input type="text" class="drive-waypoint-input" value="${wp}" placeholder="Ville, État…" style="flex:1;padding:5px 9px;border-radius:8px;border:.5px solid var(--sand-dark);font-size:12px;font-family:'DM Sans',sans-serif;background:white;">
+            <button onclick="this.parentElement.remove();_renumberDriveWaypoints()" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:13px;padding:3px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
+          </div>`).join('')}
+      </div>
+      <div style="margin-bottom:12px;">
+        <button onclick="_addDriveWaypoint()" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:3px 12px;border-radius:20px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;">+ Étape intermédiaire</button>
       </div>
       <div class="map-container">
         <div id="drive-map"></div>
@@ -2851,31 +2862,6 @@ function _renderModalContent(idx) {
         </div>
       </div>
       <div class="modal-section" style="margin-top:1rem;">
-        <div class="modal-section-title">Horaires</div>
-        <div class="field-grid">
-          <div class="field"><label>Heure de départ</label><input type="time" id="f-hdep" value="${saved.hdep||''}" oninput="document.getElementById('map-hdep-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
-          <div class="field"><label>Heure d'arrivée prévue</label><input type="time" id="f-harr" value="${saved.harr||''}" oninput="document.getElementById('map-harr-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
-        </div>
-      </div>
-      <div class="modal-section">
-        <div class="modal-section-title">Itinéraire Google Maps</div>
-        <div style="font-size:11px;color:var(--slate-light);margin-bottom:10px;line-height:1.4;">Précisez les villes et étapes intermédiaires pour le lien Google Maps. Sans effet sur le titre de la fiche.</div>
-        <div class="field-grid single">
-          <div class="field"><label>🟢 Départ</label><input type="text" id="f-gmFrom" placeholder="${step.from}" value="${saved.gmFrom||''}"></div>
-        </div>
-        <div id="drive-waypoints-list" style="display:flex;flex-direction:column;gap:6px;margin:6px 0;">
-          ${(saved.gmWaypoints||[]).map((wp,i) => `
-            <div style="display:flex;gap:6px;align-items:flex-end;">
-              <div class="field" style="flex:1;margin:0;"><label style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate-light);font-weight:500;">📍 Étape ${i+1}</label><input type="text" class="drive-waypoint-input" placeholder="Ville, État…" value="${wp}" style="width:100%;padding:7px 9px;border-radius:8px;border:.5px solid var(--sand-dark);font-size:13px;font-family:'DM Sans',sans-serif;"></div>
-              <button onclick="this.parentElement.remove();_renumberDriveWaypoints()" style="margin-bottom:1px;background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:14px;padding:6px 4px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
-            </div>`).join('')}
-        </div>
-        <button onclick="_addDriveWaypoint()" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 12px;border-radius:20px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;margin-bottom:6px;">+ Ajouter une étape</button>
-        <div class="field-grid single">
-          <div class="field"><label>🔴 Arrivée</label><input type="text" id="f-gmTo" placeholder="${step.to}" value="${saved.gmTo||''}"></div>
-        </div>
-      </div>
-      <div class="modal-section">
         <div class="modal-section-title">Remarques</div>
         <div class="field"><textarea id="f-note" placeholder="Notes sur ce trajet…">${saved.note||''}</textarea></div>
       </div>
@@ -6378,7 +6364,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.16.3 · 06/06/26
+        Version : v2.16.4 · 06/06/26
       </div>
     </div>`;
 }
