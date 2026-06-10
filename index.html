@@ -596,7 +596,7 @@
   /* ADMIN PANEL */
   #admin-overlay{position:fixed;inset:0;background:rgba(26,22,16,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .2s;}
   #admin-overlay.open{opacity:1;pointer-events:all;}
-  #admin-panel{background:var(--sand);border-radius:16px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(12px);transition:transform .2s;}
+  #admin-panel{background:var(--sand);border-radius:16px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(12px);transition:transform .2s;margin:1.5rem auto;}
   #admin-overlay.open #admin-panel{transform:translateY(0);}
   .admin-header{background:var(--ink);color:var(--sand);padding:1.25rem 1.5rem;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;}
   .admin-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;}
@@ -871,10 +871,10 @@
       <span class="nav-item-icon">🤝</span> Compte Amis
     </button>
     <button class="nav-item" id="nav-checklist-btn" onclick="openChecklist();closeMenu()">
+      <span class="nav-item-icon">✅</span> Checklist
+    </button>
     <button class="nav-item" id="nav-galerie-btn" onclick="openGalerie();closeMenu()">
       <span class="nav-item-icon">🖼️</span> Road Trip en images
-    </button>
-      <span class="nav-item-icon">✅</span> Checklist
     </button>
     <button class="nav-item" id="nav-chat-btn" onclick="openChat();closeMenu()">
       <span class="nav-item-icon">💬</span> Chat
@@ -11773,7 +11773,7 @@ function openAdmin() {
   if (_tripMap) { _tripMap.remove(); _tripMap = null; }
   document.getElementById('fab-btn').style.display = 'none';
   const fw = document.querySelector('.filters-wrap'); if (fw) fw.style.display = 'none';
-  document.getElementById('admin-overlay').style.cssText = 'display:block;position:fixed;inset:0;top:44px;background:var(--sand);z-index:600;overflow-y:auto;opacity:1;pointer-events:all;';
+  document.getElementById('admin-overlay').style.cssText = 'display:flex;flex-direction:column;align-items:center;position:fixed;inset:0;top:44px;background:var(--sand);z-index:600;overflow-y:auto;opacity:1;pointer-events:all;';
   ['nav-timeline-btn','nav-trip-btn','nav-ca-btn','nav-checklist-btn','nav-mappro-btn','nav-chat-btn','nav-logs-btn','nav-resa-btn','nav-galerie-btn'].forEach(id => {
     document.getElementById(id)?.classList.remove('active');
   });
@@ -12420,7 +12420,7 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
         <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.16.0</div><div style="font-size:10px;color:var(--slate-light);">06/06/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Bandeau photo dans les fiches Hôtel, Activité et Trajet · multi-sélection 📌 · strip adaptatif · liens utiles · journal d'actions dans les Logs
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Bandeau photo dans les fiches Hôtel, Activité et Trajet · multi-sélection 📌 · strip adaptatif · liens utiles · journal d'actions dans les Logs</div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
@@ -12530,11 +12530,7 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
         <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.0</div><div style="font-size:10px;color:var(--slate-light);">25/04/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Compte
- Amis pleine page · Virements par activité · Remboursements 
-multi-participants · Filtres date &amp; recherche · Réinitialisation 
-admin · Mails automatiques · Journal exportable · Nouvelles activités 
-FAB · Titre fiches éditable</div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Compte Amis pleine page · Virements par activité · Remboursements multi-participants · Filtres date &amp; recherche · Réinitialisation admin · Mails automatiques · Journal exportable · Nouvelles activités FAB · Titre fiches éditable</div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
