@@ -1806,21 +1806,21 @@
 
 <!-- FAB Menu -->
 <div id="fab-menu" style="position:fixed;bottom:90px;right:24px;display:none;flex-direction:column;gap:8px;align-items:flex-end;z-index:1500;">
-  <div style="display:flex;align-items:center;gap:8px;">
+  <div onclick="openNewActivity('note');closeFab();" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouvelle note libre</span>
-    <button onclick="openNewActivity('note');closeFab();" style="width:40px;height:40px;border-radius:50%;background:var(--slate);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">📝</button>
+    <button style="width:40px;height:40px;border-radius:50%;background:var(--slate);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;">📝</button>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;">
+  <div onclick="openNewActivity('visite');closeFab();" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouvelle activité / visite</span>
-    <button onclick="openNewActivity('visite');closeFab();" style="width:40px;height:40px;border-radius:50%;background:var(--teal);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">🗺</button>
+    <button style="width:40px;height:40px;border-radius:50%;background:var(--teal);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;">🗺</button>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;">
+  <div onclick="openNewActivity('depense');closeFab();" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouvelle dépense</span>
-    <button onclick="openNewActivity('depense');closeFab();" style="width:40px;height:40px;border-radius:50%;background:var(--green);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">💰</button>
+    <button style="width:40px;height:40px;border-radius:50%;background:var(--green);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;">💰</button>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;">
+  <div onclick="openNewActivity('etape');closeFab();" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouvelle étape</span>
-    <button onclick="openNewActivity('etape');closeFab();" style="width:40px;height:40px;border-radius:50%;background:var(--amber);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);">🏨</button>
+    <button style="width:40px;height:40px;border-radius:50%;background:var(--amber);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;">🏨</button>
   </div>
 </div>
 </div>
