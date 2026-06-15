@@ -828,7 +828,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.18.0 · 10/06/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.19.0 · 15/06/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -1889,6 +1889,14 @@
 </div>
 
 <script>
+// Déplacer new-activity-overlay hors de modal-overlay (sinon display:none du parent le masque)
+document.addEventListener('DOMContentLoaded', function() {
+  const el = document.getElementById('new-activity-overlay');
+  if (el && el.parentElement && el.parentElement.id === 'modal-overlay') {
+    document.body.appendChild(el);
+  }
+});
+
 const ICONS = { urgent:'🔴', missing:'🟡', info:'🔵' };
 
 let steps = [
@@ -6575,7 +6583,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols · ${steps.filter(s=>s.type==='activity').length} activités<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.18.0 · 10/06/26
+        Version : v2.19.0 · 15/06/26
       </div>
     </div>
 ${_renderActionLog()}`;
@@ -7762,11 +7770,14 @@ function renderCompteAmis() {
             const activityLabel = srcPayments.length > 0
               ? [...new Set(srcPayments.map(p => p.label))].slice(0,2).join(', ')
               : '';
+            const globalPayments = allPayments.filter(p => p.label === t.label && p.perso !== 'perso');
+            const globalAmount = globalPayments.reduce((sum, p) => sum + parseFloat(p.montant||0), 0);
+            const globalAmountStr = globalAmount > 0 ? ` (${globalAmount.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2})}\u00a0€)` : '';
 
             const tId = `t${ti}`;
             window['_tr_'+tId] = t;
             const btnStyle = 'background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;line-height:1;';
-            return `<div data-ca-row data-ca-date="${t.date?t.date.substring(0,10):''}" data-ca-label="${(t.label||'').replace(/"/g,'')}" data-ca-amount="${t.montant.toFixed(2)}" data-ca-payers="${t.de}" style="background:white;border-radius:8px;border:.5px solid var(--sand-dark);padding:7px 10px;display:flex;align-items:center;gap:8px;"><input type="checkbox" class="transfer-cb" data-ti="${ti}" data-de="${t.de}" data-a="${t.a}" data-montant="${t.montant.toFixed(2)}" data-label="${(t.label||'').replace(/"/g,'')}" style="width:14px;height:14px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;" onchange="_updateRembSelectionBtn()"><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;"><strong>${t.de}</strong> <span style="color:var(--slate-light);font-size:11px;font-weight:400;">→</span> <strong style="color:var(--teal)">${t.a}</strong></div><div style="font-size:10px;color:var(--amber);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📌 ${t.label||'–'}</div></div><span style="font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;color:var(--amber);white-space:nowrap;flex-shrink:0;">${t.montant.toFixed(2)} €</span><div style="display:flex;gap:1px;flex-shrink:0;"><button onclick="openRembModal(window['_tr_${tId}'].de,window['_tr_${tId}'].a,window['_tr_${tId}'].montant,window['_tr_${tId}'].label)" title="Rembourser" style="${btnStyle}" onmouseover="this.style.background='var(--teal-pale)'" onmouseout="this.style.background='none'">💸</button><button onclick="_sendTransferMail(window['_tr_${tId}'].de,window['_tr_${tId}'].a,window['_tr_${tId}'].montant,window['_tr_${tId}'].label)" title="Mail" style="${btnStyle}" onmouseover="this.style.background='var(--teal-pale)'" onmouseout="this.style.background='none'">📧</button><button onclick="_cancelTransfer(window['_tr_${tId}'].de,window['_tr_${tId}'].a,window['_tr_${tId}'].montant,window['_tr_${tId}'].label)" title="Annuler" style="${btnStyle}" onmouseover="this.style.background='var(--sand-dark)'" onmouseout="this.style.background='none'">🚫</button><button onclick="_deleteTransfer(window['_tr_${tId}'].de,window['_tr_${tId}'].a,window['_tr_${tId}'].montant,window['_tr_${tId}'].label)" title="Supprimer" style="${btnStyle}" onmouseover="this.style.background='var(--red-pale)'" onmouseout="this.style.background='none'">🗑</button></div></div>`;
+            return `<div data-ca-row data-ca-date="${t.date?t.date.substring(0,10):''}" data-ca-label="${(t.label||'').replace(/"/g,'')}" data-ca-amount="${t.montant.toFixed(2)}" data-ca-payers="${t.de}" style="background:white;border-radius:8px;border:.5px solid var(--sand-dark);padding:7px 10px;display:flex;align-items:center;gap:8px;"><input type="checkbox" class="transfer-cb" data-ti="${ti}" data-de="${t.de}" data-a="${t.a}" data-montant="${t.montant.toFixed(2)}" data-label="${(t.label||'').replace(/"/g,'')}" style="width:14px;height:14px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;" onchange="_updateRembSelectionBtn()"><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;"><strong>${t.de}</strong> <span style="color:var(--slate-light);font-size:11px;font-weight:400;">→</span> <strong style="color:var(--teal)">${t.a}</strong></div><div style="font-size:10px;color:var(--amber);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📌 ${t.label||'–'}${globalAmountStr}</div></div><span style="font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;color:var(--amber);white-space:nowrap;flex-shrink:0;">${t.montant.toFixed(2)} €</span><div style="display:flex;gap:1px;flex-shrink:0;"><button onclick="openRembModal(window['_tr_${tId}'].de,window['_tr_${tId}'].a,window['_tr_${tId}'].montant,window['_tr_${tId}'].label)" title="Rembourser" style="${btnStyle}" onmouseover="this.style.background='var(--teal-pale)'" onmouseout="this.style.background='none'">💸</button><button onclick="_sendTransferMail(window['_tr_${tId}'].de,window['_tr_${tId}'].a,window['_tr_${tId}'].montant,window['_tr_${tId}'].label)" title="Mail" style="${btnStyle}" onmouseover="this.style.background='var(--teal-pale)'" onmouseout="this.style.background='none'">📧</button><button onclick="_cancelTransfer(window['_tr_${tId}'].de,window['_tr_${tId}'].a,window['_tr_${tId}'].montant,window['_tr_${tId}'].label)" title="Annuler" style="${btnStyle}" onmouseover="this.style.background='var(--sand-dark)'" onmouseout="this.style.background='none'">🚫</button><button onclick="_deleteTransfer(window['_tr_${tId}'].de,window['_tr_${tId}'].a,window['_tr_${tId}'].montant,window['_tr_${tId}'].label)" title="Supprimer" style="${btnStyle}" onmouseover="this.style.background='var(--red-pale)'" onmouseout="this.style.background='none'">🗑</button></div></div>`;
           }).join('')}
         </div>`}
     </div> <!-- end ca-section-virements -->
@@ -10698,26 +10709,6 @@ activités de la journée.
   </div>
 </div>
 
-
-<!-- NOUVELLE ACTIVITÉ MODAL -->
-<div id="new-activity-overlay" onclick="if(event.target===this)closeNewActivity()" style="position:fixed;inset:0;background:rgba(26,22,16,.6);z-index:3500;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .2s;">
-  <div id="new-activity-modal" style="background:var(--sand);border-radius:16px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(10px);transition:transform .2s;">
-    <div id="new-activity-header" style="background:var(--amber);color:white;padding:1rem 1.5rem;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;">
-      <div>
-        <div id="new-activity-title" style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;">Nouvelle activité</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:2px;">Ajout à la timeline</div>
-      </div>
-      <button class="modal-close" onclick="closeNewActivity()">✕</button>
-    </div>
-    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:12px;" id="new-activity-body">
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;padding:1rem 1.5rem;border-top:.5px solid var(--sand-dark);background:white;border-radius:0 0 16px 16px;">
-      <button class="pay-btn-cancel" onclick="closeNewActivity()">Annuler</button>
-      <button id="new-activity-save-btn" class="pay-btn-ok" onclick="saveNewActivity()">+ Ajouter</button>
-    </div>
-  </div>
-</div>
-
 <!-- MEMBER DETAIL MODAL -->
 <div id="member-detail-overlay" onclick="if(event.target===this)closeMemberDetail()" style="position:fixed;inset:0;background:rgba(26,22,16,.65);z-index:4500;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .2s;">
   <div id="member-detail-modal" style="background:var(--sand);border-radius:16px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(10px);transition:transform .2s;">
@@ -10903,6 +10894,27 @@ activités de la journée.
 
 </div>
 </div>
+
+
+<!-- NOUVELLE ACTIVITÉ MODAL -->
+<div id="new-activity-overlay" onclick="if(event.target===this)closeNewActivity()" style="position:fixed;inset:0;background:rgba(26,22,16,.6);z-index:3500;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .2s;">
+  <div id="new-activity-modal" style="background:var(--sand);border-radius:16px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(10px);transition:transform .2s;">
+    <div id="new-activity-header" style="background:var(--amber);color:white;padding:1rem 1.5rem;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;">
+      <div>
+        <div id="new-activity-title" style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;">Nouvelle activité</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:2px;">Ajout à la timeline</div>
+      </div>
+      <button class="modal-close" onclick="closeNewActivity()">✕</button>
+    </div>
+    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:12px;" id="new-activity-body">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;padding:1rem 1.5rem;border-top:.5px solid var(--sand-dark);background:white;border-radius:0 0 16px 16px;">
+      <button class="pay-btn-cancel" onclick="closeNewActivity()">Annuler</button>
+      <button id="new-activity-save-btn" class="pay-btn-ok" onclick="saveNewActivity()">+ Ajouter</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- VUES PLEINE PAGE -->
 <div id="checklist-view" style="display:none;position:fixed;inset:0;top:44px;background:var(--sand);overflow-y:auto;z-index:80;">
@@ -12415,7 +12427,12 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.18.0</div><div style="font-size:10px;color:var(--slate-light);">10/06/26</div></div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.19.0</div><div style="font-size:10px;color:var(--slate-light);">15/06/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Bouton FAB : label cliquable sur toute la ligne · Fix modale nouvelle activité (sortie du modal-overlay parent) · Compte Amis : montant global de la dépense affiché en suffixe du libellé</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.18.0</div><div style="font-size:10px;color:var(--slate-light);">10/06/26</div></div>
         <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correction menu : bouton Checklist restauré · Affichage À propos corrigé (une ligne par version) · Fenêtre Administration recentrée</div>
       </div>
 
