@@ -2479,6 +2479,7 @@ let currentModalIdx = null;
 async function openModal(idx) {
   currentModalIdx = idx;
   _lastModalIdx = idx; // toujours mémoriser le dernier idx ouvert
+  closeNewActivity(); // fermer la modale nouvelle activité si ouverte
 
   // Mise à jour des boutons prev/next
   _updateNavButtons(idx);
