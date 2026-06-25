@@ -11840,11 +11840,18 @@ async function createBackup(auto = false) {
   if (statusEl && !auto) { statusEl.className='admin-status info show'; statusEl.textContent='⏳ Sauvegarde en cours…'; }
   if (!SUPA_READY) { if (statusEl) { statusEl.className='admin-status err show'; statusEl.textContent='❌ Supabase non configuré'; } return; }
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/fiches?select=*`, { headers: SUPA_HEADERS });
-    const fiches = res.ok ? await res.json() : [];
-    const backup = { id:'backup_'+Date.now(), label:auto?'Auto':'Manuelle', fiches_count:fiches.length, data:fiches, created_at:new Date().toISOString() };
     const authH = await getAuthHeaders();
-    const saveRes = await fetch(`${SUPA_URL}/rest/v1/backups`, { method:'POST', headers:authH, body:JSON.stringify(backup) });
+    const res = await fetch(`${SUPA_URL}/rest/v1/fiches?select=*`, { headers: authH });
+    const fiches = res.ok ? await res.json() : [];
+    // ID fixe selon le type — une seule ligne par type, jamais plus de 2 lignes en base
+    const backupId = auto ? 'backup_auto' : 'backup_manual';
+    const backup = { id: backupId, label: auto ? 'Auto' : 'Manuelle', fiches_count: fiches.length, data: fiches, created_at: new Date().toISOString() };
+    // Upsert : met à jour si existe, crée sinon
+    const saveRes = await fetch(`${SUPA_URL}/rest/v1/backups`, {
+      method: 'POST',
+      headers: { ...authH, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify(backup)
+    });
     if (!saveRes.ok) throw new Error('HTTP ' + saveRes.status);
     if (statusEl && !auto) {
       statusEl.className='admin-status ok show';
