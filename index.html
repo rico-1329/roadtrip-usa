@@ -668,6 +668,21 @@
     .filters-inner{gap:4px;}
     .multi-select-btn{font-size:11px;padding:4px 9px;}
     .search-box{width:90px;font-size:13px;}
+
+    /* Checklist : tableau → cartes empilées (sinon débordement illisible sur iPhone) */
+    .checklist-table thead{display:none;}
+    .checklist-table, .checklist-table tbody, .checklist-table tr, .checklist-table td{display:block;width:100%;}
+    .checklist-table tr{margin-bottom:8px;border:1px solid var(--sand-dark);border-radius:8px;overflow:hidden;}
+    .checklist-table td{box-sizing:border-box;text-align:right;padding:8px 10px 8px 46%;position:relative;min-height:32px;border-bottom:.5px solid var(--sand-dark);}
+    .checklist-table td:last-child{border-bottom:none;}
+    .checklist-table td[data-label]::before{
+      content:attr(data-label);
+      position:absolute;left:10px;top:8px;
+      font-weight:600;text-align:left;color:var(--slate-light);
+      font-size:10px;text-transform:uppercase;letter-spacing:.03em;
+    }
+    .checklist-table td input[type="date"],
+    .checklist-table td input[type="text"]{width:100%!important;text-align:right;}
     .btn-fullscreen{display:none;}
 
     /* Layout */
@@ -828,7 +843,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.20.0 · 25/06/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.21.0 · 05/07/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -6309,6 +6324,10 @@ function openChecklist() {
   });
   document.getElementById('nav-checklist-btn')?.classList.add('active');
   renderChecklist();
+  // Toujours retirer la dernière version depuis Supabase à l'ouverture de l'onglet,
+  // au cas où la session est restée ouverte depuis longtemps (typique sur iPhone/Safari)
+  // et n'a donc pas rechargé les données depuis le login.
+  _loadChecklistFromSupabase().then(() => renderChecklist());
 }
 
 function renderChecklist() {
@@ -6384,7 +6403,7 @@ function renderChecklist() {
         <span style="color:var(--slate-light);font-size:12px;flex-shrink:0;">${expanded?'▲':'▼'}</span>
       </div>
       ${expanded?`<div style="border-top:1px solid var(--sand-dark);">
-        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <table class="checklist-table" style="width:100%;border-collapse:collapse;font-size:12px;">
           <thead><tr style="background:var(--ink);color:var(--sand);">
             <th style="padding:7px 14px;text-align:left;font-weight:500;font-size:11px;">Participant</th>
             <th style="padding:7px 10px;text-align:center;font-weight:500;font-size:11px;width:40px;">✅</th>
@@ -6404,17 +6423,17 @@ function renderChecklist() {
               const rowBg = pLate?'var(--red-pale)':isChecked?'var(--green-pale)':pi%2===0?'white':'var(--sand)';
               const doc = check.file;
               return `<tr style="background:${rowBg};border-bottom:.5px solid var(--sand-dark);">
-                <td style="padding:7px 14px;font-weight:600;color:${pLate?'var(--red)':isChecked?'var(--green)':'var(--teal)'};">${prenom}</td>
-                <td style="padding:7px 10px;text-align:center;"><input type="checkbox" ${isChecked?'checked':''} onchange="_toggleCheck(${idx},'${prenom}',this.checked)" style="width:16px;height:16px;accent-color:var(--teal);cursor:pointer;"></td>
-                <td style="padding:7px 10px;text-align:center;color:${isChecked?'var(--green)':'var(--slate-light)'};">${check.date?new Date(check.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'–'}</td>
-                <td style="padding:7px 10px;text-align:center;"><input type="date" value="${check.dateLimit||item.dateLimit||''}" onchange="_updateCheckParticipant(${idx},'${prenom}','dateLimit',this.value)" style="font-family:'DM Sans',sans-serif;font-size:11px;border:1px solid var(--sand-dark);border-radius:6px;padding:2px 4px;background:white;color:${pLate?'var(--red)':'var(--ink)'};outline:none;width:110px;"></td>
-                <td style="padding:7px 10px;text-align:center;"><input type="date" value="${check.nextCheck||item.nextCheck||''}" onchange="_updateCheckParticipant(${idx},'${prenom}','nextCheck',this.value)" style="font-family:'DM Sans',sans-serif;font-size:11px;border:1px solid var(--sand-dark);border-radius:6px;padding:2px 4px;background:white;color:var(--ink);outline:none;width:110px;"></td>
-                <td style="padding:7px 10px;"><input type="text" value="${check.commentaire||''}" placeholder="Note…" onblur="_updateCheckParticipant(${idx},'${prenom}','commentaire',this.value)" style="font-family:'DM Sans',sans-serif;font-size:11px;border:1px solid var(--sand-dark);border-radius:6px;padding:4px 6px;background:white;color:var(--ink);outline:none;width:100%;"></td>
-                <td style="padding:7px 10px;text-align:center;">${doc
-                  ?`<div style="display:flex;align-items:center;gap:3px;justify-content:center;"><a href="${doc.data}" download="${doc.name}" style="font-size:18px;text-decoration:none;">📄</a><button onclick="_removeChecklistDoc(${idx},'${prenom}')" style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--slate-light);" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button></div>`
-                  :`<label style="cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;">📎<input type="file" style="display:none;" onchange="_uploadChecklistDoc(${idx},'${prenom}',this)"></label>`
+                <td data-label="Participant" style="padding:7px 14px;font-weight:600;color:${pLate?'var(--red)':isChecked?'var(--green)':'var(--teal)'};">${prenom}</td>
+                <td data-label="Fait" style="padding:7px 10px;text-align:center;"><input type="checkbox" ${isChecked?'checked':''} onchange="_toggleCheck(${idx},'${prenom}',this.checked)" style="width:16px;height:16px;accent-color:var(--teal);cursor:pointer;"></td>
+                <td data-label="Date check" style="padding:7px 10px;text-align:center;color:${isChecked?'var(--green)':'var(--slate-light)'};">${check.date?new Date(check.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'–'}</td>
+                <td data-label="Date limite" style="padding:7px 10px;text-align:center;"><input type="date" value="${check.dateLimit||item.dateLimit||''}" onchange="_updateCheckParticipant(${idx},'${prenom}','dateLimit',this.value)" style="font-family:'DM Sans',sans-serif;font-size:11px;border:1px solid var(--sand-dark);border-radius:6px;padding:2px 4px;background:white;color:${pLate?'var(--red)':'var(--ink)'};outline:none;width:110px;"></td>
+                <td data-label="Prochain check" style="padding:7px 10px;text-align:center;"><input type="date" value="${check.nextCheck||item.nextCheck||''}" onchange="_updateCheckParticipant(${idx},'${prenom}','nextCheck',this.value)" style="font-family:'DM Sans',sans-serif;font-size:11px;border:1px solid var(--sand-dark);border-radius:6px;padding:2px 4px;background:white;color:var(--ink);outline:none;width:110px;"></td>
+                <td data-label="Commentaire" style="padding:7px 10px;"><input type="text" value="${check.commentaire||''}" placeholder="Note…" onblur="_updateCheckParticipant(${idx},'${prenom}','commentaire',this.value)" style="font-family:'DM Sans',sans-serif;font-size:11px;border:1px solid var(--sand-dark);border-radius:6px;padding:4px 6px;background:white;color:var(--ink);outline:none;width:100%;"></td>
+                <td data-label="Document" style="padding:7px 10px;text-align:center;">${doc
+                  ?`<div style="display:flex;align-items:center;gap:3px;justify-content:center;"><button onclick="_openDocViewer('${(doc.url||doc.data||'').replace(/'/g,"\\'")}','${(doc.name||'').replace(/'/g,"\\'")}','${doc.type||''}')" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0;">📄</button><button onclick="_removeChecklistDoc(${idx},'${prenom}')" style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--slate-light);" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button></div>`
+                  :`<label style="cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;">📎<input type="file" accept="application/pdf,image/jpeg,image/png" style="display:none;" onchange="_uploadChecklistDoc(${idx},'${prenom}',this)"></label>`
                 }</td>
-                <td style="padding:7px 10px;text-align:center;">
+                <td data-label="Retirer" style="padding:7px 10px;text-align:center;">
                   <button onclick="_removeChecklistParticipant(${idx},'${prenom}')" title="Retirer ${prenom} de cette démarche"
                     style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:14px;"
                     onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">🗑</button>
@@ -6472,26 +6491,72 @@ async function _updateChecklistField(idx, field, value) {
 async function _uploadChecklistDoc(idx, prenom, input) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 5 * 1024 * 1024) { alert('Fichier trop grand (max 5 Mo)'); return; }
-  const reader = new FileReader();
-  reader.onload = e => {
+  const MAX_SIZE = 20 * 1024 * 1024; // 20 Mo, comme les docs hôtel
+  const ALLOWED  = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+  if (!ALLOWED.includes(file.type)) {
+    alert(file.name + ' : format non supporté (PDF, JPG, PNG uniquement)');
+    input.value = '';
+    return;
+  }
+  if (file.size > MAX_SIZE) {
+    alert(file.name + ' trop grand (max 20 Mo)');
+    input.value = '';
+    return;
+  }
+  if (!SUPA_READY) {
+    alert('Connexion Supabase indisponible, réessayez plus tard.');
+    return;
+  }
+
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const path = `checklist/item-${idx}/${encodeURIComponent(prenom)}/${Date.now()}-${safeName}`;
+
+  try {
+    const res = await fetch(`${SUPA_URL}/storage/v1/object/roadtrip-docs/${path}`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': file.type, 'x-upsert': 'true' },
+      body: file
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || ('HTTP ' + res.status));
+    }
+    const url = `${SUPA_URL}/storage/v1/object/public/roadtrip-docs/${path}`;
+
     const list = _loadChecklist();
     if (!list[idx].checks) list[idx].checks = {};
     if (!list[idx].checks[prenom]) list[idx].checks[prenom] = {};
-    list[idx].checks[prenom].file = { name: file.name, data: e.target.result };
-    _saveChecklist(list);
+    list[idx].checks[prenom].file = {
+      name: file.name, url, path, type: file.type, size: file.size,
+      addedAt: new Date().toISOString()
+    };
+    await _saveChecklist(list);
     renderChecklist();
-  };
-  reader.readAsDataURL(file);
+  } catch (e) {
+    alert('Erreur upload ' + file.name + ' : ' + e.message);
+  } finally {
+    input.value = '';
+  }
 }
 
-function _removeChecklistDoc(idx, prenom) {
+async function _removeChecklistDoc(idx, prenom) {
+  if (!confirm('Supprimer ce document ?')) return;
   const list = _loadChecklist();
-  if (list[idx]?.checks?.[prenom]) {
-    delete list[idx].checks[prenom].file;
-    _saveChecklist(list);
-    renderChecklist();
+  const doc = list[idx]?.checks?.[prenom]?.file;
+  if (!doc) return;
+
+  if (doc.path && SUPA_READY) {
+    try {
+      await fetch(`${SUPA_URL}/storage/v1/object/roadtrip-docs/${doc.path}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + SUPA_KEY }
+      });
+    } catch (e) { console.warn('Suppression Supabase Storage échouée :', e.message); }
   }
+
+  delete list[idx].checks[prenom].file;
+  await _saveChecklist(list);
+  renderChecklist();
 }
 
 async function _deleteChecklistItem(idx) {
@@ -6583,7 +6648,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols · ${steps.filter(s=>s.type==='activity').length} activités<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.20.0 · 25/06/26
+        Version : v2.21.0 · 05/07/26
       </div>
     </div>
 ${_renderActionLog()}`;
@@ -12434,7 +12499,12 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.20.0</div><div style="font-size:10px;color:var(--slate-light);">25/06/26</div></div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.21.0</div><div style="font-size:10px;color:var(--slate-light);">05/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Checklist : rafraîchissement Supabase à chaque ouverture de l'onglet (les pièces jointes ne restaient visibles que sur l'appareil d'upload) · Documents checklist migrés en Supabase Storage (PDF/JPG/PNG, 20 Mo) au lieu d'un base64 embarqué dans la fiche · Tableau checklist responsive sur mobile (cartes empilées au lieu du débordement horizontal)</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.20.0</div><div style="font-size:10px;color:var(--slate-light);">25/06/26</div></div>
         <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Optimisation base de données · Sauvegarde : upsert sur ID fixe (backup_manual / backup_auto) · Suppression du bloat Supabase (1.5 GB récupérés) · Max 2 sauvegardes en base</div>
       </div>
 
