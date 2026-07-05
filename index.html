@@ -843,7 +843,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.21.0 · 05/07/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.23.0 · 05/07/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -3677,8 +3677,7 @@ async function _addHotelDocs(idx, input) {
         body: file
       });
       if (!res.ok) throw new Error('Upload échoué HTTP ' + res.status);
-      const url = `${SUPA_URL}/storage/v1/object/public/roadtrip-docs/${path}`;
-      d.docs.push({ url, path, name: file.name, type: file.type, size: file.size, caption: file.name.replace(/\.[^/.]+$/,''), addedAt: new Date().toISOString() });
+      d.docs.push({ path, name: file.name, type: file.type, size: file.size, caption: file.name.replace(/\.[^/.]+$/,''), addedAt: new Date().toISOString() });
     } catch(e) {
       alert('Erreur upload ' + file.name + ' : ' + e.message);
     }
@@ -3727,6 +3726,59 @@ function _openDocViewer(url, name, type) {
   }
 }
 
+// ── Bucket privé : génère une URL signée à durée limitée (5 min) au lieu d'une URL publique permanente ──
+async function _signStorageUrl(path, expiresIn = 300) {
+  if (!SUPA_READY) throw new Error('Supabase indisponible');
+  const res = await fetch(`${SUPA_URL}/storage/v1/object/sign/roadtrip-docs/${path}`, {
+    method: 'POST',
+    headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ expiresIn })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || ('HTTP ' + res.status));
+  }
+  const { signedURL } = await res.json();
+  return `${SUPA_URL}/storage/v1${signedURL}`;
+}
+
+async function _openHotelDoc(idx, di) {
+  const doc = (loadFiche(idx).docs || [])[di];
+  if (!doc) return;
+  try {
+    const url = doc.path ? await _signStorageUrl(doc.path) : doc.url;
+    _openDocViewer(url, doc.name || '', doc.type || '');
+  } catch (e) {
+    alert("Impossible d'ouvrir le document : " + e.message);
+  }
+}
+
+async function _openActDoc(stepId, di) {
+  const s = _actEtapes.find(e => e.id === stepId);
+  const doc = (s?.docs || [])[di];
+  if (!doc) return;
+  try {
+    const url = doc.path ? await _signStorageUrl(doc.path) : doc.url;
+    _openDocViewer(url, doc.name || '', doc.type || '');
+  } catch (e) {
+    alert("Impossible d'ouvrir le document : " + e.message);
+  }
+}
+
+async function _openChecklistDoc(idx, prenom) {
+  const list = _loadChecklist();
+  const doc = list[idx]?.checks?.[prenom]?.file;
+  if (!doc) return;
+  try {
+    // doc.path : nouveaux uploads (Supabase Storage) → signature à la demande
+    // doc.data : anciens documents (base64 embarqué avant migration) → utilisable tel quel
+    const url = doc.path ? await _signStorageUrl(doc.path) : (doc.url || doc.data);
+    _openDocViewer(url, doc.name || '', doc.type || '');
+  } catch (e) {
+    alert("Impossible d'ouvrir le document : " + e.message);
+  }
+}
+
 function _renderDocsSection(idx, saved) {
   const docs = saved.docs || [];
   const iconFor = (type, name) => {
@@ -3756,7 +3808,7 @@ function _renderDocsSection(idx, saved) {
             <div style="font-size:12px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${doc.caption || doc.name}</div>
             <div style="font-size:10px;color:var(--slate-light);">${sizeStr(doc.size)}${doc.addedAt ? ' · ' + new Date(doc.addedAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : ''}</div>
           </div>
-          <button onclick="_openDocViewer('${doc.url}','${(doc.name||'').replace(/'/g,"\'")}','${doc.type}')" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 9px;border-radius:6px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;white-space:nowrap;flex-shrink:0;">Ouvrir</button>
+          <button onclick="_openHotelDoc(${idx},${di})" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 9px;border-radius:6px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;white-space:nowrap;flex-shrink:0;">Ouvrir</button>
           <button onclick="_deleteHotelDoc(${idx},${di})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:13px;padding:2px 4px;border-radius:4px;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
         </div>`).join('')
       : '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucun document. Ajoutez vos confirmations de réservation, bons de commande…</div>'}
@@ -3921,7 +3973,7 @@ function _actRender() {
                 <div style="font-size:11px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${doc.caption||doc.name}</div>
                 <div style="font-size:10px;color:var(--slate-light);">${sizeStr}${sizeStr&&dateStr?' · ':''}${dateStr}</div>
               </div>
-              <button onclick="_openDocViewer('${doc.url}','${(doc.name||'').replace(/'/g,"\'")}','${doc.type}')" style="font-size:10px;padding:2px 7px;border-radius:5px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;">Ouvrir</button>
+              <button onclick="_openActDoc(${s.id},${di})" style="font-size:10px;padding:2px 7px;border-radius:5px;border:.5px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;">Ouvrir</button>
               <button onclick="_actDeleteDoc(${s.id},${di})" style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:12px;padding:1px 3px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button>
             </div>`;}).join('')
           : '<div style="font-size:11px;color:var(--slate-light);">Aucun document. Ajoutez vos confirmations, billets…</div>'}
@@ -4217,8 +4269,7 @@ async function _actAddDoc(stepId, input) {
         body: file
       });
       if (!res.ok) throw new Error('Upload HTTP ' + res.status);
-      const url = `${SUPA_URL}/storage/v1/object/public/roadtrip-docs/${path}`;
-      s.docs.push({ url, path, name: file.name, type: file.type, size: file.size, caption: file.name.replace(/\.[^/.]+$/,''), addedAt: new Date().toISOString() });
+      s.docs.push({ path, name: file.name, type: file.type, size: file.size, caption: file.name.replace(/\.[^/.]+$/,''), addedAt: new Date().toISOString() });
     } catch(e) { alert('Erreur upload ' + file.name + ' : ' + e.message); }
     done++;
     if (done === files.length) { _actSaveStepMedia(); _actRender(); }
@@ -6403,6 +6454,10 @@ function renderChecklist() {
         <span style="color:var(--slate-light);font-size:12px;flex-shrink:0;">${expanded?'▲':'▼'}</span>
       </div>
       ${expanded?`<div style="border-top:1px solid var(--sand-dark);">
+        <div style="padding:8px 14px;background:var(--sand);border-bottom:1px solid var(--sand-dark);display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="hasdoc-${idx}" ${item.hasDocument!==false?'checked':''} onchange="_updateChecklistField(${idx},'hasDocument',this.checked)" style="width:15px;height:15px;accent-color:var(--amber);cursor:pointer;">
+          <label for="hasdoc-${idx}" style="font-size:11px;color:var(--slate-light);cursor:pointer;">📁 Cette démarche nécessite un document papier à classer</label>
+        </div>
         <table class="checklist-table" style="width:100%;border-collapse:collapse;font-size:12px;">
           <thead><tr style="background:var(--ink);color:var(--sand);">
             <th style="padding:7px 14px;text-align:left;font-weight:500;font-size:11px;">Participant</th>
@@ -6412,6 +6467,7 @@ function renderChecklist() {
             <th style="padding:7px 10px;text-align:center;font-weight:500;font-size:11px;">Prochain check</th>
             <th style="padding:7px 10px;text-align:left;font-weight:500;font-size:11px;">Commentaire</th>
             <th style="padding:7px 10px;text-align:center;font-weight:500;font-size:11px;width:50px;">📎</th>
+            ${item.hasDocument!==false?'<th style="padding:7px 10px;text-align:center;font-weight:500;font-size:11px;width:40px;" title="Document papier classé dans le classeur">📁</th>':''}
             <th style="padding:7px 10px;text-align:center;font-weight:500;font-size:11px;width:40px;">🗑</th>
           </tr></thead>
           <tbody>
@@ -6430,9 +6486,10 @@ function renderChecklist() {
                 <td data-label="Prochain check" style="padding:7px 10px;text-align:center;"><input type="date" value="${check.nextCheck||item.nextCheck||''}" onchange="_updateCheckParticipant(${idx},'${prenom}','nextCheck',this.value)" style="font-family:'DM Sans',sans-serif;font-size:11px;border:1px solid var(--sand-dark);border-radius:6px;padding:2px 4px;background:white;color:var(--ink);outline:none;width:110px;"></td>
                 <td data-label="Commentaire" style="padding:7px 10px;"><input type="text" value="${check.commentaire||''}" placeholder="Note…" onblur="_updateCheckParticipant(${idx},'${prenom}','commentaire',this.value)" style="font-family:'DM Sans',sans-serif;font-size:11px;border:1px solid var(--sand-dark);border-radius:6px;padding:4px 6px;background:white;color:var(--ink);outline:none;width:100%;"></td>
                 <td data-label="Document" style="padding:7px 10px;text-align:center;">${doc
-                  ?`<div style="display:flex;align-items:center;gap:3px;justify-content:center;"><button onclick="_openDocViewer('${(doc.url||doc.data||'').replace(/'/g,"\\'")}','${(doc.name||'').replace(/'/g,"\\'")}','${doc.type||''}')" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0;">📄</button><button onclick="_removeChecklistDoc(${idx},'${prenom}')" style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--slate-light);" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button></div>`
+                  ?`<div style="display:flex;align-items:center;gap:3px;justify-content:center;"><button onclick="_openChecklistDoc(${idx},'${prenom}')" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0;">📄</button><button onclick="_removeChecklistDoc(${idx},'${prenom}')" style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--slate-light);" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">✕</button></div>`
                   :`<label style="cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;">📎<input type="file" accept="application/pdf,image/jpeg,image/png" style="display:none;" onchange="_uploadChecklistDoc(${idx},'${prenom}',this)"></label>`
                 }</td>
+                ${item.hasDocument!==false?`<td data-label="Classeur papier" style="padding:7px 10px;text-align:center;"><input type="checkbox" ${check.classeur?'checked':''} onchange="_updateCheckParticipant(${idx},'${prenom}','classeur',this.checked)" title="Document papier classé dans le classeur" style="width:16px;height:16px;accent-color:var(--amber);cursor:pointer;"></td>`:''}
                 <td data-label="Retirer" style="padding:7px 10px;text-align:center;">
                   <button onclick="_removeChecklistParticipant(${idx},'${prenom}')" title="Retirer ${prenom} de cette démarche"
                     style="background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:14px;"
@@ -6522,13 +6579,12 @@ async function _uploadChecklistDoc(idx, prenom, input) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.message || ('HTTP ' + res.status));
     }
-    const url = `${SUPA_URL}/storage/v1/object/public/roadtrip-docs/${path}`;
 
     const list = _loadChecklist();
     if (!list[idx].checks) list[idx].checks = {};
     if (!list[idx].checks[prenom]) list[idx].checks[prenom] = {};
     list[idx].checks[prenom].file = {
-      name: file.name, url, path, type: file.type, size: file.size,
+      name: file.name, path, type: file.type, size: file.size,
       addedAt: new Date().toISOString()
     };
     await _saveChecklist(list);
@@ -6649,7 +6705,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols · ${steps.filter(s=>s.type==='activity').length} activités<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.21.0 · 05/07/26
+        Version : v2.23.0 · 05/07/26
       </div>
     </div>
 ${_renderActionLog()}`;
@@ -12500,7 +12556,17 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.21.0</div><div style="font-size:10px;color:var(--slate-light);">05/07/26</div></div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.23.0</div><div style="font-size:10px;color:var(--slate-light);">05/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Sécurité : documents (hôtel, activités, checklist) ouverts via URL signée à durée limitée (5 min) au lieu d'une URL publique permanente · Nécessite le passage du bucket Storage en privé côté Supabase</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.22.0</div><div style="font-size:10px;color:var(--slate-light);">05/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Checklist : nouvelle case "📁 Classeur papier" par participant pour confirmer que le document physique est bien classé, en plus de la pièce jointe numérique · Interrupteur par démarche pour masquer cette case sur celles qui n'ont pas de document papier (activé par défaut)</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.21.0</div><div style="font-size:10px;color:var(--slate-light);">05/07/26</div></div>
         <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Checklist : rafraîchissement Supabase à chaque ouverture de l'onglet (les pièces jointes ne restaient visibles que sur l'appareil d'upload) · Documents checklist migrés en Supabase Storage (PDF/JPG/PNG, 20 Mo) au lieu d'un base64 embarqué dans la fiche · Tableau checklist responsive sur mobile (cartes empilées au lieu du débordement horizontal)</div>
       </div>
 
