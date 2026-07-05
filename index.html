@@ -6509,7 +6509,8 @@ async function _uploadChecklistDoc(idx, prenom, input) {
   }
 
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const path = `checklist/item-${idx}/${encodeURIComponent(prenom)}/${Date.now()}-${safeName}`;
+  const safePrenom = prenom.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9._-]/g, '_');
+  const path = `checklist/item-${idx}/${safePrenom}/${Date.now()}-${safeName}`;
 
   try {
     const res = await fetch(`${SUPA_URL}/storage/v1/object/roadtrip-docs/${path}`, {
