@@ -1836,6 +1836,10 @@
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouvelle dépense</span>
     <button style="width:40px;height:40px;border-radius:50%;background:var(--green);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;">💰</button>
   </div>
+  <div onclick="openNewActivity('trajet');closeFab();" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+    <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouveau trajet</span>
+    <button style="width:40px;height:40px;border-radius:50%;background:var(--slate);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;">🚗</button>
+  </div>
   <div onclick="openNewActivity('etape');closeFab();" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;background:var(--ink);color:var(--sand);padding:4px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);">Nouvelle étape</span>
     <button style="width:40px;height:40px;border-radius:50%;background:var(--amber);color:white;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;">🏨</button>
@@ -2967,9 +2971,27 @@ function _renderModalContent(idx) {
     // Les adresses éditables priment sur les valeurs par défaut du code
     const _dep = saved.adrdep || step.from || '';
     const _arr = saved.adrarr || step.to   || '';
-    const gmUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(_dep)}&destination=${encodeURIComponent(_arr)}&travelmode=driving`;
-    const cFrom = findCoords(_dep) || findCoords(step.from);
-    const cTo   = findCoords(_arr) || findCoords(step.to);
+    const gmUrl = saved.custom_maps_url
+      ? saved.custom_maps_url
+      : `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(_dep)}&destination=${encodeURIComponent(_arr)}&travelmode=driving`;
+
+    // Priorité aux coordonnées exactes du lien détaillé (si présent) — le matching findCoords()
+    // est trop approximatif (table de villes réduite) et peut faire correspondre deux adresses
+    // différentes à la même entrée générique, ce qui casse le bouton Plans (départ = arrivée).
+    let cFrom = null, cTo = null;
+    if (saved.waypoints) {
+      try {
+        const wp = JSON.parse(saved.waypoints);
+        if (Array.isArray(wp) && wp.length >= 2) {
+          cFrom = [wp[0].lat, wp[0].lng];
+          cTo   = [wp[wp.length-1].lat, wp[wp.length-1].lng];
+        }
+      } catch(e) {}
+    }
+    if (!cFrom || !cTo) {
+      cFrom = findCoords(_dep) || findCoords(step.from);
+      cTo   = findCoords(_arr) || findCoords(step.to);
+    }
     const appleUrl = cFrom && cTo
       ? `https://maps.apple.com/?saddr=${cFrom[0]},${cFrom[1]}&daddr=${cTo[0]},${cTo[1]}&dirflg=d`
       : `https://maps.apple.com/?saddr=${encodeURIComponent(_dep)}&daddr=${encodeURIComponent(_arr)}&dirflg=d`;
@@ -2997,7 +3019,7 @@ function _renderModalContent(idx) {
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:0;">
         <a class="map-open-btn" id="drive-gm-btn" href="${gmUrl}" target="_blank">🗺 Ouvrir l'itinéraire dans Google Maps</a>
-        <a class="map-open-btn" id="drive-apple-btn" href="${appleUrl}" target="_blank" style="background:#000;color:white;border-color:#000;">🍎 Ouvrir l'itinéraire dans Plans</a>
+        <a class="map-open-btn" id="drive-apple-btn" href="${appleUrl}" target="_blank" style="background:#000;color:white;border-color:#000;">🍎 Ouvrir Départ → Arrivée dans Plans</a>
         <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--orange-pale);border-left:3px solid var(--amber);border-radius:8px;">
           <span style="font-size:15px;flex-shrink:0;">🗺️</span>
           <div>
@@ -3012,6 +3034,20 @@ function _renderModalContent(idx) {
           <div class="field"><label>Heure de départ</label><input type="time" id="f-hdep" value="${saved.hdep||''}" oninput="document.getElementById('map-hdep-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
           <div class="field"><label>Heure d'arrivée</label><input type="time" id="f-harr" value="${saved.harr||''}" oninput="document.getElementById('map-harr-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
         </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">🔗 Itinéraire détaillé (Google Maps)</div>
+        <div class="field">
+          <input type="text" id="f-route-link-input" placeholder="Coller un lien Google Maps avec étapes…">
+        </div>
+        <button type="button" onclick="_extractRouteWaypoints(${idx})"
+          style="font-family:'DM Sans',sans-serif;font-size:11px;padding:6px 14px;border-radius:8px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;margin-top:2px;">
+          Extraire les étapes
+        </button>
+        <div id="route-extract-preview-${idx}" style="margin-top:8px;"></div>
+        <input type="hidden" id="f-custom_maps_url" value="${(saved.custom_maps_url||'').replace(/"/g,'&quot;')}">
+        <input type="hidden" id="f-waypoints" value="${(saved.waypoints||'').replace(/"/g,'&quot;')}">
+        <div id="saved-waypoints-list-${idx}">${_renderSavedWaypointsList(saved.waypoints, idx)}</div>
       </div>
       <div class="modal-section">
         <div class="modal-section-title">Adresses</div>
@@ -3587,7 +3623,7 @@ function _renderModalContent(idx) {
 
   // Si carte trajet : initialiser la map
   if (steps[idx]?.type === 'drive') {
-    setTimeout(() => initDriveMap(steps[idx].from, steps[idx].to), 50);
+    setTimeout(() => initDriveMap(saved.adrdep || steps[idx].from, saved.adrarr || steps[idx].to, saved.waypoints), 50);
   }
 }
 
@@ -4138,6 +4174,122 @@ function _actClearAll(idx) {
 
 
 
+// ── ITINÉRAIRE DÉTAILLÉ (lien Google Maps avec étapes) ──
+
+function _parseGoogleMapsRouteLink(url) {
+  const pathMatch = url.match(/\/maps\/dir\/(.+?)\/@/);
+  if (!pathMatch) return { ok:false, error:"Format de lien non reconnu (attendu : lien Google Maps avec itinéraire, contenant '/maps/dir/…/@…')." };
+
+  const segments = pathMatch[1].split('/').map(s => decodeURIComponent(s.replace(/\+/g, ' ')));
+  if (segments.length < 2) return { ok:false, error:"Moins de 2 étapes trouvées dans le lien." };
+
+  const coordBlocks = [...url.matchAll(/!1d(-?\d+\.\d+)!2d(-?\d+\.\d+)/g)];
+
+  if (coordBlocks.length !== segments.length) {
+    return {
+      ok:false,
+      error:`Le nombre d'étapes (${segments.length}) ne correspond pas au nombre de coordonnées trouvées (${coordBlocks.length}). Extraction annulée par prudence — les lieux et coordonnées pourraient être mal associés.`
+    };
+  }
+
+  const points = segments.map((name, i) => ({
+    name,
+    lng: parseFloat(coordBlocks[i][1]),
+    lat: parseFloat(coordBlocks[i][2])
+  }));
+  return { ok:true, points };
+}
+
+function _extractRouteWaypoints(idx) {
+  const input = document.getElementById('f-route-link-input');
+  const preview = document.getElementById('route-extract-preview-' + idx);
+  const url = (input?.value || '').trim();
+  if (!url) { preview.innerHTML = '<div style="font-size:11px;color:var(--red);">Colle d\'abord un lien.</div>'; return; }
+
+  const result = _parseGoogleMapsRouteLink(url);
+  if (!result.ok) {
+    preview.innerHTML = `<div style="font-size:11px;color:var(--red);padding:8px 10px;background:#fdecea;border-radius:8px;">⚠️ ${result.error}</div>`;
+    return;
+  }
+
+  window._pendingRoute = window._pendingRoute || {};
+  window._pendingRoute[idx] = { url, points: result.points };
+
+  preview.innerHTML = `
+    <div style="font-size:11px;color:var(--ink-light);padding:8px 10px;background:var(--sand);border-radius:8px;">
+      <div style="font-weight:600;margin-bottom:6px;">${result.points.length} étapes trouvées :</div>
+      <ol style="margin:0;padding-left:16px;line-height:1.6;">
+        ${result.points.map(p => `<li>${p.name}</li>`).join('')}
+      </ol>
+      <button type="button" onclick="_applyExtractedRoute(${idx})"
+        style="margin-top:8px;font-family:'DM Sans',sans-serif;font-size:11px;padding:6px 14px;border-radius:8px;border:none;background:var(--teal);color:white;cursor:pointer;">
+        ✓ Valider et enregistrer
+      </button>
+      <button type="button" onclick="document.getElementById('route-extract-preview-${idx}').innerHTML=''"
+        style="margin-top:8px;margin-left:6px;font-family:'DM Sans',sans-serif;font-size:11px;padding:6px 14px;border-radius:8px;border:1px solid var(--sand-dark);background:transparent;color:var(--ink-light);cursor:pointer;">
+        Annuler
+      </button>
+    </div>`;
+}
+
+async function _applyExtractedRoute(idx) {
+  const pending = window._pendingRoute && window._pendingRoute[idx];
+  if (!pending) return;
+  const { url, points } = pending;
+  const first = points[0], last = points[points.length - 1];
+
+  document.getElementById('f-adrdep').value = first.name;
+  document.getElementById('f-adrarr').value = last.name;
+  document.getElementById('f-custom_maps_url').value = url;
+  document.getElementById('f-waypoints').value = JSON.stringify(points);
+
+  _updateDriveAddresses(first.name, last.name);
+  const gmBtn = document.getElementById('drive-gm-btn');
+  if (gmBtn) gmBtn.href = url;
+  initDriveMap(first.name, last.name, JSON.stringify(points));
+
+  document.getElementById('route-extract-preview-' + idx).innerHTML = '';
+  document.getElementById('f-route-link-input').value = '';
+  delete window._pendingRoute[idx];
+
+  await saveModal();
+  document.getElementById('saved-waypoints-list-' + idx).innerHTML = _renderSavedWaypointsList(JSON.stringify(points), idx);
+}
+
+function _renderSavedWaypointsList(waypointsJson, idx) {
+  if (!waypointsJson) return '';
+  let points;
+  try { points = JSON.parse(waypointsJson); } catch(e) { return ''; }
+  if (!Array.isArray(points) || points.length < 2) return '';
+  return `
+    <div style="font-size:11px;color:var(--ink-light);padding:8px 10px;background:var(--sand);border-radius:8px;margin-top:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-weight:600;">🗺️ Itinéraire enregistré (${points.length} étapes)</span>
+        <button type="button" onclick="_clearExtractedRoute(${idx})"
+          style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 10px;border-radius:8px;border:1px solid var(--red);background:transparent;color:var(--red);cursor:pointer;">
+          🗑 Supprimer
+        </button>
+      </div>
+      <ol style="margin:0;padding-left:16px;line-height:1.6;">
+        ${points.map(p => `<li>${p.name}</li>`).join('')}
+      </ol>
+    </div>`;
+}
+
+async function _clearExtractedRoute(idx) {
+  if (!confirm("Supprimer l'itinéraire détaillé ? Le bouton Google Maps repassera sur Départ → Arrivée simple.")) return;
+  document.getElementById('f-custom_maps_url').value = '';
+  document.getElementById('f-waypoints').value = '';
+  document.getElementById('saved-waypoints-list-' + idx).innerHTML = '';
+  await saveModal();
+  // Reconstruire les boutons et la carte avec les valeurs redevenues dynamiques
+  const dep = document.getElementById('f-adrdep')?.value || '';
+  const arr = document.getElementById('f-adrarr')?.value || '';
+  const gmBtn = document.getElementById('drive-gm-btn');
+  if (gmBtn) gmBtn.href = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(dep)}&destination=${encodeURIComponent(arr)}&travelmode=driving`;
+  initDriveMap(dep, arr, null);
+}
+
 function _updateDriveAddresses(dep, arr) {
   const depVal = dep !== null ? dep : document.getElementById('f-adrdep')?.value || '';
   const arrVal = arr !== null ? arr : document.getElementById('f-adrarr')?.value || '';
@@ -4149,14 +4301,28 @@ function _updateDriveAddresses(dep, arr) {
     const el = document.getElementById('drive-arr-display');
     if (el) el.textContent = arrVal;
   }
-  // Mettre à jour les liens maps
+  // Mettre à jour les liens maps — le bouton Google Maps garde l'itinéraire détaillé s'il existe
+  const customUrl = document.getElementById('f-custom_maps_url')?.value || '';
   const gmBtn = document.getElementById('drive-gm-btn');
-  if (gmBtn && depVal && arrVal) {
+  if (gmBtn && !customUrl && depVal && arrVal) {
     gmBtn.href = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(depVal) + '&destination=' + encodeURIComponent(arrVal) + '&travelmode=driving';
   }
   const appleBtn = document.getElementById('drive-apple-btn');
   if (appleBtn && depVal && arrVal) {
-    appleBtn.href = 'https://maps.apple.com/?saddr=' + encodeURIComponent(depVal) + '&daddr=' + encodeURIComponent(arrVal) + '&dirflg=d';
+    let cFrom = null, cTo = null;
+    const waypointsJson = document.getElementById('f-waypoints')?.value || '';
+    if (waypointsJson) {
+      try {
+        const wp = JSON.parse(waypointsJson);
+        if (Array.isArray(wp) && wp.length >= 2) {
+          cFrom = [wp[0].lat, wp[0].lng];
+          cTo   = [wp[wp.length-1].lat, wp[wp.length-1].lng];
+        }
+      } catch(e) {}
+    }
+    appleBtn.href = cFrom && cTo
+      ? `https://maps.apple.com/?saddr=${cFrom[0]},${cFrom[1]}&daddr=${cTo[0]},${cTo[1]}&dirflg=d`
+      : 'https://maps.apple.com/?saddr=' + encodeURIComponent(depVal) + '&daddr=' + encodeURIComponent(arrVal) + '&dirflg=d';
   }
 }
 
@@ -4957,7 +5123,7 @@ async function saveModal() {
 
   // Mettre à jour uniquement les champs du formulaire
   const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps','parking-montant','parking-note','hdep-max','horaires-commentaire',
-                  'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName'];
+                  'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName','custom_maps_url','waypoints'];
   fields.forEach(f => {
     const el = document.getElementById('f-' + f);
     if (el) data[f] = el.value;
@@ -5607,10 +5773,38 @@ function findCoords(name) {
   return null;
 }
 
-function initDriveMap(from, to) {
+function initDriveMap(from, to, waypointsJson) {
   if (driveMapInstance) { driveMapInstance.remove(); driveMapInstance = null; }
   const el = document.getElementById('drive-map');
   if (!el || typeof L === 'undefined') return;
+
+  // Itinéraire détaillé (lien Google Maps avec étapes) : on trace tous les points connus avec leurs coordonnées précises
+  let detailedPoints = null;
+  if (waypointsJson) {
+    try {
+      const wp = JSON.parse(waypointsJson);
+      if (Array.isArray(wp) && wp.length >= 2 && wp.every(p => typeof p.lat === 'number' && typeof p.lng === 'number')) {
+        detailedPoints = wp;
+      }
+    } catch(e) {}
+  }
+
+  if (detailedPoints) {
+    driveMapInstance = L.map('drive-map', { zoomControl:true, attributionControl:false });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom:19, subdomains:'abcd', attribution:'© OpenStreetMap © CARTO' }).addTo(driveMapInstance);
+
+    const latlngs = detailedPoints.map(p => [p.lat, p.lng]);
+    detailedPoints.forEach((p, i) => {
+      const isFirst = i === 0, isLast = i === detailedPoints.length - 1;
+      const label = isFirst ? 'A' : (isLast ? 'B' : (i+1));
+      const color = isFirst ? 'var(--amber)' : (isLast ? 'var(--teal)' : '#C8622A');
+      const icon = L.divIcon({ html:`<div style="background:${color};color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.3)">${label}</div>`, className:'', iconSize:[20,20], iconAnchor:[10,10] });
+      L.marker([p.lat, p.lng], { icon }).addTo(driveMapInstance).bindPopup(`<strong>${isFirst?'Départ':isLast?'Arrivée':'Étape '+(i+1)}</strong><br>${p.name}`);
+    });
+    L.polyline(latlngs, { color:'#C8622A', weight:2.5, dashArray:'6 5', opacity:.8 }).addTo(driveMapInstance);
+    driveMapInstance.fitBounds(L.latLngBounds(latlngs), { padding:[30, 30] });
+    return;
+  }
 
   const cFrom = findCoords(from);
   const cTo   = findCoords(to);
@@ -8208,6 +8402,23 @@ const NEW_ACTIVITY_CONFIGS = {
       <div class="pay-field"><label>Note</label>
         <textarea id="na-note" placeholder="Détails…" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;resize:vertical;min-height:60px;"></textarea></div>`
   },
+  trajet: {
+    title: '🚗 Nouveau trajet',
+    color: 'var(--slate)',
+    fields: `
+      <div class="pay-field"><label>Départ <span class="req">*</span></label>
+        <input type="text" id="na-from" placeholder="Ex. Jackson, WY…" style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;"></div>
+      <div class="pay-field"><label>Arrivée <span class="req">*</span></label>
+        <input type="text" id="na-to" placeholder="Ex. Yellowstone…" style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;"></div>
+      <div class="pay-field"><label>Date</label>
+        <input type="date" id="na-date" style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;" min="2026-07-28" max="2026-08-21"></div>
+      <div class="pay-field"><label>Distance (km)</label>
+        <input type="number" id="na-km" placeholder="0" min="0" style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;"></div>
+      <div class="pay-field"><label>Durée estimée</label>
+        <input type="text" id="na-duration" placeholder="Ex. 1h30" style="font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;"></div>
+      <div class="pay-field"><label>Note</label>
+        <textarea id="na-note" placeholder="Détails…" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:8px;background:white;color:var(--ink);outline:none;width:100%;box-sizing:border-box;resize:vertical;min-height:60px;"></textarea></div>`
+  },
   note: {
     title: '📝 Note libre',
     color: 'var(--slate)',
@@ -8251,21 +8462,32 @@ function closeNewActivity() {
 }
 
 async function saveNewActivity() {
+  const isTrajet = _newActivityType === 'trajet';
   const city  = document.getElementById('na-city')?.value.trim();
+  const from  = document.getElementById('na-from')?.value.trim() || '';
+  const to    = document.getElementById('na-to')?.value.trim()   || '';
   const note  = document.getElementById('na-note')?.value.trim() || '';
   const date  = document.getElementById('na-date')?.value || '';
   const prix  = parseFloat(document.getElementById('na-prix')?.value) || 0;
   const nights= parseInt(document.getElementById('na-nights')?.value) || 1;
   const hotel = document.getElementById('na-hotel')?.value.trim() || '';
+  const km    = parseFloat(document.getElementById('na-km')?.value) || 0;
+  const duration = document.getElementById('na-duration')?.value.trim() || '';
 
-  if (!city) {
+  if (isTrajet) {
+    if (!from || !to) {
+      const el = document.getElementById(!from ? 'na-from' : 'na-to');
+      if (el) { el.style.borderColor = 'var(--red)'; el.focus(); }
+      return;
+    }
+  } else if (!city) {
     const el = document.getElementById('na-city');
     if (el) { el.style.borderColor = 'var(--red)'; el.focus(); }
     return;
   }
 
   // Créer le nouveau step dynamique
-  const typeMap = { etape:'hotel', visite:'activity', depense:'depense', note:'hotel' };
+  const typeMap = { etape:'hotel', visite:'activity', depense:'depense', note:'hotel', trajet:'drive' };
   const isVisite = _newActivityType === 'visite';
   const newStep = isVisite ? {
     type:      'activity',
@@ -8279,6 +8501,17 @@ async function saveNewActivity() {
     id:        'dyn-' + Date.now(),
     _isDup:    true,
     _newActivity: 'visite',
+    _created:  new Date().toISOString()
+  } : isTrajet ? {
+    type:      'drive',
+    from, to,
+    dates:     date ? new Date(date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '',
+    dateDebut: date,
+    km:        km || '',
+    duration:  duration || '',
+    id:        'dyn-' + Date.now(),
+    _isDup:    true,
+    _newActivity: 'trajet',
     _created:  new Date().toISOString()
   } : {
     type:      typeMap[_newActivityType] || 'hotel',
@@ -8305,8 +8538,9 @@ async function saveNewActivity() {
   }
   steps.splice(insertAt, 0, newStep);
   await saveExtraSteps();
+  const displayName = isTrajet ? `${from} → ${to}` : city;
   _addActionLog('➕', isVisite ? 'Création activité' : 'Création fiche',
-    `"${city}" · type=${newStep.type} · date=${date || '–'}`);
+    `"${displayName}" · type=${newStep.type} · date=${date || '–'}`);
 
   // Créer la fiche avec la note
   const ficheData = { note, prix: String(prix||''), payments: [] };
@@ -8326,7 +8560,7 @@ async function saveNewActivity() {
   // Notification
   const notif = document.createElement('div');
   notif.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--amber);color:white;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:opacity .5s;white-space:nowrap;';
-  notif.textContent = `✅ "${city}" ajouté à la timeline`;
+  notif.textContent = `✅ "${displayName}" ajouté à la timeline`;
   document.body.appendChild(notif);
   setTimeout(() => { notif.style.opacity='0'; setTimeout(()=>notif.remove(),500); }, 3000);
 }
