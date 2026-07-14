@@ -197,6 +197,7 @@
 
   /* CARDS */
   .card{background:white;border-radius:12px;border:.5px solid var(--sand-dark);padding:1rem 1.25rem;transition:box-shadow .2s,transform .2s;}
+  .hotel-band{background:#0E1A2B;color:#CFE0FF;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px;padding:6px 1.25rem;margin:-1rem -1.25rem .75rem -1.25rem;border-radius:12px 12px 0 0;}
   .card:hover{box-shadow:0 4px 20px rgba(26,22,16,.08);transform:translateY(-1px);}
   .card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px;}
   .card-city{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;line-height:1.2;}
@@ -649,6 +650,7 @@
   @media(min-width:601px) and (max-width:860px){
     main{padding:1.5rem 1rem;}
     .card{padding:.85rem 1.1rem;}
+    .hotel-band{padding:5px 1.1rem;margin:-.85rem -1.1rem .65rem -1.1rem;}
     .card-city{font-size:1rem;}
     .flight-step-card{padding:.85rem 1.1rem;}
   }
@@ -694,6 +696,7 @@
 
     /* Cards */
     .card{padding:.7rem .85rem;border-radius:10px;}
+    .hotel-band{padding:4px .85rem;margin:-.7rem -.85rem .55rem -.85rem;border-radius:10px 10px 0 0;font-size:9px;}
     .card-city{font-size:.95rem;}
     .card-date{font-size:10px;padding:2px 6px;}
     .card-hotel{font-size:11px;margin-bottom:6px;}
@@ -1935,13 +1938,13 @@ let steps = [
     alerts:[{ kind:'info', label:'Premier plein inclus', detail:'Restituer le véhicule réservoir vide à San Francisco (SFO)' }] },
 
   // ── J1 : JACKSON, WYOMING ──
-  { id:'d-jac-elk', type:'drive', from:'Budget JAC · Airport Road', to:'Elk Country Inn Jackson', km:13, duration:'0h20' },
+  { id:'d-jac-elk', type:'drive', dateDebut:'2026-07-28', from:'Budget JAC · Airport Road', to:'Elk Country Inn Jackson', km:13, duration:'0h20' },
   { id:'h-20260728', type:'hotel', dates:'28 juil.', dateDebut:'2026-07-28', dateFin:'2026-07-29', nights:1, city:'Jackson, Wyoming', hotel:'Elk Country Inn Jackson ★', price:375, ptdej:true, annul:'avant le 25 juillet',
     visits:'Centre-ville (arcs en bois de cerf, boutiques western), National Museum of Wildlife Art, Cache Creek / Snow King Mountain',
     alerts:[{ kind:'urgent', label:'Annulation imminente', detail:'Date limite : 25 juillet' }] },
 
   // ── J2-4 : YELLOWSTONE / GRAND TETON ──
-  { id:'d-jac-yst', type:'drive', from:'Jackson', to:'Yellowstone / Grand Teton', km:100, duration:'1h30' },
+  { id:'d-jac-yst', type:'drive', dateDebut:'2026-07-29', from:'Jackson', to:'Yellowstone / Grand Teton', km:100, duration:'1h30' },
   { id:'h-20260729', type:'hotel', dates:'29 juil. – 1er août', dateDebut:'2026-07-29', dateFin:'2026-08-01', nights:3, city:'Yellowstone / Grand Teton, Wyoming', hotel:'Best Western Weston Inn ★', price:723, ptdej:true, annul:'avant le 20 juillet',
     visits:'Old Faithful, Grand Prismatic Spring, Grand Canyon de Yellowstone, Lamar Valley (bisons, ours, loups), Mammoth Hot Springs, Hayden Valley',
     alerts:[{ kind:'urgent', label:'Date limite possiblement dépassée', detail:'Annulation avant le 20 juillet — à vérifier d\'urgence' }] },
@@ -2007,43 +2010,43 @@ let steps = [
     ] },
 
   // ── J6-7 : MOAB / ARCHES ──
-  { id:'d-nuit-moab', type:'drive', from:'Étape nuit', to:'Moab / Arches', km:238, duration:'4h30' },
+  { id:'d-nuit-moab', type:'drive', dateDebut:'2026-08-02', from:'Étape nuit', to:'Moab / Arches', km:238, duration:'4h30' },
   { id:'h-20260802', type:'hotel', dates:'2 – 3 août', dateDebut:'2026-08-02', dateFin:'2026-08-04', nights:2, city:'Moab / Arches, Utah', hotel:'Hyatt Place (4 places)', price:377, ptdej:true, annul:'avant le 29 juillet',
     visits:'Delicate Arch, Landscape Arch & Devils Garden, Canyonlands, tour 4x4 ou VTT',
     alerts:[{ kind:'urgent', label:'Annulation imminente', detail:'Date limite : 29 juillet' }] },
 
   // ── J8 : MONUMENT VALLEY ──
-  { id:'d-moab-monument', type:'drive', from:'Moab', to:'Monument Valley', km:204, duration:'2h29' },
+  { id:'d-moab-monument', type:'drive', dateDebut:'2026-08-04', from:'Moab', to:'Monument Valley', km:204, duration:'2h29' },
   { id:'h-20260804', type:'hotel', dates:'4 août', dateDebut:'2026-08-04', dateFin:'2026-08-05', nights:1, city:'Monument Valley, Arizona', hotel:'The View Hotel', price:390, ptdej:false, annul:null,
     visits:'Tour 4x4 Navajo, Mittens & Merrick Butte, Forrest Gump Point (US163), coucher de soleil Artist\'s Point (6h-20h · 10€/pers)',
     alerts:[{ kind:'missing', label:'Politique d\'annulation manquante', detail:'Aucune date limite renseignée — contacter l\'hôtel' }] },
 
   // ── J9-10 : PAGE / ANTELOPE CANYON / LAC POWELL ──
-  { id:'d-monument-page', type:'drive', from:'Monument Valley', to:'Page / Antelope Canyon', km:145, duration:'3h16' },
+  { id:'d-monument-page', type:'drive', dateDebut:'2026-08-05', from:'Monument Valley', to:'Page / Antelope Canyon', km:145, duration:'3h16' },
   { id:'h-20260805', type:'hotel', dates:'5 – 6 août', dateDebut:'2026-08-05', dateFin:'2026-08-07', nights:2, city:'Page / Lac Powell, Arizona', hotel:'Days Inn & Suites by Wyndham', price:251, ptdej:true, annul:'avant le 4 août',
     visits:'Lower Antelope Canyon (déjà réservé), Upper Antelope Canyon, Horseshoe Bend, croisière ou kayak Lac Powell',
     alerts:[{ kind:'urgent', label:'Annulation proche', detail:'Date limite : 4 août' }] },
 
   // ── J11 : BRYCE CANYON / ZION ──
-  { id:'d-page-bryce', type:'drive', from:'Page', to:'Bryce Canyon / Zion', km:251, duration:'2h55' },
+  { id:'d-page-bryce', type:'drive', dateDebut:'2026-08-07', from:'Page', to:'Bryce Canyon / Zion', km:251, duration:'2h55' },
   { id:'h-20260807', type:'hotel', dates:'7 août', dateDebut:'2026-08-07', dateFin:'2026-08-08', nights:1, city:'Bryce Canyon / Zion, Utah', hotel:'Bryce Pioneer Village ★', price:149, ptdej:false, annul:'avant le 6 août',
     visits:'Navajo Loop + Queen\'s Garden, lever de soleil Sunrise Point, amphithéâtre Bryce (2300-2800m), Watchman Trail Zion',
     alerts:[{ kind:'urgent', label:'Annulation proche', detail:'Date limite : 6 août' }] },
 
   // ── J12 : KANAB ──
-  { id:'d-bryce-kanab', type:'drive', from:'Bryce Canyon', to:'Kanab', km:80, duration:'1h00' },
+  { id:'d-bryce-kanab', type:'drive', dateDebut:'2026-08-08', from:'Bryce Canyon', to:'Kanab', km:80, duration:'1h00' },
   { id:'h-20260808', type:'hotel', dates:'8 août', dateDebut:'2026-08-08', dateFin:'2026-08-09', nights:1, city:'Kanab, Utah', hotel:'La Quinta by Wyndham Kanab', price:100, ptdej:false, annul:null,
     visits:'Best Friends Animal Sanctuary, The Wave (permis requis), passage Zion (50 km)',
     alerts:[{ kind:'missing', label:'Politique d\'annulation manquante', detail:'À confirmer · Passage possible à Zion (50 km)' }] },
 
   // ── J13 : GRAND CANYON ──
-  { id:'d-kanab-gc', type:'drive', from:'Kanab', to:'Grand Canyon / Seligman', km:210, duration:'4h30' },
+  { id:'d-kanab-gc', type:'drive', dateDebut:'2026-08-09', from:'Kanab', to:'Grand Canyon / Seligman', km:210, duration:'4h30' },
   { id:'h-20260809', type:'hotel', dates:'9 août', dateDebut:'2026-08-09', dateFin:'2026-08-10', nights:1, city:'Grand Canyon, Arizona', hotel:'Grand Canyon Hotel & Suites ★', price:147, ptdej:true, annul:'avant le 3 août',
     visits:'Grand Canyon South Rim, Bright Angel Trail, Seligman (Route 66, Roadkill Café)',
     alerts:[{ kind:'urgent', label:'Annulation imminente', detail:'Date limite : 3 août' }] },
 
   // ── J14 : WILLIAMS / SELIGMAN OU KINGMAN (CHOIX À FAIRE) ──
-  { id:'d-gc-williams', type:'drive', from:'Grand Canyon', to:'Williams / Kingman', km:100, duration:'1h00' },
+  { id:'d-gc-williams', type:'drive', dateDebut:'2026-08-10', from:'Grand Canyon', to:'Williams / Kingman', km:100, duration:'1h00' },
   { id:'h-20260810', type:'hotel', dates:'10 août', dateDebut:'2026-08-10', dateFin:'2026-08-11', nights:1, city:'Williams / Seligman OU Kingman, Arizona', hotel:'⚠️ CHOIX À FAIRE : Howard Johnson Williams (opt. 1) / Ramada Wyndham Kingman (opt. 2)', price:104, ptdej:true, annul:'avant le 7 août',
     visits:'Williams : Main Street, Bearizona Wildlife Park, Grand Canyon Railway · Seligman : Route 66 vintage · Laughlin si possible',
     alerts:[
@@ -2052,7 +2055,7 @@ let steps = [
     ] },
 
   // ── J15-16 : LAS VEGAS ──
-  { id:'d-williams-lv', type:'drive', from:'Williams / Kingman', to:'Las Vegas', km:320, duration:'3h15' },
+  { id:'d-williams-lv', type:'drive', dateDebut:'2026-08-11', from:'Williams / Kingman', to:'Las Vegas', km:320, duration:'3h15' },
   { id:'h-20260811', type:'hotel', dates:'11 – 12 août', dateDebut:'2026-08-11', dateFin:'2026-08-13', nights:2, city:'Las Vegas, Nevada', hotel:'⚠️ CHOIX À FAIRE : New York New York (opt. 1) / Paris Las Vegas (opt. 2)', price:317, ptdej:false, annul:'avant le 8 août',
     visits:'Old Vegas, street art, quartier Fremont, The Strip',
     alerts:[
@@ -2061,7 +2064,7 @@ let steps = [
     ] },
 
   // ── J17 : DEATH VALLEY ──
-  { id:'d-lv-dv', type:'drive', from:'Las Vegas', to:'Death Valley', km:416, duration:'4h37' },
+  { id:'d-lv-dv', type:'drive', dateDebut:'2026-08-13', from:'Las Vegas', to:'Death Valley', km:416, duration:'4h37' },
   { id:'h-20260813', type:'hotel', dates:'13 août', dateDebut:'2026-08-13', dateFin:'2026-08-14', nights:1, city:'Death Valley, Californie', hotel:'Furnace Creek Ranch', price:189, ptdej:false, annul:'avant le 8 août',
     visits:'Badwater Basin, Zabriskie Point, visite Bagdad Café en route',
     alerts:[
@@ -2070,7 +2073,7 @@ let steps = [
     ] },
 
   // ── J18-19 : LOS ANGELES ──
-  { id:'d-dv-la', type:'drive', from:'Death Valley', to:'Los Angeles', km:400, duration:'4h00' },
+  { id:'d-dv-la', type:'drive', dateDebut:'2026-08-14', from:'Death Valley', to:'Los Angeles', km:400, duration:'4h00' },
   { id:'h-20260814', type:'hotel', dates:'14 – 15 août', dateDebut:'2026-08-14', dateFin:'2026-08-16', nights:2, city:'Los Angeles, Californie', hotel:'⚠️ CHOIX À FAIRE : Hollywood Celebrity Hotel (opt. 1) / Sure Stay Santa Monica (opt. 2)', price:387, ptdej:true, annul:'avant le 11 août',
     visits:'Hollywood Walk of Fame, Dolby Theatre, TCL Chinese Theatre, Getty Center, Beverly Hills, Rodeo Drive, Griffith Observatoire (lettres Hollywood), Universal CityWalk',
     alerts:[
@@ -2079,7 +2082,7 @@ let steps = [
     ] },
 
   // ── J20 : SOLVANG ──
-  { id:'d-la-solvang', type:'drive', from:'Los Angeles', to:'Solvang', km:200, duration:'2h00' },
+  { id:'d-la-solvang', type:'drive', dateDebut:'2026-08-16', from:'Los Angeles', to:'Solvang', km:200, duration:'2h00' },
   { id:'h-20260816', type:'hotel', dates:'16 août', dateDebut:'2026-08-16', dateFin:'2026-08-17', nights:1, city:'Solvang, Californie', hotel:'Solvang Inn & Cottages ★', price:148, ptdej:true, annul:'avant le 12 août',
     visits:'Village danois, dégustation de vins, balade à vélo dans la campagne',
     alerts:[
@@ -2088,13 +2091,13 @@ let steps = [
     ] },
 
   // ── J21 : MONTEREY ──
-  { id:'d-solvang-monterey', type:'drive', from:'Solvang', to:'Monterey', km:190, duration:'2h00' },
+  { id:'d-solvang-monterey', type:'drive', dateDebut:'2026-08-17', from:'Solvang', to:'Monterey', km:190, duration:'2h00' },
   { id:'h-20260817', type:'hotel', dates:'17 août', dateDebut:'2026-08-17', dateFin:'2026-08-18', nights:1, city:'Monterey, Californie', hotel:'Colton Inn', price:192, ptdej:true, annul:'avant le 13 août',
     visits:'Aquarium de Monterey (réserver à l\'avance), 17-Mile Drive, Cannery Row',
     alerts:[{ kind:'urgent', label:'Annulation proche', detail:'Date limite : 13 août' }] },
 
   // ── J22-23 : SAN FRANCISCO ──
-  { id:'d-monterey-sf', type:'drive', from:'Monterey', to:'San Francisco', km:190, duration:'2h00' },
+  { id:'d-monterey-sf', type:'drive', dateDebut:'2026-08-18', from:'Monterey', to:'San Francisco', km:190, duration:'2h00' },
   { id:'h-20260818', type:'hotel', dates:'18 – 19 août', dateDebut:'2026-08-18', dateFin:'2026-08-20', nights:2, city:'San Francisco, Californie', hotel:'⚠️ CHOIX À FAIRE : Hotel Caza Fisherman\'s Wharf (opt. 1) / Hotel Zetta San Francisco (opt. 2)', price:302, ptdej:false, annul:null,
     visits:'Cable car Powell Street, Union Square, Alcatraz (réserver des semaines à l\'avance), Financial District, Nob Hill, Twin Peaks, Crissy Field (vue Golden Gate)',
     alerts:[
@@ -2103,8 +2106,7 @@ let steps = [
     ] },
 
   // ── RESTITUTION VÉHICULE ──
-  { id:'d-sf-sfo', type:'drive', from:'Hôtel San Francisco', to:'San Francisco Airport SFO', km:22, duration:'0h30',
-    alerts:[{ kind:'info', label:'Restitution du véhicule', detail:'Budget SFO · 780 McDonnell Road · Réservoir vide' }] },
+  { id:'d-sf-sfo', type:'drive', dateDebut:'2026-08-20', from:'Hôtel San Francisco', to:'San Francisco Airport SFO', km:22, duration:'0h30' },
   { id:'car-return', type:'car-return', dates:'20 août · matin', city:'San Francisco Airport (SFO)', label:'Restitution du véhicule', sub:'Budget · 780 McDonnell Road, San Francisco', address:'780 McDonnell Road, San Francisco, CA', ref:'35554355FR4', bsp:'8878530806',
     alerts:[{ kind:'info', label:'Restituer réservoir vide', detail:'Premier plein inclus à la prise en charge — restitution à vide autorisée' }] },
 
@@ -2614,7 +2616,7 @@ function _renderModalContent(idx) {
     isFlight    ? `Lufthansa · Réf. ZKUZPE · Billet LH/ETKT 220 6059505613-14`
     : isCarPickup ? `Budget · Jackson Hole Airport · 28 juillet 2026 · 18h00`
     : isCarReturn ? `Budget · San Francisco Airport · 20 août 2026 · 18h00`
-    : isDrive   ? `Trajet · ${step.duration || '–'} · ${step.km ? step.km + ' km' : '–'}`
+    : isDrive   ? `${(saved.dateDebut || step.dateDebut) ? new Date((saved.dateDebut || step.dateDebut)+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}) + ' · ' : ''}Trajet · ${step.duration || '–'} · ${step.km ? step.km + ' km' : '–'}`
     : isActivityStep(step) ? `${step.dates}${step.heureDebut ? ' · ' + step.heureDebut + (step.heureFin ? ' → ' + step.heureFin : '') : ''}`
     : saved.hotelName
       ? `${saved.hotelName} · ${step.dates}`
@@ -2697,6 +2699,7 @@ function _renderModalContent(idx) {
         <div class="modal-section-title">Remarques</div>
         <div class="field"><textarea id="f-note" placeholder="Notes libres…">${saved.note || ''}</textarea></div>
       </div>
+      ${_alertsSectionHTML(idx, step, saved)}
       <div class="modal-section">
         <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
           <span>🔗 Liens utiles</span>
@@ -2818,6 +2821,7 @@ function _renderModalContent(idx) {
         <div class="modal-section-title">Remarques</div>
         <div class="field"><textarea id="f-note" placeholder="Numéros de siège, enregistrement en ligne, notes…">${saved.note||''}</textarea></div>
       </div>
+      ${_alertsSectionHTML(idx, step, saved)}
       <div class="modal-section">
         <div class="modal-section-title">💰 Finances</div>
         ${_inlineFinancesHTML('flight_main', 1207, idx)}
@@ -2916,6 +2920,7 @@ function _renderModalContent(idx) {
         <div class="modal-section-title">Remarques</div>
         <div class="field"><textarea id="f-note" placeholder="État du véhicule au retour, observations, n° de reçu…">${saved.note||''}</textarea></div>
       </div>
+      ${_alertsSectionHTML(idx, step, saved)}
       <div class="modal-section">
         <div class="modal-section-title">💰 Finances</div>
         ${_inlineFinancesHTML('car_main', 306, idx)}
@@ -2963,6 +2968,7 @@ function _renderModalContent(idx) {
         <div class="modal-section-title">Remarques</div>
         <div class="field"><textarea id="f-note" placeholder="Numéro d'immatriculation, état du véhicule, observations…">${saved.note||''}</textarea></div>
       </div>
+      ${_alertsSectionHTML(idx, step, saved)}
       <div class="modal-section">
         <div class="modal-section-title">💰 Finances</div>
         ${_inlineFinancesHTML('car_main', 306, idx)}
@@ -3029,8 +3035,9 @@ function _renderModalContent(idx) {
         </div>
       </div>
       <div class="modal-section" style="margin-top:1rem;">
-        <div class="modal-section-title">Horaires</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="modal-section-title">Date &amp; horaires</div>
+        <div class="field"><label>Jour du trajet</label><input type="date" id="f-dateDebut" value="${saved.dateDebut || step.dateDebut || ''}"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
           <div class="field"><label>Heure de départ</label><input type="time" id="f-hdep" value="${saved.hdep||''}" oninput="document.getElementById('map-hdep-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
           <div class="field"><label>Heure d'arrivée</label><input type="time" id="f-harr" value="${saved.harr||''}" oninput="document.getElementById('map-harr-display').textContent=this.value?'🕐 '+this.value:'–'"></div>
         </div>
@@ -3060,6 +3067,7 @@ function _renderModalContent(idx) {
         <div class="modal-section-title">Remarques</div>
         <div class="field"><textarea id="f-note" placeholder="Notes sur ce trajet…">${saved.note||''}</textarea></div>
       </div>
+      ${_alertsSectionHTML(idx, step, saved)}
       <div class="modal-section">
         <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
           <span>📸 Photos du trajet</span>
@@ -3442,38 +3450,7 @@ function _renderModalContent(idx) {
       </div>
 
       <!-- ── ALERTES ── -->
-      <div class="modal-section">
-        <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
-          <span>⚠️ Alertes</span>
-          <button onclick="_openAlertEditor(${idx}, null)" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid var(--red);background:var(--red-pale);color:var(--red);cursor:pointer;">+ Nouvelle alerte</button>
-        </div>
-        <div id="hotel-alerts-${idx}" style="display:flex;flex-direction:column;gap:6px;">
-          ${(()=>{
-            // Alertes du step (codées en dur) + alertes custom sauvegardées
-            const overridden   = saved._overriddenStepAlerts || [];
-            const stepAlerts   = (step.alerts || []).filter((a,i) => !overridden.includes(i)).map((a,i) => ({ ...a, _src:'step', _i:i }));
-            const savedAlerts  = (saved.customAlerts || []).map((a,i) => ({ ...a, _src:'custom', _i:i }));
-            const allAlerts    = [...stepAlerts, ...savedAlerts];
-            const icons  = { urgent:'🔴', missing:'🟡', info:'🔵' };
-            const colors = { urgent:'var(--red)', missing:'#D4820A', info:'var(--teal)' };
-            const bgs    = { urgent:'var(--red-pale)', missing:'var(--orange-pale)', info:'var(--teal-pale)' };
-            if (!allAlerts.length) return '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucune alerte pour cette étape.</div>';
-            return allAlerts.map(a => `
-              <div style="display:flex;align-items:flex-start;gap:8px;background:${bgs[a.kind]||bgs.info};border-left:3px solid ${colors[a.kind]||colors.info};border-radius:8px;padding:7px 10px;font-size:12px;">
-                <span style="flex-shrink:0;font-size:13px;margin-top:1px;">${icons[a.kind]||'🔵'}</span>
-                <div style="flex:1;min-width:0;">
-                  <div style="font-weight:600;color:var(--ink);">${a.label||''}</div>
-                  ${a.detail ? `<div style="font-size:11px;color:var(--ink-light);margin-top:2px;">${a.detail}</div>` : ''}
-                  ${a._src==='step' ? '<div style="font-size:10px;color:var(--slate-light);margin-top:3px;font-style:italic;">Alerte initiale</div>' : ''}
-                </div>
-                <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
-                  <button onclick="_openAlertEditor(${idx}, ${JSON.stringify({...a}).replace(/"/g,'&quot;')})" title="Modifier" style="background:none;border:none;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;color:var(--slate-light);" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--slate-light)'">✏️</button>
-                  <button onclick="_deleteAlert(${idx},'${a._src}',${a._i})" title="Supprimer" style="background:none;border:none;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;color:var(--slate-light);" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">🗑</button>
-                </div>
-              </div>`).join('');
-          })()}
-        </div>
-      </div>
+      ${_alertsSectionHTML(idx, step, saved)}
 
       <div class="modal-section">
         <div class="modal-section-title">🅿️ Parking</div>
@@ -4668,6 +4645,39 @@ async function _deleteAlert(idx, src, i) {
   _rerenderAlertSection(idx, step, saved);
 }
 
+function _alertsSectionHTML(idx, step, saved) {
+  const overridden  = saved._overriddenStepAlerts || [];
+  const stepAlerts  = (step.alerts || []).filter((a,i) => !overridden.includes(i)).map((a,i) => ({ ...a, _src:'step', _i:i }));
+  const savedAlerts = (saved.customAlerts || []).map((a,i) => ({ ...a, _src:'custom', _i:i }));
+  const allAlerts   = [...stepAlerts, ...savedAlerts];
+  const icons  = { urgent:'🔴', missing:'🟡', info:'🔵' };
+  const colors = { urgent:'var(--red)', missing:'#D4820A', info:'var(--teal)' };
+  const bgs    = { urgent:'var(--red-pale)', missing:'var(--orange-pale)', info:'var(--teal-pale)' };
+  const list = !allAlerts.length
+    ? '<div style="font-size:11px;color:var(--slate-light);padding:4px 0;">Aucune alerte pour cette étape.</div>'
+    : allAlerts.map(a => `
+      <div style="display:flex;align-items:flex-start;gap:8px;background:${bgs[a.kind]||bgs.info};border-left:3px solid ${colors[a.kind]||colors.info};border-radius:8px;padding:7px 10px;font-size:12px;">
+        <span style="flex-shrink:0;font-size:13px;margin-top:1px;">${icons[a.kind]||'🔵'}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;color:var(--ink);">${a.label||''}</div>
+          ${a.detail ? `<div style="font-size:11px;color:var(--ink-light);margin-top:2px;">${a.detail}</div>` : ''}
+          ${a._src==='step' ? '<div style="font-size:10px;color:var(--slate-light);margin-top:3px;font-style:italic;">Alerte initiale</div>' : ''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
+          <button onclick="_openAlertEditor(${idx}, ${JSON.stringify({...a}).replace(/"/g,'&quot;')})" title="Modifier" style="background:none;border:none;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;color:var(--slate-light);" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--slate-light)'">✏️</button>
+          <button onclick="_deleteAlert(${idx},'${a._src}',${a._i})" title="Supprimer" style="background:none;border:none;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;color:var(--slate-light);" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--slate-light)'">🗑</button>
+        </div>
+      </div>`).join('');
+  return `
+      <div class="modal-section">
+        <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>⚠️ Alertes</span>
+          <button onclick="_openAlertEditor(${idx}, null)" style="font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid var(--red);background:var(--red-pale);color:var(--red);cursor:pointer;">+ Nouvelle alerte</button>
+        </div>
+        <div id="hotel-alerts-${idx}" style="display:flex;flex-direction:column;gap:6px;">${list}</div>
+      </div>`;
+}
+
 function _refreshStepAlerts(idx, saved) {
   // Mettre à jour les alertes visibles sur la carte timeline
   const step  = steps[idx];
@@ -5122,7 +5132,7 @@ async function saveModal() {
   }
 
   // Mettre à jour uniquement les champs du formulaire
-  const fields = ['hdep','harr','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps','parking-montant','parking-note','hdep-max','horaires-commentaire',
+  const fields = ['hdep','harr','dateDebut','adrdep','adrarr','ddeb','dfin','resanum','tel','prix','dannul','note','payepar','modepay','datepay','acompte','gps','parking-montant','parking-note','hdep-max','horaires-commentaire',
                   'gMontant','gMode','gDateVers','gDateRest','gMontantRest','gRetenue','gNote','hotelName','custom_maps_url','waypoints'];
   fields.forEach(f => {
     const el = document.getElementById('f-' + f);
@@ -5183,7 +5193,11 @@ async function saveModal() {
   confirmEl.classList.add('show');
 
   await saveFiche(currentModalIdx, data);
-  updateCardInTimeline(currentModalIdx, data);
+  if (steps[currentModalIdx] && steps[currentModalIdx].type === 'drive') {
+    renderTimeline(); // la date a pu changer : il faut replacer la carte dans le bon groupe de jour
+  } else {
+    updateCardInTimeline(currentModalIdx, data);
+  }
 
   confirmEl.textContent = '✓ Sauvegardé';
   setTimeout(() => { confirmEl.classList.remove('show'); }, 2500);
@@ -5389,7 +5403,9 @@ function renderTimeline() {
   const MONTHS_FR  = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
   let lastDayKey = null;
 
-  function stepDate(s) {
+  function stepDate(s, i) {
+    const saved = (i != null) ? loadFiche(i) : null;
+    if (saved && saved.dateDebut) return saved.dateDebut;
     if (s.dateDebut) return s.dateDebut;
     if (s.type==='flight' && s.direction==='aller') return '2026-07-28';
     if (s.type==='car-pickup') return '2026-07-28';
@@ -5414,9 +5430,38 @@ function renderTimeline() {
 
   let pendingSep = null; // séparateur en attente d'un step visible
 
-  steps.forEach((step, idx) => {
+  // Réordonne l'affichage : au sein d'une même journée, l'hôtel (ou étape/note
+  // portant type 'hotel') passe toujours en dernier, après trajets, activités
+  // et dépenses. Ne modifie pas le tableau `steps` — seulement l'ordre de rendu,
+  // donc tous les idx utilisés ailleurs (modales, édition, suppression…) restent valides.
+  function computeDisplayOrder() {
+    const groups = [];
+    let currentGroup = null;
+    let lastKey = null;
+    steps.forEach((step, idx) => {
+      const dKey = stepDate(step, idx);
+      if (dKey && dKey !== lastKey) {
+        lastKey = dKey;
+        currentGroup = [];
+        groups.push(currentGroup);
+      }
+      if (!currentGroup) { currentGroup = []; groups.push(currentGroup); }
+      currentGroup.push(idx);
+    });
+    const order = [];
+    groups.forEach(g => {
+      const others = g.filter(i => steps[i].type !== 'hotel');
+      const hotels = g.filter(i => steps[i].type === 'hotel');
+      order.push(...others, ...hotels);
+    });
+    return order;
+  }
+  const displayOrder = computeDisplayOrder();
+
+  displayOrder.forEach((idx) => {
+    const step = steps[idx];
     // Nœud de rupture journalier — créé mais pas encore inséré
-    const dKey = stepDate(step);
+    const dKey = stepDate(step, idx);
     if (dKey && dKey !== lastDayKey) {
       lastDayKey = dKey;
       pendingSep = makeDaySep(dKey); // en attente
@@ -5608,6 +5653,7 @@ function renderTimeline() {
         </div>`;
     } else {
       const mc = step.visits ? 'visit' : 'hotel';
+      const isRealHotel = !step._newActivity; // exclut les étapes/notes libres créées via le FAB
       let tags = '';
       if (step.price) tags += `<span class="tag tag-price" title="Montant budgété">${step.price} €</span>`;
       if (step.nights > 1) tags += `<span class="tag tag-nights">${step.nights} nuits</span>`;
@@ -5616,6 +5662,7 @@ function renderTimeline() {
       if (step.visits) tags += `<span class="tag tag-visit">🗺 ${step.visits.length>55?step.visits.slice(0,55)+'…':step.visits}</span>`;
       entry.innerHTML = `<div class="marker ${mc}">H</div>
         <div class="card">
+          ${isRealHotel ? '<div class="hotel-band">🏨 Hébergement</div>' : ''}
           <div class="card-header">
             <div class="card-header-left">
               <div class="card-city">${loadFiche(idx)._customTitle || step.city}</div>
