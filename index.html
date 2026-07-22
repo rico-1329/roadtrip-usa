@@ -671,20 +671,7 @@
     .multi-select-btn{font-size:11px;padding:4px 9px;}
     .search-box{width:90px;font-size:13px;}
 
-    /* Checklist : tableau → cartes empilées (sinon débordement illisible sur iPhone) */
-    .checklist-table thead{display:none;}
-    .checklist-table, .checklist-table tbody, .checklist-table tr, .checklist-table td{display:block;width:100%;}
-    .checklist-table tr{margin-bottom:8px;border:1px solid var(--sand-dark);border-radius:8px;overflow:hidden;}
-    .checklist-table td{box-sizing:border-box;text-align:right;padding:8px 10px 8px 46%;position:relative;min-height:32px;border-bottom:.5px solid var(--sand-dark);}
-    .checklist-table td:last-child{border-bottom:none;}
-    .checklist-table td[data-label]::before{
-      content:attr(data-label);
-      position:absolute;left:10px;top:8px;
-      font-weight:600;text-align:left;color:var(--slate-light);
-      font-size:10px;text-transform:uppercase;letter-spacing:.03em;
-    }
-    .checklist-table td input[type="date"],
-    .checklist-table td input[type="text"]{width:100%!important;text-align:right;}
+    /* Checklist : tableau compact, scroll horizontal si besoin (au lieu de cartes empilées) */
     .btn-fullscreen{display:none;}
 
     /* Layout */
@@ -2968,6 +2955,7 @@ function _renderModalContent(idx) {
         <div class="modal-section-title">Remarques</div>
         <div class="field"><textarea id="f-note" placeholder="Numéro d'immatriculation, état du véhicule, observations…">${saved.note||''}</textarea></div>
       </div>
+      ${_renderDocsSection(idx, saved)}
       ${_alertsSectionHTML(idx, step, saved)}
       <div class="modal-section">
         <div class="modal-section-title">💰 Finances</div>
@@ -5393,27 +5381,60 @@ function ficheBtn(idx) {
   </button>`;
 }
 
+// ── DATE & ORDRE D'AFFICHAGE PARTAGÉS ──
+// Source de vérité unique utilisée par Timeline, Map, Map Pro et Réservations.
+const TRIP_START_GLOBAL = new Date('2026-07-28');
+const DAY_LABELS_FR = ['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
+const MONTHS_FR_GLOBAL = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+
+function stepDate(s, i) {
+  const saved = (i != null) ? loadFiche(i) : null;
+  if (saved && saved.dateDebut) return saved.dateDebut;
+  if (s.dateDebut) return s.dateDebut;
+  if (s.type==='flight' && s.direction==='aller') return '2026-07-28';
+  if (s.type==='car-pickup') return '2026-07-28';
+  if (s.type==='flight' && s.direction==='retour') return '2026-08-20';
+  if (s.type==='car-return') return '2026-08-20';
+  if (s.type==='end') return null;
+  return null;
+}
+
+// Réordonne l'affichage : au sein d'une même journée, l'hôtel (ou étape/note
+// portant type 'hotel') passe toujours en dernier, après trajets, activités
+// et dépenses. Ne modifie pas le tableau `steps` — seulement l'ordre de rendu,
+// donc tous les idx utilisés ailleurs (modales, édition, suppression…) restent valides.
+function computeDisplayOrder() {
+  const groups = [];
+  let currentGroup = null;
+  let lastKey = null;
+  steps.forEach((step, idx) => {
+    const dKey = stepDate(step, idx);
+    if (dKey && dKey !== lastKey) {
+      lastKey = dKey;
+      currentGroup = [];
+      groups.push(currentGroup);
+    }
+    if (!currentGroup) { currentGroup = []; groups.push(currentGroup); }
+    currentGroup.push(idx);
+  });
+  const order = [];
+  groups.forEach(g => {
+    const others = g.filter(i => steps[i].type !== 'hotel');
+    const hotels = g.filter(i => steps[i].type === 'hotel');
+    order.push(...others, ...hotels);
+  });
+  return order;
+}
+
 function renderTimeline() {
   const tl = document.getElementById('timeline');
   tl.innerHTML = '';
   let count = 0;
 
-  const TRIP_START = new Date('2026-07-28');
-  const DAY_LABELS = ['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
-  const MONTHS_FR  = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+  const TRIP_START = TRIP_START_GLOBAL;
+  const DAY_LABELS = DAY_LABELS_FR;
+  const MONTHS_FR  = MONTHS_FR_GLOBAL;
   let lastDayKey = null;
-
-  function stepDate(s, i) {
-    const saved = (i != null) ? loadFiche(i) : null;
-    if (saved && saved.dateDebut) return saved.dateDebut;
-    if (s.dateDebut) return s.dateDebut;
-    if (s.type==='flight' && s.direction==='aller') return '2026-07-28';
-    if (s.type==='car-pickup') return '2026-07-28';
-    if (s.type==='flight' && s.direction==='retour') return '2026-08-20';
-    if (s.type==='car-return') return '2026-08-20';
-    if (s.type==='end') return null;
-    return null;
-  }
 
   function makeDaySep(dateStr) {
     const d    = new Date(dateStr + 'T12:00:00');
@@ -5430,33 +5451,8 @@ function renderTimeline() {
 
   let pendingSep = null; // séparateur en attente d'un step visible
 
-  // Réordonne l'affichage : au sein d'une même journée, l'hôtel (ou étape/note
-  // portant type 'hotel') passe toujours en dernier, après trajets, activités
-  // et dépenses. Ne modifie pas le tableau `steps` — seulement l'ordre de rendu,
-  // donc tous les idx utilisés ailleurs (modales, édition, suppression…) restent valides.
-  function computeDisplayOrder() {
-    const groups = [];
-    let currentGroup = null;
-    let lastKey = null;
-    steps.forEach((step, idx) => {
-      const dKey = stepDate(step, idx);
-      if (dKey && dKey !== lastKey) {
-        lastKey = dKey;
-        currentGroup = [];
-        groups.push(currentGroup);
-      }
-      if (!currentGroup) { currentGroup = []; groups.push(currentGroup); }
-      currentGroup.push(idx);
-    });
-    const order = [];
-    groups.forEach(g => {
-      const others = g.filter(i => steps[i].type !== 'hotel');
-      const hotels = g.filter(i => steps[i].type === 'hotel');
-      order.push(...others, ...hotels);
-    });
-    return order;
-  }
   const displayOrder = computeDisplayOrder();
+
 
   displayOrder.forEach((idx) => {
     const step = steps[idx];
@@ -6129,18 +6125,15 @@ function renderTrip() {
   const dateFrom = document.getElementById('trip-date-from').value;
   const dateTo   = document.getElementById('trip-date-to').value;
 
-  const MONTHS_FR = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
-  const DAYS_FR   = ['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
+  const MONTHS_FR = MONTHS_FR_GLOBAL;
+  const DAYS_FR   = DAY_LABELS_FR;
 
-  // Construire liste d'étapes avec coords
-  const allSteps = steps.map((s, i) => {
-    const d = s.dateDebut
-      || (s.type==='flight'&&s.direction==='aller' ? '2026-07-28'
-        : s.type==='car-pickup' ? '2026-07-28'
-        : (s.type==='car-return'||(s.type==='flight'&&s.direction==='retour')) ? '2026-08-20'
-        : null);
+  // Construire liste d'étapes avec coords — même ordre et mêmes dates que la Timeline
+  const allSteps = computeDisplayOrder().map(i => {
+    const s = steps[i];
+    const d = stepDate(s, i);
     return { s, i, d, coords: stepCoords(s) };
-  }).filter(({s}) => s.type !== 'end' && s.type !== 'flight-segment' && s.type !== 'drive');
+  }).filter(({s}) => s.type !== 'end' && s.type !== 'flight-segment');
 
   // Filtrer
   const filtered = allSteps.filter(({s, d}) => {
@@ -6702,7 +6695,8 @@ function renderChecklist() {
           <input type="checkbox" id="hasdoc-${idx}" ${item.hasDocument!==false?'checked':''} onchange="_updateChecklistField(${idx},'hasDocument',this.checked)" style="width:15px;height:15px;accent-color:var(--amber);cursor:pointer;">
           <label for="hasdoc-${idx}" style="font-size:11px;color:var(--slate-light);cursor:pointer;">📁 Cette démarche nécessite un document papier à classer</label>
         </div>
-        <table class="checklist-table" style="width:100%;border-collapse:collapse;font-size:12px;">
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+        <table class="checklist-table" style="width:100%;min-width:640px;border-collapse:collapse;font-size:12px;">
           <thead><tr style="background:var(--ink);color:var(--sand);">
             <th style="padding:7px 14px;text-align:left;font-weight:500;font-size:11px;">Participant</th>
             <th style="padding:7px 10px;text-align:center;font-weight:500;font-size:11px;width:40px;">✅</th>
@@ -6743,6 +6737,7 @@ function renderChecklist() {
             }).join('')}
           </tbody>
         </table>
+        </div>
       </div>`:''}
     </div>`;
   });
@@ -7482,9 +7477,10 @@ function _renderMapProTimeline() {
     allItems.push({ type:'wp', ...waypoints[2] }); // DEN
   }
 
-  // Étapes USA (sans les vols)
-  steps.forEach((s,i) => {
-    if (s.type === 'hotel' || s.type === 'car-pickup' || s.type === 'car-return') {
+  // Étapes USA (sans les vols) — même ordre que la Timeline (hôtel en fin de journée)
+  computeDisplayOrder().forEach(i => {
+    const s = steps[i];
+    if (s.type === 'hotel' || s.type === 'car-pickup' || s.type === 'car-return' || s.type === 'drive' || isActivityStep(s)) {
       allItems.push({ type:'step', s, i });
     }
   });
@@ -7515,11 +7511,14 @@ function _renderMapProTimeline() {
     const s = item.s; const i = item.i;
     const isFlight = s.type === 'flight';
     const isCar = s.type === 'car-pickup' || s.type === 'car-return';
-    const bg = isFlight ? '#0E1A2B' : isCar ? '#2A2018' : 'white';
+    const isDriveItem = s.type === 'drive';
+    const isActivityItem = isActivityStep(s);
+    const bg = isFlight ? '#0E1A2B' : isCar ? '#2A2018' : isDriveItem ? 'var(--slate-pale)' : 'white';
     const color = isFlight || isCar ? 'var(--sand)' : 'var(--ink)';
-    const subColor = isFlight || isCar ? 'rgba(245,240,232,.4)' : 'var(--slate-light)';
-    const icon = isFlight ? '✈️' : isCar ? '🚗' : '🏨';
-    const label = s.city ? s.city.split(',')[0] : (s.label || (s.direction==='aller'?'Vol aller':'Vol retour'));
+    const subColor = isFlight || isCar ? 'rgba(245,240,232,.4)' : isDriveItem ? 'var(--slate-light)' : 'var(--amber)';
+    const icon = isFlight ? '✈️' : isCar ? '🚗' : isDriveItem ? '🚗' : isActivityItem ? '🗺' : '🏨';
+    const label = isDriveItem ? `${s.from||''} → ${s.to||''}`
+      : s.city ? s.city.split(',')[0] : (s.label || (s.direction==='aller'?'Vol aller':'Vol retour'));
     const hasAlert = (s.alerts||[]).some(a => a.kind==='urgent');
     const isChoice = (s.hotel||'').includes('CHOIX');
 
@@ -9367,23 +9366,28 @@ function _renderReservationsContent() {
 
   let html = '';
 
-  // ── VOLS ──
+  // ── VOLS ── (source unique : steps[], synchronisé avec la Timeline)
   html += divider('✈️', 'Vols Lufthansa');
-  const vols = [
-    { key:'vol_aller', titre:'Vol aller · 28 juillet 2026',
-      segs:[{from:'MRS',dep:'06:05',num:'LH 2267',ac:'A319',dur:'1h35',to:'MUC',arr:'07:40',escale:'Escale Munich · 3h25'},
-            {from:'MUC',dep:'11:05',num:'LH 480',ac:'A380-800',dur:'10h40',to:'DEN',arr:'13:45',escale:'Escale Denver · 2h35'},
-            {from:'DEN',dep:'16:20',num:'LH 8734',ac:'A320',dur:'1h33',to:'JAC',arr:'17:53',escale:null}] },
-    { key:'vol_retour', titre:'Vol retour · 20 – 21 août 2026',
-      segs:[{from:'SFO',dep:'21:05',num:'LH 459',ac:'A350-900',dur:'11h05',to:'MUC',arr:'+1 17:10',escale:'Escale Munich · 2h50'},
-            {from:'MUC',dep:'20:00',num:'LH 2266',ac:'A319',dur:'1h45',to:'MRS',arr:'21:45',escale:null}] }
-  ];
+  const vols = steps
+    .map((s, i) => ({ s, i }))
+    .filter(({s}) => s.type === 'flight')
+    .map(({s, i}) => ({
+      key: 'vol_' + (s.direction || i),
+      idx: i,
+      titre: `Vol ${s.direction === 'aller' ? 'aller' : 'retour'} · ${s.dates} 2026`,
+      pnr: s.ref || '',
+      segs: (s.segments || []).map(seg => ({
+        from: seg.from, dep: seg.dep, num: seg.num, ac: seg.aircraft, dur: seg.duration,
+        to: seg.to, arr: seg.arr,
+        escale: seg.layover ? `Escale ${(seg.toName||seg.to)} · ${seg.layover.replace('Escale ','')}` : null
+      }))
+    }));
   html += '<div style="display:flex;flex-direction:column;gap:.75rem;">';
   vols.forEach(v => {
     html += `<div style="background:#0E1A2B;border-radius:12px;padding:1rem 1.25rem;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;flex-wrap:wrap;gap:6px;">
         <div style="font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:#fff;">${v.titre}</div>
-        <div style="display:flex;gap:6px;align-items:center;">${statusBadge(v.key)}<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(100,160,255,.15);color:#90BCFF;border:.5px solid rgba(100,160,255,.25);">ZKUZPE</span></div>
+        <div style="display:flex;gap:6px;align-items:center;">${statusBadge(v.key)}${v.pnr?`<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(100,160,255,.15);color:#90BCFF;border:.5px solid rgba(100,160,255,.25);">${v.pnr}</span>`:''}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:.75rem;">
         ${v.segs.map(s => `
@@ -9399,24 +9403,37 @@ function _renderReservationsContent() {
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         ${statusBtns(v.key, true)}
         <a href="https://www.lufthansa.com/fr/fr/my-bookings" target="_blank" style="font-size:11px;padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);text-decoration:none;">🌐 Lufthansa</a>
-        <button onclick="openFlightModal()" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);cursor:pointer;">📋 Fiche</button>
+        <button onclick="openModalFromMap(${v.idx})" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);cursor:pointer;">📋 Fiche</button>
       </div>
     </div>`;
   });
   html += '</div>';
 
-  // ── VOITURE ──
+  // ── VOITURE ── (source unique : steps[car-pickup / car-return])
   html += divider('🚗', 'Location de voiture');
   const carKey = 'voiture_budget';
+  const carPickupIdx = steps.findIndex(s => s.type === 'car-pickup');
+  const carReturnIdx = steps.findIndex(s => s.type === 'car-return');
+  const carPickup = carPickupIdx >= 0 ? steps[carPickupIdx] : null;
+  const carReturnStep = carReturnIdx >= 0 ? steps[carReturnIdx] : null;
+  let carDaysLabel = '';
+  if (carPickup && carReturnStep) {
+    const dPickup = stepDate(carPickup, carPickupIdx);
+    const dReturn = stepDate(carReturnStep, carReturnIdx);
+    if (dPickup && dReturn) {
+      const nbDays = Math.round((new Date(dReturn+'T12:00:00') - new Date(dPickup+'T12:00:00')) / 86400000);
+      if (nbDays > 0) carDaysLabel = nbDays + ' jours · ';
+    }
+  }
   html += `<div style="background:var(--ink);border-radius:12px;padding:1rem 1.25rem;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;flex-wrap:wrap;gap:6px;">
-      <div style="font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--sand);">Budget · Volkswagen Passat</div>
-      <div style="display:flex;gap:6px;align-items:center;">${statusBadge(carKey)}<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(200,98,42,.2);color:var(--amber-light);">35554355FR4</span></div>
+      <div style="font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--sand);">${carPickup?.sub || 'Location de voiture'}</div>
+      <div style="display:flex;gap:6px;align-items:center;">${statusBadge(carKey)}${carPickup?.ref?`<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(200,98,42,.2);color:var(--amber-light);">${carPickup.ref}</span>`:''}</div>
     </div>
     <div style="font-size:12px;color:rgba(245,240,232,.6);display:flex;flex-direction:column;gap:3px;margin-bottom:.75rem;">
-      <div>📍 <strong style="color:var(--sand)">Prise en charge</strong> · Jackson JAC · 28 juil. 18h00</div>
-      <div style="padding-left:16px;font-size:11px;color:rgba(245,240,232,.3);">↓ 23 jours · KM illimité · Automatique · Premier plein inclus</div>
-      <div>📍 <strong style="color:var(--sand)">Restitution</strong> · San Francisco SFO · 20 août · Réservoir vide</div>
+      ${carPickup?`<div>📍 <strong style="color:var(--sand)">Prise en charge</strong> · ${carPickup.city||''} · ${carPickup.dates||''}</div>`:''}
+      <div style="padding-left:16px;font-size:11px;color:rgba(245,240,232,.3);">↓ ${carDaysLabel}KM illimité · Automatique · Premier plein inclus</div>
+      ${carReturnStep?`<div>📍 <strong style="color:var(--sand)">Restitution</strong> · ${carReturnStep.city||''} · ${carReturnStep.dates||''}</div>`:''}
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;">
       ${statusBtns(carKey, true)}
