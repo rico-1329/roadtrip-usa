@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="manifest" href="./manifest.json">
 <style>
   :root {
     --sand:#F5F0E8; --sand-dark:#EAE3D2;
@@ -836,7 +837,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.25.0 · 23/07/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.28.1 · 23/07/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -2458,21 +2459,28 @@ async function loadAllFiches() {
     if (!res.ok) return;
     const rows = await res.json();
     rows.forEach(row => {
+      const d = parseData(row.data);
+
+      // Snapshot systématique : TOUTE fiche renvoyée par Supabase est mise en cache
+      // localStorage sous sa clé d'origine, pas seulement flight_main/car_main/remboursements.
+      // C'est ce qui garantit qu'une fiche jamais ouverte manuellement est quand même
+      // disponible hors ligne — condition nécessaire pour la consultation en avion.
+      try { localStorage.setItem(row.id, JSON.stringify(d)); } catch(e) {}
+
       // Ne pas injecter les anciennes clés numériques dans _cache[N]
       // car elles décalent les indices depuis l'ajout des fiches activité (v2.13+)
       // Seules les clés string stables (ex: roadtrip_fiche_act-20260730) sont utilisées
-      // Charger aussi les clés string (flight_main, car_main, remboursements…)
       if (row.id === 'roadtrip_fiche_flight_main' || row.id === 'roadtrip_fiche_car_main') {
         const key = row.id.replace('roadtrip_fiche_', '');
-        const d = parseData(row.data);
         _cache[key] = d;
-        try { localStorage.setItem(row.id, JSON.stringify(d)); } catch(e) {}
       }
       // Remboursements
       if (row.id === 'roadtrip_remboursements' && row.data?.remboursements) {
         try { localStorage.setItem('roadtrip_remboursements', JSON.stringify(row.data.remboursements)); } catch(e) {}
       }
     });
+    _setOfflineBanner(false);
+    try { localStorage.setItem('roadtrip_last_sync', new Date().toISOString()); } catch(e) {}
     // Rafraîchir la timeline puis appliquer les données sur chaque carte
     renderTimeline();
     renderSidebar();
@@ -2485,10 +2493,34 @@ async function loadAllFiches() {
     });
   } catch(e) {
     console.log('ℹ️ Supabase inaccessible au démarrage — données locales utilisées.');
+    _setOfflineBanner(true);
     steps.forEach((_, idx) => {
       const d = loadFiche(idx);
       if (Object.keys(d).length) updateCardInTimeline(idx, d);
     });
+  }
+}
+
+// ── BANDEAU MODE HORS LIGNE ──
+// Affiché quand les données viennent du cache local (localStorage) faute de réseau,
+// pour que personne ne prenne une donnée potentiellement ancienne pour une donnée à jour.
+function _setOfflineBanner(isOffline) {
+  let el = document.getElementById('offline-banner');
+  if (isOffline) {
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'offline-banner';
+      el.style.cssText = 'position:sticky;top:0;z-index:500;background:var(--amber);color:white;font-size:12px;font-weight:600;text-align:center;padding:6px 10px;font-family:\'DM Sans\',sans-serif;';
+      document.body.prepend(el);
+    }
+    let lastSync = '';
+    try {
+      const raw = localStorage.getItem('roadtrip_last_sync');
+      if (raw) lastSync = ' · dernière synchro : ' + new Date(raw).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+    } catch(e) {}
+    el.textContent = '📴 Mode hors ligne — données locales' + lastSync;
+  } else if (el) {
+    el.remove();
   }
 }
 
@@ -3691,6 +3723,7 @@ async function _addHotelDocs(idx, input) {
       try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(er) {}
       saveFiche(idx, d);
       _renderModalContent(idx);
+      _syncOfflineDocChecklist();
     }
   }
   input.value = '';
@@ -3715,6 +3748,7 @@ async function _deleteHotelDoc(idx, docIndex) {
   try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(e) {}
   await saveFiche(idx, d);
   _renderModalContent(idx);
+  _syncOfflineDocChecklist();
 }
 
 function _openDocViewer(url, name, type) {
@@ -3804,6 +3838,7 @@ function _renderDocsSection(idx, saved) {
         <input type="file" accept=".pdf,image/jpeg,image/png" multiple style="display:none;" onchange="_addHotelDocs(${idx},this)">
       </label>
     </div>
+    ${docs.length ? `<div style="font-size:10px;color:var(--slate-light);margin:-2px 0 6px;">📴 Pour garder un document accessible sans réseau (avion…) : "Ouvrir", puis bouton Partager de votre téléphone → "Enregistrer dans Fichiers" (iPhone) ou "Télécharger" (Android).</div>` : ''}
     <div id="hotel-docs-${idx}" style="display:flex;flex-direction:column;gap:6px;">
       ${docs.length ? docs.map((doc, di) => `
         <div style="display:flex;align-items:center;gap:8px;background:white;border:.5px solid var(--sand-dark);border-radius:8px;padding:7px 10px;">
@@ -3966,6 +4001,7 @@ function _actRender() {
             + Ajouter<input type="file" accept=".pdf,image/jpeg,image/png" multiple style="display:none;" onchange="_actAddDoc(${s.id},this)">
           </label>
         </div>
+        ${(s.docs||[]).length ? `<div style="font-size:10px;color:var(--slate-light);margin:4px 0 0;">📴 Pour l'accès sans réseau : "Ouvrir", puis Partager → "Enregistrer dans Fichiers"/"Télécharger".</div>` : ''}
         <div style="display:flex;flex-direction:column;gap:4px;">
           ${(s.docs||[]).length ? (s.docs).map((doc,di) => {
             const sizeStr = !doc.size ? '' : doc.size < 1024*1024 ? (doc.size/1024).toFixed(0)+' Ko' : (doc.size/(1024*1024)).toFixed(1)+' Mo';
@@ -4406,7 +4442,7 @@ async function _actAddDoc(stepId, input) {
       s.docs.push({ path, name: file.name, type: file.type, size: file.size, caption: file.name.replace(/\.[^/.]+$/,''), addedAt: new Date().toISOString() });
     } catch(e) { alert('Erreur upload ' + file.name + ' : ' + e.message); }
     done++;
-    if (done === files.length) { _actSaveStepMedia(); _actRender(); }
+    if (done === files.length) { _actSaveStepMedia(); _actRender(); _syncOfflineDocChecklist(); }
   }
   input.value = '';
 }
@@ -4426,6 +4462,7 @@ async function _actDeleteDoc(stepId, di) {
   s.docs = (s.docs||[]).filter((_,i) => i !== di);
   _actSaveStepMedia();
   _actRender();
+  _syncOfflineDocChecklist();
 }
 
 function _actAddPOI(stepId) {
@@ -6599,6 +6636,67 @@ async function _loadChecklistFromSupabase() {
   } catch(e) { console.warn('Checklist Supabase load failed:', e.message); }
 }
 
+// ── SYNC AUTOMATIQUE : checklist de téléchargement offline ──
+// Génère/maintient une ligne de checklist PAR DOCUMENT critique attaché à une fiche
+// (hôtel, ou sous-étape d'activité), avec une case à cocher par personne :
+// "j'ai téléchargé ce document sur mon téléphone" (voir _deleteHotelDoc/_actAddDoc
+// pour le stockage des documents eux-mêmes, indépendant de ceci).
+// Les lignes dont le document source a été supprimé sont retirées automatiquement.
+// Date limite alignée sur la veille du départ (vol du 28/07/2026, voir initCountdown()).
+const OFFLINE_DOC_DEADLINE = '2026-07-27';
+
+function _syncOfflineDocChecklist() {
+  try {
+    _syncOfflineDocChecklistInner();
+  } catch(e) {
+    console.error('Erreur _syncOfflineDocChecklist (non bloquante):', e);
+  }
+}
+
+function _syncOfflineDocChecklistInner() {
+  const list = _loadChecklist();
+  const seenIds = new Set();
+
+  steps.forEach((step, idx) => {
+    const d = loadFiche(idx);
+    const label = (step.city || step.from || step.hotel || `étape ${idx + 1}`);
+
+    (d.docs || []).forEach((doc, di) => {
+      const itemId = 'offline-doc-' + storageKey(idx) + '-' + di;
+      seenIds.add(itemId);
+      const itemLabel = '📎 Télécharger sur son téléphone : ' + (doc.caption || doc.name) + ' — ' + label;
+      const existing = list.find(it => it.id === itemId);
+      if (existing) { existing.label = itemLabel; }
+      else {
+        list.push({ id: itemId, label: itemLabel, prenoms: PARTICIPANTS.slice(), responsable: '',
+          dateLimit: OFFLINE_DOC_DEADLINE, nextCheck: '',
+          commentaire: 'Généré automatiquement à partir du document attaché à la fiche.', checks: {} });
+      }
+    });
+
+    (d.etapes || []).forEach((etape, ei) => {
+      (etape.docs || []).forEach((doc, di) => {
+        const itemId = 'offline-doc-' + storageKey(idx) + '-etape' + ei + '-' + di;
+        seenIds.add(itemId);
+        const itemLabel = '📎 Télécharger sur son téléphone : ' + (doc.caption || doc.name) + ' — ' + label + (etape.titre ? ' / ' + etape.titre : '');
+        const existing = list.find(it => it.id === itemId);
+        if (existing) { existing.label = itemLabel; }
+        else {
+          list.push({ id: itemId, label: itemLabel, prenoms: PARTICIPANTS.slice(), responsable: '',
+            dateLimit: OFFLINE_DOC_DEADLINE, nextCheck: '',
+            commentaire: 'Généré automatiquement à partir du document attaché à la fiche.', checks: {} });
+        }
+      });
+    });
+  });
+
+  // Retirer les lignes auto-générées dont le document source n'existe plus
+  const cleaned = list.filter(it => !String(it.id).startsWith('offline-doc-') || seenIds.has(it.id));
+
+  _saveChecklist(cleaned);
+  if (document.getElementById('checklist-view')?.style.display === 'block') renderChecklist();
+}
+
 function openChecklist() {
   _hideAllViews();
   if (_tripMap) { _tripMap.remove(); _tripMap = null; }
@@ -6619,10 +6717,23 @@ function openChecklist() {
 }
 
 function renderChecklist() {
-  const list = _loadChecklist();
-  const today = new Date().toISOString().split('T')[0];
   const body = document.getElementById('checklist-body');
   if (!body) return;
+  try {
+    _renderChecklistInner(body);
+  } catch(e) {
+    console.error('Erreur renderChecklist:', e);
+    body.innerHTML = `<div style="padding:1.5rem;background:var(--red-pale);border:1.5px solid var(--red);border-radius:10px;color:var(--red);font-size:12px;">
+      <strong>⚠️ Erreur d'affichage de la checklist</strong><br><br>
+      <span style="font-family:monospace;font-size:11px;">${(e.message||e).toString()}</span><br><br>
+      Fais une capture d'écran de ce message et transmets-la pour correction. En attendant, tes données ne sont pas perdues — seul l'affichage est en cause.
+    </div>`;
+  }
+}
+
+function _renderChecklistInner(body) {
+  const list = _loadChecklist();
+  const today = new Date().toISOString().split('T')[0];
 
   const fStatus      = window._clFilter_status     || 'all';
   const fParticipant = window._clFilter_participant || 'all';
@@ -6866,7 +6977,8 @@ async function _deleteChecklistItem(idx) {
 
 async function _addChecklistItem() {
   const list = _loadChecklist();
-  const nextId = list.length > 0 ? Math.max(...list.map(i => i.id || 0)) + 1 : 1;
+  const numericIds = list.map(i => typeof i.id === 'number' ? i.id : 0);
+  const nextId = numericIds.length > 0 ? Math.max(...numericIds) + 1 : 1;
   list.push({ id: nextId, label: '', prenoms: [...PARTICIPANTS], responsable:'', dateLimit: '', nextCheck: '', commentaire: '', checks: {} });
   await _saveChecklist(list);
   renderChecklist();
@@ -6944,7 +7056,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols · ${steps.filter(s=>s.type==='activity').length} activités<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.25.0 · 23/07/26
+        Version : v2.28.1 · 23/07/26
       </div>
     </div>
 ${_renderActionLog()}`;
@@ -10664,6 +10776,14 @@ function _testNavMenus() { (async () => {
   return results;
   })(); }
 
+// ── SERVICE WORKER (app shell hors ligne) ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .catch((e) => console.log('ℹ️ Service worker non enregistré : ' + (e.message || e)));
+  });
+}
+
 // ── INITIALISATION ──
 (async function init() {
   await loadExtraSteps();
@@ -10671,6 +10791,7 @@ function _testNavMenus() { (async () => {
   renderSidebar();
   renderTimeline();
   await loadAllFiches();
+  _syncOfflineDocChecklist();
   loadBannerPrefs();
   // Scroll automatique vers le premier step visible (aujourd'hui ou futur)
   setTimeout(() => {
@@ -12857,7 +12978,27 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.25.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.28.1</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correctif : l'onglet Checklist s'affichait vide (bug signalé). Cause exacte non reproduite malgré des tests ciblés — au lieu de deviner davantage, le rendu de la checklist et la synchro automatique des documents offline sont rendus défensifs : toute erreur s'affiche désormais directement à l'écran avec son message, au lieu de laisser la page blanche, et une erreur de synchro ne peut plus bloquer le reste du chargement de l'appli. Si le problème persiste, le message d'erreur affiché permettra de le corriger précisément.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.28.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Mode hors ligne (3/3 — enregistrement des documents) : note d'aide sous chaque liste de documents (fiches hôtel et sous-étapes d'activité) expliquant comment enregistrer un PDF sur le téléphone (Ouvrir → Partager → Enregistrer dans Fichiers/Télécharger). Pas de nouveau mécanisme technique : le bouton "Ouvrir" existant ouvre déjà le PDF dans le viewer natif du navigateur, qui propose ce chemin d'enregistrement — il manquait seulement l'indication pour que ce soit fait au bon moment (avant le vol).</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.27.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Mode hors ligne (2/3 — checklist de téléchargement) : une ligne est désormais générée automatiquement dans la Checklist pour chaque document PDF attaché à une fiche (hôtel ou sous-étape d'activité), avec une case à cocher par personne ("je l'ai téléchargé sur mon téléphone"). Échéance fixée à la veille du départ (27/07). Les lignes se retirent automatiquement si le document source est supprimé. Réutilise le système de Checklist existant plutôt que d'en créer un nouveau.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.26.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Mode hors ligne (1/3 — fondation) : service worker pour ouvrir l'appli sans réseau (cache app shell + Leaflet/jsPDF/Supabase JS), toutes les fiches désormais mises en cache local systématiquement (plus seulement celles ouvertes manuellement), bandeau "📴 Mode hors ligne" avec horodatage de dernière synchro. Nécessite le dépôt de manifest.json et service-worker.js à la racine, au même niveau qu'index.html. Concerne uniquement la consultation — la modification hors ligne reste à construire.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.25.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
         <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Point de référence avant fonctionnalités offline (consultation hors ligne des fiches, checklist de téléchargement partagée, export/import de modifications). Aucun changement fonctionnel dans cette version — sert de base de rollback.</div>
       </div>
 
