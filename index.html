@@ -837,7 +837,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.28.2 · 23/07/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.28.3 · 23/07/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -7056,7 +7056,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols · ${steps.filter(s=>s.type==='activity').length} activités<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.28.2 · 23/07/26
+        Version : v2.28.3 · 23/07/26
       </div>
     </div>
 ${_renderActionLog()}`;
@@ -10784,6 +10784,14 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// ── DÉTECTION HORS LIGNE (signal navigateur natif) ──
+// Plus fiable que de dépendre d'un appel Supabase précis qui réussit ou échoue :
+// ces événements reflètent directement le changement d'état réseau du système
+// (mode avion, WiFi coupé...), donc se déclenchent au bon moment à coup sûr.
+window.addEventListener('offline', () => _setOfflineBanner(true));
+window.addEventListener('online', () => { _setOfflineBanner(false); loadAllFiches(); });
+if (navigator.onLine === false) _setOfflineBanner(true);
+
 // ── INITIALISATION ──
 (async function init() {
   await loadExtraSteps();
@@ -12978,7 +12986,12 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.28.2</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.28.3</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correctif (diagnostiqué grâce aux logs console fournis) : le bandeau hors ligne ne se déclenchait que si l'appel Supabase groupé précis échouait — pas fiable si un autre appel réseau échoue en premier. Basculé sur l'événement navigateur natif window.addEventListener('offline'/'online'), qui reflète directement le changement d'état réseau du système. Correction en parallèle d'un bug du service worker (v2.28.0-2.28.2) : les ressources non mises en cache (tuiles de carte notamment) provoquaient une erreur "Failed to convert value to Response" hors ligne au lieu d'échouer proprement.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.28.2</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
         <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correctif : le bandeau "Mode hors ligne" n'était visible qu'en scrollant (il utilisait position:sticky, qui suppose un conteneur de page qui scrolle — l'appli n'en a pas, elle utilise des vues plein écran indépendantes). Passé en position fixe, toujours visible en haut de l'écran dès qu'il apparaît. Compromis assumé : il peut recouvrir brièvement le haut de la barre de navigation le temps d'être hors ligne — préférable à un bandeau invisible.</div>
       </div>
 
