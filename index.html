@@ -837,7 +837,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.30.0 · 23/07/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.31.0 · 23/07/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -6854,6 +6854,15 @@ function _renderChecklistInner(body) {
           <input type="checkbox" id="hasdoc-${idx}" ${item.hasDocument!==false?'checked':''} onchange="_updateChecklistField(${idx},'hasDocument',this.checked)" style="width:15px;height:15px;accent-color:var(--amber);cursor:pointer;">
           <label for="hasdoc-${idx}" style="font-size:11px;color:var(--slate-light);cursor:pointer;">📁 Cette démarche nécessite un document papier à classer</label>
         </div>
+        ${(() => {
+          const missing = PARTICIPANTS.filter(p => !item.prenoms.includes(p));
+          if (!missing.length) return '';
+          return `<div style="padding:8px 14px;background:var(--teal-pale);border-bottom:1px solid var(--sand-dark);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:11px;color:var(--teal);font-weight:500;">+ Réintégrer :</span>
+            ${missing.map(p => `<button onclick="_addChecklistParticipant(${idx},'${p}')" title="Rajouter ${p} sur cette démarche"
+              style="font-family:'DM Sans',sans-serif;font-size:11px;padding:3px 10px;border-radius:10px;border:1px solid var(--teal);background:white;color:var(--teal);cursor:pointer;">+ ${p}</button>`).join('')}
+          </div>`;
+        })()}
         <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
         <table class="checklist-table" style="width:100%;min-width:640px;border-collapse:collapse;font-size:12px;">
           <thead><tr style="background:var(--ink);color:var(--sand);">
@@ -6909,7 +6918,16 @@ async function _removeChecklistParticipant(idx, prenom) {
   if (!confirm(`Retirer ${prenom} de cette démarche ?`)) return;
   const list = await _loadChecklistFresh();
   list[idx].prenoms = list[idx].prenoms.filter(p => p !== prenom);
-  if (list[idx].checks) delete list[idx].checks[prenom];
+  // On conserve volontairement list[idx].checks[prenom] (coche, document, commentaire...)
+  // au lieu de le supprimer : si ${prenom} est réintégré par erreur via "+ Réintégrer",
+  // son historique de suivi est restauré intact plutôt que reparti de zéro.
+  await _saveChecklist(list);
+  renderChecklist();
+}
+
+async function _addChecklistParticipant(idx, prenom) {
+  const list = await _loadChecklistFresh();
+  if (!list[idx].prenoms.includes(prenom)) list[idx].prenoms.push(prenom);
   await _saveChecklist(list);
   renderChecklist();
 }
@@ -7104,7 +7122,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols · ${steps.filter(s=>s.type==='activity').length} activités<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.30.0 · 23/07/26
+        Version : v2.31.0 · 23/07/26
       </div>
     </div>
 ${_renderActionLog()}`;
@@ -13035,8 +13053,13 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.30.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Indicateur de vérification sur la Checklist : à chaque ouverture de l'onglet, un petit texte sous le titre indique si les données locales ont été comparées avec succès à la base ("✓ Vérifié à HH:MM — identique"), si une mise à jour a été récupérée ("🔄 Mis à jour depuis le serveur"), ou si la vérification n'a pas pu avoir lieu faute de réseau ("📴 Hors ligne — non vérifié"). Objectif : rendre visible ce qui se passait déjà silencieusement en arrière-plan (v2.29.0), pour que tu saches en un coup d'œil si ce que tu regardes est confirmé à jour.</div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.31.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Checklist : possibilité de réintégrer une personne retirée par erreur d'une démarche. En dépliant une démarche, un bandeau "+ Réintégrer" apparaît si un des 4 prénoms n'y figure plus, avec un bouton par personne manquante. Amélioration associée : le retrait d'un participant ne supprime plus son historique (coche, date, document, commentaire) — seulement la ligne côté suivi. Le réintégrer restaure donc tout tel quel, plutôt que de repartir de zéro.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.30.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Indicateur de vérification sur la Checklist : à chaque ouverture de l'onglet, un petit texte sous le titre indique si les données locales sont confirmées identiques à la base, mises à jour, ou non vérifiées (hors ligne).</div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
