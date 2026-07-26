@@ -837,7 +837,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.28.4 · 23/07/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.30.0 · 23/07/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -3723,7 +3723,6 @@ async function _addHotelDocs(idx, input) {
       try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(er) {}
       saveFiche(idx, d);
       _renderModalContent(idx);
-      _syncOfflineDocChecklist();
     }
   }
   input.value = '';
@@ -3748,7 +3747,6 @@ async function _deleteHotelDoc(idx, docIndex) {
   try { localStorage.setItem(storageKey(idx), JSON.stringify(d)); } catch(e) {}
   await saveFiche(idx, d);
   _renderModalContent(idx);
-  _syncOfflineDocChecklist();
 }
 
 function _openDocViewer(url, name, type) {
@@ -3804,7 +3802,7 @@ async function _openActDoc(stepId, di) {
 }
 
 async function _openChecklistDoc(idx, prenom) {
-  const list = _loadChecklist();
+  const list = await _loadChecklistFresh();
   const doc = list[idx]?.checks?.[prenom]?.file;
   if (!doc) return;
   try {
@@ -4442,7 +4440,7 @@ async function _actAddDoc(stepId, input) {
       s.docs.push({ path, name: file.name, type: file.type, size: file.size, caption: file.name.replace(/\.[^/.]+$/,''), addedAt: new Date().toISOString() });
     } catch(e) { alert('Erreur upload ' + file.name + ' : ' + e.message); }
     done++;
-    if (done === files.length) { _actSaveStepMedia(); _actRender(); _syncOfflineDocChecklist(); }
+    if (done === files.length) { _actSaveStepMedia(); _actRender(); }
   }
   input.value = '';
 }
@@ -4462,7 +4460,6 @@ async function _actDeleteDoc(stepId, di) {
   s.docs = (s.docs||[]).filter((_,i) => i !== di);
   _actSaveStepMedia();
   _actRender();
-  _syncOfflineDocChecklist();
 }
 
 function _actAddPOI(stepId) {
@@ -6630,16 +6627,45 @@ async function _saveChecklist(list) {
 }
 
 async function _loadChecklistFromSupabase() {
-  if (!SUPA_READY) return;
+  if (!SUPA_READY) return 'offline';
   try {
     const res = await fetch(`${SUPA_URL}/rest/v1/fiches?id=eq.${CHECKLIST_KEY}&select=data`, { headers: SUPA_HEADERS });
     const rows = await res.json();
     if (rows.length > 0 && Array.isArray(rows[0].data?.checklist)) {
       localStorage.setItem(CHECKLIST_KEY, JSON.stringify(rows[0].data.checklist));
+      return 'checked';
     } else if (rows.length > 0 && rows[0].data?.checklist) {
       console.warn('⚠️ Checklist Supabase corrompue (pas un tableau), ignorée :', rows[0].data.checklist);
+      return 'error';
     }
-  } catch(e) { console.warn('Checklist Supabase load failed:', e.message); }
+    return 'checked';
+  } catch(e) {
+    console.warn('Checklist Supabase load failed:', e.message);
+    return 'offline';
+  }
+}
+
+// Affiche un petit statut de vérification (identique / mis à jour / hors ligne) sous le titre de la checklist.
+function _showChecklistSyncStatus(status, changed) {
+  const el = document.getElementById('checklist-sync-status');
+  if (!el) return;
+  const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  if (status === 'checking') {
+    el.innerHTML = `🔄 Vérification en cours…`;
+    el.style.color = 'var(--slate-light)';
+  } else if (status === 'offline') {
+    el.innerHTML = `📴 Hors ligne — non vérifié, données locales`;
+    el.style.color = 'var(--amber)';
+  } else if (status === 'error') {
+    el.innerHTML = `⚠️ Vérification impossible (donnée invalide côté serveur)`;
+    el.style.color = 'var(--red)';
+  } else if (changed) {
+    el.innerHTML = `🔄 Mis à jour depuis le serveur à ${now}`;
+    el.style.color = 'var(--teal)';
+  } else {
+    el.innerHTML = `✓ Vérifié à ${now} — identique à la base`;
+    el.style.color = 'var(--slate-light)';
+  }
 }
 
 // ── SYNC AUTOMATIQUE : checklist de téléchargement offline ──
@@ -6651,16 +6677,26 @@ async function _loadChecklistFromSupabase() {
 // Date limite alignée sur la veille du départ (vol du 28/07/2026, voir initCountdown()).
 const OFFLINE_DOC_DEADLINE = '2026-07-27';
 
-function _syncOfflineDocChecklist() {
+// Charge la checklist EN PRIORITÉ depuis Supabase (source de vérité), et ne se rabat
+// sur le cache local que si Supabase est injoignable (mode hors ligne).
+// À utiliser systématiquement avant toute MODIFICATION de la checklist, pour éviter
+// qu'un appareil avec un cache local périmé n'écrase par erreur des données plus
+// récentes enregistrées depuis un autre appareil (ex: PC vs iPhone d'Éric).
+async function _loadChecklistFresh() {
+  await _loadChecklistFromSupabase();
+  return _loadChecklist();
+}
+
+async function _syncOfflineDocChecklist() {
   try {
-    _syncOfflineDocChecklistInner();
+    await _syncOfflineDocChecklistInner();
   } catch(e) {
     console.error('Erreur _syncOfflineDocChecklist (non bloquante):', e);
   }
 }
 
-function _syncOfflineDocChecklistInner() {
-  const list = _loadChecklist();
+async function _syncOfflineDocChecklistInner() {
+  const list = await _loadChecklistFresh();
   const seenIds = new Set();
 
   steps.forEach((step, idx) => {
@@ -6719,7 +6755,13 @@ function openChecklist() {
   // Toujours retirer la dernière version depuis Supabase à l'ouverture de l'onglet,
   // au cas où la session est restée ouverte depuis longtemps (typique sur iPhone/Safari)
   // et n'a donc pas rechargé les données depuis le login.
-  _loadChecklistFromSupabase().then(() => renderChecklist());
+  const _before = JSON.stringify(_loadChecklist());
+  _showChecklistSyncStatus('checking');
+  _loadChecklistFromSupabase().then((status) => {
+    renderChecklist();
+    const _after = JSON.stringify(_loadChecklist());
+    _showChecklistSyncStatus(status, _before !== _after);
+  });
 }
 
 function renderChecklist() {
@@ -6865,7 +6907,7 @@ function _renderChecklistInner(body) {
 }
 async function _removeChecklistParticipant(idx, prenom) {
   if (!confirm(`Retirer ${prenom} de cette démarche ?`)) return;
-  const list = _loadChecklist();
+  const list = await _loadChecklistFresh();
   list[idx].prenoms = list[idx].prenoms.filter(p => p !== prenom);
   if (list[idx].checks) delete list[idx].checks[prenom];
   await _saveChecklist(list);
@@ -6873,7 +6915,7 @@ async function _removeChecklistParticipant(idx, prenom) {
 }
 
 async function _updateCheckParticipant(idx, prenom, field, value) {
-  const list = _loadChecklist();
+  const list = await _loadChecklistFresh();
   if (!list[idx].checks) list[idx].checks = {};
   if (!list[idx].checks[prenom]) list[idx].checks[prenom] = {};
   list[idx].checks[prenom][field] = value;
@@ -6881,7 +6923,7 @@ async function _updateCheckParticipant(idx, prenom, field, value) {
 }
 
 async function _toggleCheck(idx, prenom, done) {
-  const list = _loadChecklist();
+  const list = await _loadChecklistFresh();
   if (!list[idx].checks) list[idx].checks = {};
   const existing = list[idx].checks[prenom] || {};
   // Conserver le document et les autres champs, juste changer done/date
@@ -6895,7 +6937,7 @@ async function _toggleCheck(idx, prenom, done) {
 }
 
 async function _updateChecklistField(idx, field, value) {
-  const list = _loadChecklist();
+  const list = await _loadChecklistFresh();
   list[idx][field] = value;
   await _saveChecklist(list);
   renderChecklist();
@@ -6936,7 +6978,7 @@ async function _uploadChecklistDoc(idx, prenom, input) {
       throw new Error(err.message || ('HTTP ' + res.status));
     }
 
-    const list = _loadChecklist();
+    const list = await _loadChecklistFresh();
     if (!list[idx].checks) list[idx].checks = {};
     if (!list[idx].checks[prenom]) list[idx].checks[prenom] = {};
     list[idx].checks[prenom].file = {
@@ -6954,7 +6996,7 @@ async function _uploadChecklistDoc(idx, prenom, input) {
 
 async function _removeChecklistDoc(idx, prenom) {
   if (!confirm('Supprimer ce document ?')) return;
-  const list = _loadChecklist();
+  const list = await _loadChecklistFresh();
   const doc = list[idx]?.checks?.[prenom]?.file;
   if (!doc) return;
 
@@ -6973,7 +7015,7 @@ async function _removeChecklistDoc(idx, prenom) {
 }
 
 async function _deleteChecklistItem(idx) {
-  const list = _loadChecklist();
+  const list = await _loadChecklistFresh();
   const label = list[idx]?.label || 'cette démarche';
   if (!confirm(`Supprimer définitivement "${label}" ?`)) return;
   list.splice(idx, 1);
@@ -6982,7 +7024,7 @@ async function _deleteChecklistItem(idx) {
 }
 
 async function _addChecklistItem() {
-  const list = _loadChecklist();
+  const list = await _loadChecklistFresh();
   const numericIds = list.map(i => typeof i.id === 'number' ? i.id : 0);
   const nextId = numericIds.length > 0 ? Math.max(...numericIds) + 1 : 1;
   list.push({ id: nextId, label: '', prenoms: [...PARTICIPANTS], responsable:'', dateLimit: '', nextCheck: '', commentaire: '', checks: {} });
@@ -7062,7 +7104,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols · ${steps.filter(s=>s.type==='activity').length} activités<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.28.4 · 23/07/26
+        Version : v2.30.0 · 23/07/26
       </div>
     </div>
 ${_renderActionLog()}`;
@@ -11481,6 +11523,7 @@ activités de la journée.
       <div>
         <h2 style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--ink);margin:0;">✅ Checklist Road Trip</h2>
         <div style="font-size:11px;color:var(--slate-light);margin-top:2px;">Suivi des démarches par participant</div>
+        <div id="checklist-sync-status" style="font-size:10px;margin-top:3px;font-weight:600;"></div>
       </div>
       <button onclick="_addChecklistItem()" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 16px;border-radius:20px;border:none;background:var(--teal);color:white;cursor:pointer;font-weight:500;">
         + Ajouter une démarche
@@ -12992,8 +13035,23 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.28.4</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correctif — cause exacte du bug "Checklist vide" identifiée grâce au message d'erreur affiché en v2.28.1 : "list.forEach is not a function". La fonction _loadChecklist() ne vérifiait pas que la donnée relue (localStorage ou Supabase) était bien un tableau avant de la renvoyer — une donnée corrompue en amont faisait planter tout affichage de la checklist. Corrigé pour toujours revenir aux démarches par défaut si la donnée n'est pas un tableau valide, avec un avertissement en console. ⚠️ Si votre checklist réapparaît vide/aux valeurs par défaut après ce correctif, c'est le signe que la corruption avait déjà eu lieu côté Supabase avant ce correctif — les cases déjà cochées devront être recochées manuellement, la donnée d'origine n'était pas récupérable automatiquement.</div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.30.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Indicateur de vérification sur la Checklist : à chaque ouverture de l'onglet, un petit texte sous le titre indique si les données locales ont été comparées avec succès à la base ("✓ Vérifié à HH:MM — identique"), si une mise à jour a été récupérée ("🔄 Mis à jour depuis le serveur"), ou si la vérification n'a pas pu avoir lieu faute de réseau ("📴 Hors ligne — non vérifié"). Objectif : rendre visible ce qui se passait déjà silencieusement en arrière-plan (v2.29.0), pour que tu saches en un coup d'œil si ce que tu regardes est confirmé à jour.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.29.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Principe renforcé : la checklist fait toujours confiance à Supabase en priorité avant toute modification, jamais à un cache local d'appareil qui pourrait être périmé. Les 9 actions qui modifient la checklist rechargent désormais la dernière version depuis la base avant d'appliquer le changement.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.28.5</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correctif de fiabilité checklist : la synchro automatique des documents offline (_syncOfflineDocChecklist) tournait après chaque ajout/suppression de document sur une fiche, sur n'importe quel appareil — créant un risque de collision d'écriture avec une modification manuelle de la checklist en cours au même moment (dernière sauvegarde gagne, l'autre est silencieusement perdue). C'est ce qui a fait disparaître un document uploadé sur la démarche ESTA. Réduit à un seul déclenchement, au chargement de l'appli — les nouvelles lignes 📎 apparaissent au prochain rechargement plutôt qu'instantanément, en échange d'un risque de collision bien plus faible.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.28.4</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Correctif — cause exacte du bug "Checklist vide" identifiée grâce au message d'erreur affiché en v2.28.1 : "list.forEach is not a function". La fonction _loadChecklist() ne vérifiait pas que la donnée relue (localStorage ou Supabase) était bien un tableau avant de la renvoyer — une donnée corrompue en amont faisait planter tout affichage de la checklist. Corrigé pour toujours revenir aux démarches par défaut si la donnée n'est pas un tableau valide, avec un avertissement en console.</div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
