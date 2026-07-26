@@ -837,7 +837,7 @@
 
     <!-- Versionning -->
     <div style="margin-top:1.5rem;border-top:1px solid var(--sand-dark);padding-top:.75rem;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.31.0 · 23/07/26</span>
+      <span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-pale);padding:2px 10px;border-radius:10px;">v2.32.0 · 23/07/26</span>
       <button onclick="openAboutModal()" title="À propos de Roadtrip USA" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand-dark);background:white;color:var(--slate-light);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='var(--amber)';this.style.color='white';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='white';this.style.color='var(--slate-light)';this.style.borderColor='var(--sand-dark)'">?</button>
     </div>
     </div>
@@ -2265,13 +2265,18 @@ async function saveFiche(idx, data) {
       }
     }
     const now = new Date().toISOString();
-    await fetch(`${SUPA_URL}/rest/v1/fiches`, {
+    const res = await fetch(`${SUPA_URL}/rest/v1/fiches`, {
       method: 'POST',
       headers: SUPA_HEADERS,
       body: JSON.stringify({ id: storageKey(idx), data, updated_at: now })
     });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     _loadedAt[idx] = now; // Mettre à jour le timestamp local
-  } catch(e) { _log.warn('Supabase hors ligne, données sauvegardées localement : ' + (e.message||e)); }
+    _removePendingSync(storageKey(idx));
+  } catch(e) {
+    _log.warn('Supabase hors ligne, données sauvegardées localement : ' + (e.message||e));
+    _addPendingSync(storageKey(idx));
+  }
 }
 
 function ficheHasData(idx) {
@@ -2445,6 +2450,38 @@ async function loadExtraSteps() {
   });
 }
 
+// ── FILE D'ATTENTE DE SYNCHRO (fiches modifiées hors ligne, pas encore envoyées) ──
+// saveFiche() écrit déjà chaque modification en localStorage immédiatement, avec ou
+// sans réseau. Le vrai risque était qu'au retour en ligne, loadAllFiches() écrase
+// silencieusement cette modification locale par l'ancienne version du serveur avant
+// qu'elle ait pu être envoyée. Cette file mémorise quelles fiches sont concernées.
+function _getPendingSync() {
+  try { return JSON.parse(localStorage.getItem('roadtrip_pending_sync') || '[]'); } catch(e) { return []; }
+}
+function _addPendingSync(key) {
+  const s = new Set(_getPendingSync()); s.add(key);
+  try { localStorage.setItem('roadtrip_pending_sync', JSON.stringify([...s])); } catch(e) {}
+}
+function _removePendingSync(key) {
+  const s = new Set(_getPendingSync()); s.delete(key);
+  try { localStorage.setItem('roadtrip_pending_sync', JSON.stringify([...s])); } catch(e) {}
+}
+
+// Pousse vers Supabase toutes les fiches modifiées hors ligne en attente.
+// Option A (choisie) : on écrase sans détection de conflit — dernier import gagne.
+async function _flushPendingSync() {
+  if (!SUPA_READY || !navigator.onLine) return;
+  const pending = _getPendingSync();
+  if (!pending.length) return;
+  console.log(`🔄 Synchronisation de ${pending.length} fiche(s) modifiée(s) hors ligne...`);
+  for (const key of pending) {
+    const idx = steps.findIndex((s, i) => storageKey(i) === key);
+    if (idx === -1) { _removePendingSync(key); continue; }
+    const data = loadFiche(idx);
+    await saveFiche(idx, data);
+  }
+}
+
 async function loadAllFiches() {
   if (!SUPA_READY) {
     console.log('ℹ️ Supabase non configuré — utilisation du cache local uniquement.');
@@ -2458,6 +2495,7 @@ async function loadAllFiches() {
     const res = await fetch(`${SUPA_URL}/rest/v1/fiches?select=id,data`, { headers: SUPA_HEADERS });
     if (!res.ok) return;
     const rows = await res.json();
+    const pendingKeys = new Set(_getPendingSync());
     rows.forEach(row => {
       const d = parseData(row.data);
 
@@ -2465,7 +2503,11 @@ async function loadAllFiches() {
       // localStorage sous sa clé d'origine, pas seulement flight_main/car_main/remboursements.
       // C'est ce qui garantit qu'une fiche jamais ouverte manuellement est quand même
       // disponible hors ligne — condition nécessaire pour la consultation en avion.
-      try { localStorage.setItem(row.id, JSON.stringify(d)); } catch(e) {}
+      // EXCEPTION : si cette fiche a une modification locale pas encore envoyée
+      // (éditée hors ligne), on ne l'écrase pas ici — _flushPendingSync() s'en charge juste après.
+      if (!pendingKeys.has(row.id)) {
+        try { localStorage.setItem(row.id, JSON.stringify(d)); } catch(e) {}
+      }
 
       // Ne pas injecter les anciennes clés numériques dans _cache[N]
       // car elles décalent les indices depuis l'ajout des fiches activité (v2.13+)
@@ -2481,6 +2523,7 @@ async function loadAllFiches() {
     });
     _setOfflineBanner(false);
     try { localStorage.setItem('roadtrip_last_sync', new Date().toISOString()); } catch(e) {}
+    _flushPendingSync();
     // Rafraîchir la timeline puis appliquer les données sur chaque carte
     renderTimeline();
     renderSidebar();
@@ -7122,7 +7165,7 @@ function _logsRefresh() {
         Supabase : ${SUPA_READY ? '✅ configuré' : '❌ manquant'}<br>
         Étapes : ${steps.filter(s=>s.type==='hotel').length} hôtels · ${steps.filter(s=>s.type==='drive').length} trajets · ${steps.filter(s=>s.type==='flight').length} vols · ${steps.filter(s=>s.type==='activity').length} activités<br>
         Choix à réaliser : ${steps.filter(s=>(s.hotel||'').includes('CHOIX')).length}<br>
-        Version : v2.31.0 · 23/07/26
+        Version : v2.32.0 · 23/07/26
       </div>
     </div>
 ${_renderActionLog()}`;
@@ -11725,6 +11768,16 @@ activités de la journée.
         <div class="admin-status" id="backup-status"></div>
       </div>
 
+      <!-- Modifications de fiches faites hors ligne, en attente d'envoi -->
+      <div class="admin-section">
+        <div class="admin-section-title">📴 Modifications hors ligne</div>
+        <div id="pending-sync-status" style="font-size:12px;color:var(--slate-light);margin-bottom:8px;">Vérification…</div>
+        <div class="admin-actions">
+          <button class="admin-btn primary" onclick="_manualFlushPendingSync()">🔄 Synchroniser maintenant</button>
+        </div>
+      </div>
+
+
       <!-- Historique des sauvegardes -->
       <div class="admin-section">
         <div class="admin-section-title">Historique des sauvegardes</div>
@@ -12412,6 +12465,38 @@ function openAdmin() {
   document.getElementById('nav-admin-btn')?.classList.add('active');
   loadAdminStats();
   loadBackupList();
+  _renderPendingSyncStatus();
+}
+
+function _renderPendingSyncStatus() {
+  const el = document.getElementById('pending-sync-status');
+  if (!el) return;
+  const pending = _getPendingSync();
+  if (!pending.length) {
+    el.textContent = '✓ Aucune modification en attente — tout est synchronisé.';
+    el.style.color = 'var(--green)';
+    return;
+  }
+  const labels = pending.map(key => {
+    const idx = steps.findIndex((s, i) => storageKey(i) === key);
+    const step = idx !== -1 ? steps[idx] : null;
+    return step ? (step.city || step.from || step.hotel || `étape ${idx + 1}`) : key;
+  });
+  el.innerHTML = `⚠️ ${pending.length} fiche(s) modifiée(s) hors ligne, pas encore envoyée(s) au serveur :<br>` +
+    `<span style="font-weight:600;">${labels.join(', ')}</span>` +
+    (navigator.onLine ? '' : '<br><span style="color:var(--amber);">Hors ligne — la synchro se fera automatiquement au retour du réseau, ou via le bouton ci-dessous une fois reconnecté.</span>');
+  el.style.color = 'var(--red)';
+}
+
+async function _manualFlushPendingSync() {
+  if (!navigator.onLine) {
+    alert('Pas de réseau détecté — la synchronisation se fera automatiquement dès que la connexion reviendra.');
+    return;
+  }
+  const el = document.getElementById('pending-sync-status');
+  if (el) { el.textContent = '🔄 Synchronisation en cours…'; el.style.color = 'var(--teal)'; }
+  await _flushPendingSync();
+  _renderPendingSyncStatus();
 }
 function closeAdmin() {
   document.getElementById('admin-overlay').style.display = 'none';
@@ -13053,8 +13138,13 @@ setInterval(()=>{ if(SUPA_READY && document.getElementById('app').style.display!
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:4px;">
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:var(--amber-pale);border:.5px solid var(--amber);">
-        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.31.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
-        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Checklist : possibilité de réintégrer une personne retirée par erreur d'une démarche. En dépliant une démarche, un bandeau "+ Réintégrer" apparaît si un des 4 prénoms n'y figure plus, avec un bouton par personne manquante. Amélioration associée : le retrait d'un participant ne supprime plus son historique (coche, date, document, commentaire) — seulement la ligne côté suivi. Le réintégrer restaure donc tout tel quel, plutôt que de repartir de zéro.</div>
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--amber);">v2.32.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Modification des fiches (hôtel/activité/trajet) hors ligne — point 4 du plan initial. Choix retenu : option A, pas de détection de conflit, dernière synchro gagne. saveFiche() enregistrait déjà chaque modification en local même sans réseau, mais rien n'empêchait le prochain chargement d'écraser silencieusement cette modification par l'ancienne version du serveur avant qu'elle soit envoyée — c'est ce point précis qui est corrigé : une fiche modifiée hors ligne n'est plus jamais écrasée, et elle est automatiquement renvoyée au serveur dès que le réseau revient. Nouveau panneau "📴 Modifications hors ligne" dans Administration : liste les fiches en attente d'envoi, avec un bouton pour forcer la synchro manuellement. Pas de nouvelle page séparée nécessaire — l'édition hors ligne se fait directement dans l'appli, comme la consultation.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
+        <div style="flex-shrink:0;text-align:right;min-width:52px;"><div style="font-size:12px;font-weight:700;color:var(--ink-light);">v2.31.0</div><div style="font-size:10px;color:var(--slate-light);">23/07/26</div></div>
+        <div style="font-size:11px;color:var(--ink-light);line-height:1.45;">Checklist : possibilité de réintégrer une personne retirée par erreur d'une démarche, avec conservation de son historique de suivi.</div>
       </div>
 
       <div style="display:flex;gap:10px;align-items:flex-start;padding:.55rem .65rem;border-radius:8px;background:white;border:.5px solid var(--sand-dark);">
