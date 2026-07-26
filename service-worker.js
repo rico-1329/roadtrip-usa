@@ -4,7 +4,7 @@
 // et loadFiche()/saveFiche() dans index.html qui ont leur propre cache localStorage.
 // Séparer les deux évite les conflits entre deux mécanismes de cache différents.
 
-const CACHE_NAME = 'roadtrip-usa-shell-v2.30.0';
+const CACHE_NAME = 'roadtrip-usa-shell-v2.31.0';
 const APP_SHELL = [
   './',
   './index.html'
